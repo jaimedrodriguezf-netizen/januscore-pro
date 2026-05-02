@@ -1,0 +1,64 @@
+---
+import { siteData } from '../data/siteData';
+import MobileNav from './react/MobileNav';
+---
+
+<header id="main-nav" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 h-20 flex items-center">
+  <div class="container mx-auto px-6 flex items-center justify-between">
+    <a href="#inicio" class="text-2xl font-bold tracking-tighter flex items-center gap-2 group">
+      <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-bg transform group-hover:rotate-12 transition-transform duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-bg"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+      </div>
+      <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-sans">
+        {siteData.name}
+      </span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-10">
+      {siteData.navLinks.map((link) => (
+        <a 
+          href={link.href} 
+          class="text-sm font-medium text-text-secondary hover:text-primary transition-colors duration-200 relative group py-2"
+        >
+          {link.label}
+          <span class="absolute bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      ))}
+      <a 
+        href="#contacto" 
+        class="px-6 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 text-primary rounded-full text-sm font-bold hover:from-primary hover:to-secondary hover:text-bg transition-all duration-500 shadow-lg shadow-primary/5 hover:shadow-primary/20"
+      >
+        Hablemos
+      </a>
+    </nav>
+
+    {/* Mobile Navigation (React island) - Absolute positioning for precise alignment and no-displacement */}
+    <div class="md:hidden absolute right-6 inset-y-0 flex items-center">
+      <MobileNav 
+        client:load 
+        links={siteData.navLinks} 
+        email={siteData.contactEmail}
+        phone={siteData.contactPhone}
+        socialLinks={siteData.socialLinks}
+      />
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById('main-nav');
+  
+  const handleScroll = () => {
+    if (window.scrollY > 80) {
+      header?.classList.add('bg-bg/80', 'backdrop-blur-xl', 'border-b', 'border-white/5', 'h-16');
+      header?.classList.remove('h-20');
+    } else {
+      header?.classList.remove('bg-bg/80', 'backdrop-blur-xl', 'border-b', 'border-white/5', 'h-16');
+      header?.classList.add('h-20');
+    }
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  // Initial check in case of refresh
+  handleScroll();
+</script>

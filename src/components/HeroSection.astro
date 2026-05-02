@@ -1,0 +1,53 @@
+---
+import HeroAnimation from './react/HeroAnimation';
+import { siteData } from '../data/siteData';
+---
+
+<section id="inicio" class="relative min-h-screen flex items-center overflow-hidden">
+  {/* Canvas animation background */}
+  <HeroAnimation client:load />
+
+  {/* Hero content */}
+  <div class="relative z-10 w-full max-w-7xl mx-auto px-6 py-24 md:py-32">
+    <div class="max-w-4xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-8 animate-pulse">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+        </span>
+        Nueva era industrial
+      </div>
+      
+      <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-text leading-[1.1] mb-8 tracking-tight">
+        {siteData.tagline}
+        <span class="block bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mt-2">
+          Conectamos tus activos con el futuro
+        </span>
+      </h1>
+      
+      <p class="text-xl sm:text-2xl text-text-secondary max-w-3xl mb-12 leading-relaxed font-light">
+        {siteData.description}
+      </p>
+      
+      <div class="flex flex-col sm:flex-row gap-6">
+        <a
+          href="#contacto"
+          class="group relative inline-flex items-center justify-center px-10 py-5 bg-primary text-bg font-bold rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(0,212,255,0.4)]"
+        >
+          <span class="relative z-10">Empezá tu proyecto</span>
+          <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+        </a>
+        <a
+          href="#servicios"
+          class="inline-flex items-center justify-center px-10 py-5 border-2 border-primary/20 text-text font-bold rounded-2xl
+            hover:border-primary hover:text-primary transition-all duration-300 backdrop-blur-sm"
+        >
+          Explorá servicios
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {/* Decorative bottom fade to transition to next section */}
+  <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-bg to-transparent z-10"></div>
+</section>

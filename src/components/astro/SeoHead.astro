@@ -34,7 +34,7 @@ const ogUrlFull = ogImage.startsWith('http') ? ogImage : `${siteData.url}${ogIma
 <meta property="og:image" content={ogUrlFull} />
 <meta property="og:url" content={ogUrl} />
 <meta property="og:site_name" content={siteData.name} />
-<meta property="og:locale" content="es_AR" />
+<meta property="og:locale" content="es_EC" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
@@ -51,6 +51,17 @@ const ogUrlFull = ogImage.startsWith('http') ? ogImage : `${siteData.url}${ogIma
   "logo": `${siteData.url}/favicon.svg`,
   "description": siteData.description,
   "sameAs": siteData.socialLinks.map((l) => l.href),
+  "contactPoint": {
+  "@type": "ContactPoint",
+  "email": siteData.contactEmail,
+  "contactType": "customer service",
+  "areaServed": "EC",
+  "availableLanguage": "Spanish"
+  },  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Quito",
+    "addressCountry": "EC"
+  }
 })} />
 
 <!-- JSON-LD: Product schemas per business unit -->

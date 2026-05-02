@@ -1,0 +1,28 @@
+---
+import BusinessUnitCard from './react/BusinessUnitCard';
+import { businessUnits } from '../data/businessUnits';
+import ScrollReveal from './react/ScrollReveal';
+---
+
+<section id="servicios" class="py-24 md:py-32 bg-surface/10 border-b border-white/5">
+  <div class="container mx-auto px-6">
+    <div class="max-w-6xl mx-auto">
+      <ScrollReveal client:visible>
+        <div class="text-center mb-20">
+          <h2 class="text-4xl md:text-5xl font-bold text-text mb-6">
+            Lo que hacemos
+          </h2>
+          <p class="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed font-light">
+            Tres áreas de expertise que cubren todo el espectro tecnológico industrial: del sensor al software inteligente.
+          </p>
+        </div>
+      </ScrollReveal>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        {businessUnits.map((unit, index) => (
+          <BusinessUnitCard client:visible key={unit.id} unit={unit} index={index} />
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

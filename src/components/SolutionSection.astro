@@ -1,0 +1,70 @@
+---
+import ScrollReveal from './react/ScrollReveal';
+---
+
+<section id="solucion" class="py-24 md:py-32 bg-surface/20 border-y border-white/5 relative">
+  <div class="container mx-auto px-6">
+    <div class="max-w-6xl mx-auto text-center">
+      <ScrollReveal client:visible>
+        <h2 class="text-4xl md:text-5xl font-bold text-text mb-6">
+          El puente que estabas esperando
+        </h2>
+        <p class="text-xl text-text-secondary max-w-3xl mx-auto mb-20 leading-relaxed font-light">
+          Janus Core es la conexión definitiva entre tus activos físicos y la inteligencia digital. 
+          No vendemos componentes sueltos — construimos el ecosistema completo: 
+          desde el sensor que percibe hasta el dashboard que te muestra lo que importa.
+        </p>
+      </ScrollReveal>
+
+      <div class="grid md:grid-cols-3 gap-8 md:gap-12">
+        {/* Step 1: Percibimos */}
+        <ScrollReveal client:visible delay={0.1}>
+          <div class="group p-8 rounded-3xl bg-surface border border-white/5 hover:border-primary/30 transition-all duration-500 hover:-translate-y-2">
+            <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8 text-primary">
+                <path d="M12 2a10 10 0 1010 10" stroke-linecap="round" />
+                <path d="M12 6a6 6 0 106 6" stroke-linecap="round" />
+                <circle cx="12" cy="12" r="2" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-text mb-4">Percibimos</h3>
+            <p class="text-text-secondary leading-relaxed">
+              Sensores, cámaras y dispositivos IoT de grado industrial capturan cada señal vital de tu operación en tiempo real.
+            </p>
+          </div>
+        </ScrollReveal>
+
+        {/* Step 2: Procesamos */}
+        <ScrollReveal client:visible delay={0.2}>
+          <div class="group p-8 rounded-3xl bg-surface border border-white/5 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-2">
+            <div class="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8 text-secondary">
+                <path d="M12 3a4 4 0 00-4 4c0 1.5.5 2.5 1.5 3.5L8 16h8l-1.5-5.5C15.5 9.5 16 8.5 16 7a4 4 0 00-4-4z" />
+                <path d="M9 16v3a2 2 0 002 2h2a2 2 0 002-2v-3" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-text mb-4">Procesamos</h3>
+            <p class="text-text-secondary leading-relaxed">
+              Modelos de IA locales analizan, predicen y deciden en el borde (Edge Computing) sin depender de la nube.
+            </p>
+          </div>
+        </ScrollReveal>
+
+        {/* Step 3: Actuamos */}
+        <ScrollReveal client:visible delay={0.3}>
+          <div class="group p-8 rounded-3xl bg-surface border border-white/5 hover:border-accent/30 transition-all duration-500 hover:-translate-y-2">
+            <div class="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8 text-accent">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-text mb-4">Actuamos</h3>
+            <p class="text-text-secondary leading-relaxed">
+              Dashboards de alta fidelidad, alertas inteligentes y automatizaciones directas que cierran el círculo de valor.
+            </p>
+          </div>
+        </ScrollReveal>
+      </div>
+    </div>
+  </div>
+</section>

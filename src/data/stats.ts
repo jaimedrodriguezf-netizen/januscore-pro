@@ -9,7 +9,7 @@ export const stats: Stat[] = [
   },
   {
     id: 'clientes',
-    value: 12,
+    value: 100,
     suffix: '+',
     label: 'Clientes activos',
   },

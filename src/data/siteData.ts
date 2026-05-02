@@ -40,5 +40,7 @@ export const siteData: SiteConfig = {
     { label: 'Casos de Uso', href: '#casos' },
     { label: 'Contacto', href: '#contacto' },
   ],
+  contactEmail: 'jaimedrodriguezf@gmail.com',
+  contactPhone: '+593 98 314 4424',
   socialLinks,
 };

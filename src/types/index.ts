@@ -13,6 +13,8 @@ export interface SiteConfig {
   navLinks: NavLink[];
   footerLinks: NavLink[];
   socialLinks: SocialLink[];
+  contactEmail: string;
+  contactPhone: string;
 }
 
 export interface SocialLink {

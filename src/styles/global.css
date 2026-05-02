@@ -30,11 +30,13 @@
     color: var(--color-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   body {
     min-height: 100dvh;
     font-family: var(--font-sans);
+    overflow-x: hidden;
   }
 
   ::selection {
