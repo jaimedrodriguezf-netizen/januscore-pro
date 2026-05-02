@@ -57,7 +57,7 @@ npx playwright test
 El despliegue se realiza de forma quirúrgica vía SSH/Rsync para garantizar que los archivos se actualicen sin interrumpir el servicio:
 ```bash
 # Ejemplo de despliegue a producción
-rsync -avz --progress -e 'ssh -p 65002' dist/ u615423061@109.106.250.178:domains/januscore.pro/public_html/
+rsync -avz --progress -e 'ssh -p <PORT>' dist/ <USER>@<HOST>:<PATH>
 ```
 
 ---
