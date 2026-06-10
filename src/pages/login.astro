@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { db } from '../db/db';
+import { users } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import bcrypt from 'bcryptjs';
+import { createSession } from '../lib/auth';
+
+let errorMsg = '';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const formData = await Astro.request.formData();
+    const email = formData.get('email')?.toString().trim();
+    const password = formData.get('password')?.toString();
+
+    if (!email || !password) {
+      errorMsg = 'Todos los campos son obligatorios.';
+    } else {
+      const existingUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+
+      if (existingUser.length === 0) {
+        errorMsg = 'Credenciales incorrectas.';
+      } else {
+        const user = existingUser[0];
+        const isPasswordValid = await bcrypt.compare(
+          password,
+          user.passwordHash,
+        );
+
+        if (!isPasswordValid) {
+          errorMsg = 'Credenciales incorrectas.';
+        } else {
+          await createSession(user.id, Astro.cookies);
+          return Astro.redirect('/dashboard');
+        }
+      }
+    }
+  } catch (err) {
+    errorMsg = 'Ocurrió un error inesperado. Intente nuevamente.';
+    console.error(err);
+  }
+}
+---
+
+<BaseLayout title="Iniciar Sesión | Janus Core">
+  <main
+    class="min-h-screen flex items-center justify-center bg-bg px-4 relative overflow-hidden"
+    id="main-content"
+  >
+    <!-- Background gradients -->
+    <div
+      class="absolute w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[120px] top-1/4 left-1/4 -z-10"
+    >
+    </div>
+    <div
+      class="absolute w-[300px] h-[300px] rounded-full bg-primary/10 blur-[100px] bottom-1/4 right-1/4 -z-10"
+    >
+    </div>
+
+    <div
+      class="w-full max-w-md bg-surface/40 backdrop-blur-md border border-text-secondary/10 p-8 rounded-2xl shadow-2xl"
+    >
+      <div class="text-center mb-8">
+        <a href="/" class="inline-block mb-4">
+          <span class="text-2xl font-bold tracking-wider text-primary"
+            >🌌 JANUS<span class="text-text">CORE</span></span
+          >
+        </a>
+        <h1 class="text-xl font-semibold text-text">Iniciar Sesión</h1>
+        <p class="text-sm text-text-secondary mt-1">
+          Ingresa tus credenciales para acceder al panel
+        </p>
+      </div>
+
+      {
+        errorMsg && (
+          <div class="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm mb-6 flex items-center gap-2">
+            <span>⚠️</span>
+            <p>{errorMsg}</p>
+          </div>
+        )
+      }
+
+      <form method="POST" class="space-y-4">
+        <div>
+          <label
+            for="email"
+            class="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1"
+            >Correo Electrónico</label
+          >
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="w-full bg-bg/60 border border-text-secondary/20 rounded-lg px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors text-sm"
+            placeholder="usuario@januscore.com"
+          />
+        </div>
+
+        <div>
+          <label
+            for="password"
+            class="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1"
+            >Contraseña</label
+          >
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            class="w-full bg-bg/60 border border-text-secondary/20 rounded-lg px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors text-sm"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-primary hover:bg-primary/95 text-bg font-bold py-3 px-4 rounded-lg transition-all shadow-[0_0_15px_rgba(0,212,255,0.25)] hover:shadow-[0_0_20px_rgba(0,212,255,0.4)] hover:-translate-y-0.5 cursor-pointer text-sm"
+        >
+          Entrar al Panel
+        </button>
+      </form>
+
+      <div class="mt-6 text-center text-xs text-text-secondary">
+        ¿No tienes una cuenta? <a
+          href="/register"
+          class="text-primary hover:underline font-semibold"
+          >Regístrate gratis aquí</a
+        >
+      </div>
+    </div>
+  </main>
+</BaseLayout>

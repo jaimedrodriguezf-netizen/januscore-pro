@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { db } from '../db/db';
+import { users } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import bcrypt from 'bcryptjs';
+import { createSession } from '../lib/auth';
+
+let errorMsg = '';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const formData = await Astro.request.formData();
+    const name = formData.get('name')?.toString().trim();
+    const email = formData.get('email')?.toString().trim();
+    const password = formData.get('password')?.toString();
+
+    if (!email || !password || !name) {
+      errorMsg = 'Todos los campos son obligatorios.';
+    } else if (password.length < 6) {
+      errorMsg = 'La contraseña debe tener al menos 6 caracteres.';
+    } else {
+      // Check if user already exists
+      const existingUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+
+      if (existingUser.length > 0) {
+        errorMsg = 'El correo electrónico ya está registrado.';
+      } else {
+        const userId = crypto.randomUUID();
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        await db.insert(users).values({
+          id: userId,
+          email,
+          passwordHash,
+          name,
+          role: 'user',
+        });
+
+        // Auto-login after registration
+        await createSession(userId, Astro.cookies);
+        return Astro.redirect('/dashboard');
+      }
+    }
+  } catch (err) {
+    errorMsg = 'Ocurrió un error inesperado. Intente nuevamente.';
+    console.error(err);
+  }
+}
+---
+
+<BaseLayout title="Registro | Janus Core">
+  <main
+    class="min-h-screen flex items-center justify-center bg-bg px-4 relative overflow-hidden"
+    id="main-content"
+  >
+    <!-- Background gradients -->
+    <div
+      class="absolute w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[120px] top-1/4 left-1/4 -z-10"
+    >
+    </div>
+    <div
+      class="absolute w-[300px] h-[300px] rounded-full bg-primary/10 blur-[100px] bottom-1/4 right-1/4 -z-10"
+    >
+    </div>
+
+    <div
+      class="w-full max-w-md bg-surface/40 backdrop-blur-md border border-text-secondary/10 p-8 rounded-2xl shadow-2xl"
+    >
+      <div class="text-center mb-8">
+        <a href="/" class="inline-block mb-4">
+          <span class="text-2xl font-bold tracking-wider text-primary"
+            >🌌 JANUS<span class="text-text">CORE</span></span
+          >
+        </a>
+        <h1 class="text-xl font-semibold text-text">Crear una cuenta</h1>
+        <p class="text-sm text-text-secondary mt-1">
+          Registra tus credenciales para acceder al panel
+        </p>
+      </div>
+
+      {
+        errorMsg && (
+          <div class="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm mb-6 flex items-center gap-2">
+            <span>⚠️</span>
+            <p>{errorMsg}</p>
+          </div>
+        )
+      }
+
+      <form method="POST" class="space-y-4">
+        <div>
+          <label
+            for="name"
+            class="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1"
+            >Nombre Completo</label
+          >
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            class="w-full bg-bg/60 border border-text-secondary/20 rounded-lg px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors text-sm"
+            placeholder="Juan Pérez"
+          />
+        </div>
+
+        <div>
+          <label
+            for="email"
+            class="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1"
+            >Correo Electrónico</label
+          >
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="w-full bg-bg/60 border border-text-secondary/20 rounded-lg px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors text-sm"
+            placeholder="usuario@januscore.com"
+          />
+        </div>
+
+        <div>
+          <label
+            for="password"
+            class="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1"
+            >Contraseña</label
+          >
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            minlength="6"
+            class="w-full bg-bg/60 border border-text-secondary/20 rounded-lg px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors text-sm"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-primary hover:bg-primary/95 text-bg font-bold py-3 px-4 rounded-lg transition-all shadow-[0_0_15px_rgba(0,212,255,0.25)] hover:shadow-[0_0_20px_rgba(0,212,255,0.4)] hover:-translate-y-0.5 cursor-pointer text-sm"
+        >
+          Registrarse
+        </button>
+      </form>
+
+      <div class="mt-6 text-center text-xs text-text-secondary">
+        ¿Ya tienes una cuenta? <a
+          href="/login"
+          class="text-primary hover:underline font-semibold"
+          >Inicia sesión aquí</a
+        >
+      </div>
+    </div>
+  </main>
+</BaseLayout>

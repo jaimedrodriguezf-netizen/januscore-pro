@@ -1,0 +1,264 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { destroySession, SESSION_COOKIE_NAME } from '../../lib/auth';
+
+const user = Astro.locals.user;
+
+if (Astro.request.method === 'POST') {
+  const token = Astro.cookies.get(SESSION_COOKIE_NAME)?.value;
+  if (token) {
+    await destroySession(token, Astro.cookies);
+  }
+  return Astro.redirect('/login');
+}
+
+// Simulated IoT metrics for the Janus Core panel
+const assets = [
+  {
+    id: 'TX-401',
+    name: 'Turbina Hidráulica Principal',
+    status: 'optimal',
+    health: 98,
+    lastTelemetry: 'Hace 2s',
+  },
+  {
+    id: 'MT-088',
+    name: 'Motor Compresor de Inducción',
+    status: 'optimal',
+    health: 92,
+    lastTelemetry: 'Hace 5s',
+  },
+  {
+    id: 'CV-102',
+    name: 'Cinta Transportadora Principal',
+    status: 'warning',
+    health: 76,
+    lastTelemetry: 'Hace 10s',
+  },
+  {
+    id: 'PL-305',
+    name: 'Bomba de Refrigeración Secundaria',
+    status: 'danger',
+    health: 48,
+    lastTelemetry: 'Justo ahora',
+  },
+];
+
+const stats = [
+  {
+    label: 'Dispositivos Activos',
+    value: '42 / 45',
+    change: '+2 hoy',
+    color: 'primary',
+  },
+  {
+    label: 'Eficiencia Operacional',
+    value: '91.8%',
+    change: '+0.5% esta sem.',
+    color: 'accent',
+  },
+  {
+    label: 'Alertas Activas',
+    value: '2 críticas',
+    change: '-3 resueltas',
+    color: 'secondary',
+  },
+];
+---
+
+<BaseLayout title="Panel de Control | Janus Core">
+  <div class="min-h-screen bg-bg flex flex-col md:flex-row" id="main-content">
+    <!-- Sidebar Navigation -->
+    <aside
+      class="w-full md:w-64 bg-surface border-b md:border-b-0 md:border-r border-text-secondary/10 p-6 flex flex-col justify-between"
+    >
+      <div>
+        <div class="mb-8">
+          <span class="text-xl font-bold tracking-wider text-primary"
+            >🌌 JANUS<span class="text-text">CORE</span></span
+          >
+          <p
+            class="text-[10px] text-text-secondary uppercase tracking-widest mt-1"
+          >
+            Command Center
+          </p>
+        </div>
+
+        <nav class="space-y-1">
+          <a
+            href="/dashboard"
+            class="flex items-center gap-3 px-4 py-2.5 bg-primary/10 text-primary rounded-lg font-medium text-sm transition-colors"
+          >
+            <span>📊</span> Dashboard
+          </a>
+          <a
+            href="#"
+            class="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-text hover:bg-surface/50 rounded-lg text-sm transition-colors"
+          >
+            <span>⚙️</span> Activos IoT
+          </a>
+          <a
+            href="#"
+            class="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-text hover:bg-surface/50 rounded-lg text-sm transition-colors"
+          >
+            <span>🔔</span> Alertas
+          </a>
+        </nav>
+      </div>
+
+      <div class="mt-8 pt-6 border-t border-text-secondary/10 space-y-4">
+        <div>
+          <p class="text-xs text-text-secondary">Usuario activo</p>
+          <p class="text-sm font-semibold text-text truncate">
+            {user?.name || user?.email}
+          </p>
+          <span
+            class="inline-block bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded font-mono mt-1 uppercase"
+          >
+            {user?.role}
+          </span>
+        </div>
+
+        <form method="POST">
+          <button
+            type="submit"
+            class="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-xs font-semibold py-2 px-4 rounded-lg transition-colors cursor-pointer"
+          >
+            <span>🔌</span> Cerrar Sesión
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 md:p-10 space-y-8 overflow-y-auto">
+      <!-- Top Bar -->
+      <header
+        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+      >
+        <div>
+          <h1 class="text-2xl font-bold text-text">Dashboard Operativo</h1>
+          <p class="text-sm text-text-secondary">
+            Monitoreo de telemetría e inteligencia predictiva en tiempo real
+          </p>
+        </div>
+        <div
+          class="flex items-center gap-2 bg-surface border border-text-secondary/10 px-4 py-2 rounded-lg text-xs"
+        >
+          <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+          <span class="text-text-secondary">Servidor principal online</span>
+        </div>
+      </header>
+
+      <!-- Stats Grid -->
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {
+          stats.map((stat) => (
+            <div class="bg-surface border border-text-secondary/10 p-6 rounded-xl relative overflow-hidden group hover:border-text-secondary/20 transition-all">
+              <p class="text-xs text-text-secondary font-semibold uppercase tracking-wider">
+                {stat.label}
+              </p>
+              <p class="text-3xl font-bold text-text mt-2">{stat.value}</p>
+              <p class="text-xs text-text-secondary mt-1">{stat.change}</p>
+              <div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+            </div>
+          ))
+        }
+      </section>
+
+      <!-- Table: IoT Assets -->
+      <section
+        class="bg-surface border border-text-secondary/10 rounded-xl overflow-hidden"
+      >
+        <div
+          class="px-6 py-4 border-b border-text-secondary/10 flex justify-between items-center"
+        >
+          <h2 class="font-bold text-text text-sm uppercase tracking-wider">
+            Estado de Activos Industriales
+          </h2>
+          <button
+            class="text-xs text-primary hover:underline font-semibold cursor-pointer"
+            >Ver todos</button
+          >
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr
+                class="border-b border-text-secondary/10 bg-bg/40 text-xs text-text-secondary uppercase"
+              >
+                <th class="py-3 px-6">ID Activo</th>
+                <th class="py-3 px-6">Nombre de Activo</th>
+                <th class="py-3 px-6">Salud</th>
+                <th class="py-3 px-6">Estado</th>
+                <th class="py-3 px-6">Última Conexión</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-text-secondary/5">
+              {
+                assets.map((asset) => (
+                  <tr class="hover:bg-bg/25 transition-colors">
+                    <td class="py-4 px-6 font-mono font-semibold text-primary">
+                      {asset.id}
+                    </td>
+                    <td class="py-4 px-6 text-text font-medium">
+                      {asset.name}
+                    </td>
+                    <td class="py-4 px-6">
+                      <div class="flex items-center gap-2">
+                        <div class="w-24 bg-bg rounded-full h-1.5 overflow-hidden">
+                          <div
+                            class={`h-1.5 rounded-full ${
+                              asset.health > 90
+                                ? 'bg-accent'
+                                : asset.health > 70
+                                  ? 'bg-yellow-400'
+                                  : 'bg-red-500'
+                            }`}
+                            style={{ width: `${asset.health}%` }}
+                          />
+                        </div>
+                        <span class="text-xs font-semibold">
+                          {asset.health}%
+                        </span>
+                      </div>
+                    </td>
+                    <td class="py-4 px-6">
+                      <span
+                        class={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wider ${
+                          asset.status === 'optimal'
+                            ? 'bg-accent/10 text-accent'
+                            : asset.status === 'warning'
+                              ? 'bg-yellow-400/10 text-yellow-400'
+                              : 'bg-red-500/10 text-red-500'
+                        }`}
+                      >
+                        <span
+                          class={`w-1.5 h-1.5 rounded-full ${
+                            asset.status === 'optimal'
+                              ? 'bg-accent'
+                              : asset.status === 'warning'
+                                ? 'bg-yellow-400'
+                                : 'bg-red-500'
+                          }`}
+                        />
+                        {asset.status === 'optimal'
+                          ? 'Óptimo'
+                          : asset.status === 'warning'
+                            ? 'Advertencia'
+                            : 'Peligro'}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6 text-text-secondary text-xs">
+                      {asset.lastTelemetry}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</BaseLayout>

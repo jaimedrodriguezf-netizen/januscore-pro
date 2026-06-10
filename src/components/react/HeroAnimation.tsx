@@ -34,7 +34,7 @@ export default function HeroAnimation() {
 
     // Check for reduced motion
     const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
+      '(prefers-reduced-motion: reduce)',
     ).matches;
 
     if (prefersReducedMotion) {
@@ -53,7 +53,7 @@ export default function HeroAnimation() {
 
     // ─── Canvas sizing ────────────────────────────────────────────
     function resize() {
-      const rect = container.getBoundingClientRect();
+      const rect = container!.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
       canvas!.width = w * dpr;
@@ -207,7 +207,12 @@ export default function HeroAnimation() {
           const alpha = lineAlpha * wave * progress;
 
           // Gradient from violet to cyan
-          const grad = ctx!.createLinearGradient(node.x, node.y, target.x, target.y);
+          const grad = ctx!.createLinearGradient(
+            node.x,
+            node.y,
+            target.x,
+            target.y,
+          );
           grad.addColorStop(0, COLORS.violet);
           grad.addColorStop(0.5, COLORS.cyan);
           grad.addColorStop(1, COLORS.violet);
@@ -236,8 +241,12 @@ export default function HeroAnimation() {
 
         // Glow
         const glow = ctx!.createRadialGradient(
-          node.x, node.y, 0,
-          node.x, node.y, radius * 3
+          node.x,
+          node.y,
+          0,
+          node.x,
+          node.y,
+          radius * 3,
         );
         glow.addColorStop(0, COLORS.violet);
         glow.addColorStop(1, 'transparent');
@@ -261,9 +270,9 @@ export default function HeroAnimation() {
     // ─── Animation loop ─────────────────────────────────────────
     let gridPoints = generateGrid();
     let nodes = generateNodes();
-    let animationPhase = 0; // 0-3
-    let phaseProgress = 0;
-    let startTime = performance.now();
+    const animationPhase = 0; // 0-3
+    const phaseProgress = 0;
+    const startTime = performance.now();
 
     // Re-generate on resize
     const debounceResize = () => {
@@ -340,10 +349,7 @@ export default function HeroAnimation() {
       className="absolute inset-0 w-full h-full overflow-hidden"
       aria-hidden="true"
     >
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
       {/* Static SVG fallback for prefers-reduced-motion */}
       <svg
@@ -434,7 +440,13 @@ export default function HeroAnimation() {
         </g>
 
         {/* Center glow */}
-        <circle cx="400" cy="300" r="150" fill="url(#centerGlow)" opacity="0.3" />
+        <circle
+          cx="400"
+          cy="300"
+          r="150"
+          fill="url(#centerGlow)"
+          opacity="0.3"
+        />
 
         <defs>
           <radialGradient id="centerGlow">

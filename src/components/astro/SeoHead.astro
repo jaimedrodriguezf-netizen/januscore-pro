@@ -17,7 +17,9 @@ const {
 } = Astro.props;
 
 const ogUrl = canonicalUrl;
-const ogUrlFull = ogImage.startsWith('http') ? ogImage : `${siteData.url}${ogImage}`;
+const ogUrlFull = ogImage.startsWith('http')
+  ? ogImage
+  : `${siteData.url}${ogImage}`;
 ---
 
 <meta charset="utf-8" />
@@ -43,38 +45,45 @@ const ogUrlFull = ogImage.startsWith('http') ? ogImage : `${siteData.url}${ogIma
 <meta name="twitter:image" content={ogUrlFull} />
 
 <!-- JSON-LD: Organization -->
-<script type="application/ld+json" set:html={JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": siteData.name,
-  "url": siteData.url,
-  "logo": `${siteData.url}/favicon.svg`,
-  "description": siteData.description,
-  "sameAs": siteData.socialLinks.map((l) => l.href),
-  "contactPoint": {
-  "@type": "ContactPoint",
-  "email": siteData.contactEmail,
-  "contactType": "customer service",
-  "areaServed": "EC",
-  "availableLanguage": "Spanish"
-  },  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Quito",
-    "addressCountry": "EC"
-  }
-})} />
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: siteData.name,
+    url: siteData.url,
+    logo: `${siteData.url}/favicon.svg`,
+    description: siteData.description,
+    sameAs: siteData.socialLinks.map((l) => l.href),
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: siteData.contactEmail,
+      contactType: 'customer service',
+      areaServed: 'EC',
+      availableLanguage: 'Spanish',
+    },
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Quito',
+      addressCountry: 'EC',
+    },
+  })}
+/>
 
 <!-- JSON-LD: Product schemas per business unit -->
-<script type="application/ld+json" set:html={JSON.stringify(
-  businessUnits.map((unit) => ({
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": unit.title,
-    "description": unit.description,
-    "category": unit.shortTitle,
-    "offers": {
-      "@type": "Offer",
-      "availability": "https://schema.org/InStock",
-    },
-  })),
-)} />
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(
+    businessUnits.map((unit) => ({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: unit.title,
+      description: unit.description,
+      category: unit.shortTitle,
+      offers: {
+        '@type': 'Offer',
+        availability: 'https://schema.org/InStock',
+      },
+    })),
+  )}
+/>

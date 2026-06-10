@@ -6,17 +6,22 @@ interface TestimonialCarouselProps {
   cases: UseCase[];
 }
 
-export default function TestimonialCarousel({ cases }: TestimonialCarouselProps) {
+export default function TestimonialCarousel({
+  cases,
+}: TestimonialCarouselProps) {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const prefersReducedMotion = useReducedMotion();
 
   const total = cases.length;
 
-  const goTo = useCallback((index: number) => {
-    setCurrent(((index % total) + total) % total);
-  }, [total]);
+  const goTo = useCallback(
+    (index: number) => {
+      setCurrent(((index % total) + total) % total);
+    },
+    [total],
+  );
 
   const goNext = useCallback(() => goTo(current + 1), [current, goTo]);
   const goPrev = useCallback(() => goTo(current - 1), [current, goTo]);
@@ -40,7 +45,9 @@ export default function TestimonialCarousel({ cases }: TestimonialCarouselProps)
       <AnimatePresence mode="wait">
         <motion.div
           key={currentCase.id}
-          initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, x: 40 }}
+          initial={
+            prefersReducedMotion ? { opacity: 1 } : { opacity: 0, x: 40 }
+          }
           animate={{ opacity: 1, x: 0 }}
           exit={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, x: -40 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
@@ -63,10 +70,18 @@ export default function TestimonialCarousel({ cases }: TestimonialCarouselProps)
 
           {/* Result metric */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent/10 border border-accent/20">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-accent flex-shrink-0">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="w-5 h-5 text-accent flex-shrink-0"
+            >
               <polyline points="20 6 9 17 4 12" />
             </svg>
-            <span className="text-accent font-semibold text-sm">{currentCase.result}</span>
+            <span className="text-accent font-semibold text-sm">
+              {currentCase.result}
+            </span>
           </div>
         </motion.div>
       </AnimatePresence>
@@ -96,7 +111,13 @@ export default function TestimonialCarousel({ cases }: TestimonialCarouselProps)
             className="p-2 rounded-lg bg-surface border border-text-secondary/20 text-text-secondary hover:text-primary hover:border-primary/50 transition-colors"
             aria-label="Caso anterior"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="w-5 h-5"
+            >
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
@@ -105,7 +126,13 @@ export default function TestimonialCarousel({ cases }: TestimonialCarouselProps)
             className="p-2 rounded-lg bg-surface border border-text-secondary/20 text-text-secondary hover:text-primary hover:border-primary/50 transition-colors"
             aria-label="Caso siguiente"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="w-5 h-5"
+            >
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>

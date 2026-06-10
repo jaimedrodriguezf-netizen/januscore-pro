@@ -10,7 +10,12 @@ interface MobileNavProps {
   socialLinks: SocialLink[];
 }
 
-export default function MobileNav({ links, email, phone, socialLinks }: MobileNavProps) {
+export default function MobileNav({
+  links,
+  email,
+  phone,
+  socialLinks,
+}: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -45,7 +50,7 @@ export default function MobileNav({ links, email, phone, socialLinks }: MobileNa
     if (!isOpen || !drawerRef.current) return;
 
     const focusableElements = drawerRef.current.querySelectorAll<HTMLElement>(
-      'a, button, [tabindex]:not([tabindex="-1"])'
+      'a, button, [tabindex]:not([tabindex="-1"])',
     );
     const firstFocusable = focusableElements[0];
     const lastFocusable = focusableElements[focusableElements.length - 1];
@@ -85,20 +90,23 @@ export default function MobileNav({ links, email, phone, socialLinks }: MobileNa
     };
   }, [isOpen]);
 
-  const handleLinkClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    setIsOpen(false);
-    
-    // Small delay to let the drawer close before scrolling
-    setTimeout(() => {
-      const target = document.querySelector(href);
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 300);
-    
-    hamburgerRef.current?.focus();
-  }, []);
+  const handleLinkClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      e.preventDefault();
+      setIsOpen(false);
+
+      // Small delay to let the drawer close before scrolling
+      setTimeout(() => {
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 300);
+
+      hamburgerRef.current?.focus();
+    },
+    [],
+  );
 
   const transitionProps = prefersReducedMotion
     ? { duration: 0 }
@@ -159,14 +167,29 @@ export default function MobileNav({ links, email, phone, socialLinks }: MobileNa
                 className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-text-secondary"
                 aria-label="Cerrar menú"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
               </button>
 
               {/* Menu Section */}
               <motion.div variants={itemVariants} className="mb-2">
-                <span className="text-primary font-bold tracking-widest text-[9px] uppercase opacity-50">Menú</span>
+                <span className="text-primary font-bold tracking-widest text-[9px] uppercase opacity-50">
+                  Menú
+                </span>
               </motion.div>
-              
+
               <div className="flex flex-col mb-6">
                 {links.map((link) => (
                   <motion.a
@@ -182,26 +205,56 @@ export default function MobileNav({ links, email, phone, socialLinks }: MobileNa
               </div>
 
               {/* Contact Section */}
-              <motion.div variants={itemVariants} className="mb-3 pt-4 border-t border-white/5">
-                <span className="text-primary font-bold tracking-widest text-[9px] uppercase opacity-50">Contacto</span>
+              <motion.div
+                variants={itemVariants}
+                className="mb-3 pt-4 border-t border-white/5"
+              >
+                <span className="text-primary font-bold tracking-widest text-[9px] uppercase opacity-50">
+                  Contacto
+                </span>
               </motion.div>
 
               <motion.div variants={itemVariants} className="space-y-1.5 mb-5">
-                <a 
+                <a
                   href={`mailto:${email}`}
                   className="flex items-center gap-3 text-text-secondary hover:text-primary transition-colors group"
                 >
                   <div className="w-8 h-8 shrink-0 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m22 2-7 20-4-9-9-4Z" />
+                      <path d="M22 2 11 13" />
+                    </svg>
                   </div>
                   <span className="text-xs font-medium truncate">{email}</span>
                 </a>
-                <a 
+                <a
                   href={`tel:${phone.replace(/\s/g, '')}`}
                   className="flex items-center gap-3 text-text-secondary hover:text-primary transition-colors group"
                 >
                   <div className="w-8 h-8 shrink-0 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                    </svg>
                   </div>
                   <span className="text-xs font-medium">{phone}</span>
                 </a>
@@ -209,38 +262,99 @@ export default function MobileNav({ links, email, phone, socialLinks }: MobileNa
 
               {/* WhatsApp Button */}
               <motion.div variants={itemVariants} className="mb-6">
-                <a 
+                <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#25D366] text-bg font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#25D366]/20 text-[11px]"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
                   WhatsApp Directo
                 </a>
               </motion.div>
 
               {/* Social Links Footer */}
-              <motion.div variants={itemVariants} className="mt-auto pt-4 pb-6 border-t border-white/5 flex items-center justify-between social-links-footer">
+              <motion.div
+                variants={itemVariants}
+                className="mt-auto pt-4 pb-6 border-t border-white/5 flex items-center justify-between social-links-footer"
+              >
                 <div className="flex gap-4">
                   {socialLinks.map((social) => (
-                    <a 
+                    <a
                       key={social.label}
-                      href={social.href} 
-                      target="_blank" 
+                      href={social.href}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/30 transition-all"
                       aria-label={social.label}
                     >
-                      {social.label === 'GitHub' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>}
-                      {social.label === 'LinkedIn' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>}
-                      {(social.label === 'Twitter / X' || social.label === 'Twitter') && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>}
+                      {social.label === 'GitHub' && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                        </svg>
+                      )}
+                      {social.label === 'LinkedIn' && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                          <rect x="2" y="9" width="4" height="12"></rect>
+                          <circle cx="4" cy="4" r="2"></circle>
+                        </svg>
+                      )}
+                      {(social.label === 'Twitter / X' ||
+                        social.label === 'Twitter') && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                        </svg>
+                      )}
                     </a>
                   ))}
                 </div>
                 <div className="text-right">
                   <p className="text-[9px] text-text-secondary uppercase tracking-widest leading-tight">
-                    Bits, Átomos<br/>& Inteligencia
+                    Bits, Átomos
+                    <br />& Inteligencia
                   </p>
                 </div>
               </motion.div>

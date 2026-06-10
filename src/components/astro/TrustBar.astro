@@ -9,25 +9,28 @@ import { stats } from '../../data/stats';
 >
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0">
-      {stats.map((stat, index) => (
-        <div
-          key={stat.id}
-          class="flex flex-col items-center text-center md:border-r md:border-white/5 last:md:border-r-0 px-4"
-        >
-          <!-- Placeholder span for StatsCounter React island (client:visible) -->
-          <span
-            class="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-1 font-mono tabular-nums"
-            data-stat-value={stat.value}
-            data-stat-suffix={stat.suffix || ''}
-            data-stat-prefix={stat.prefix || ''}
+      {
+        stats.map((stat, index) => (
+          <div
+            class="flex flex-col items-center text-center md:border-r md:border-white/5 last:md:border-r-0 px-4"
           >
-            {stat.prefix || ''}{stat.value}{stat.suffix || ''}
-          </span>
-          <span class="text-xs md:text-sm text-text-secondary font-medium tracking-wide uppercase">
-            {stat.label}
-          </span>
-        </div>
-      ))}
+            {/* Placeholder span for StatsCounter React island (client:visible) */}
+            <span
+              class="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-1 font-mono tabular-nums"
+              data-stat-value={stat.value}
+              data-stat-suffix={stat.suffix || ''}
+              data-stat-prefix={stat.prefix || ''}
+            >
+              {stat.prefix || ''}
+              {stat.value}
+              {stat.suffix || ''}
+            </span>
+            <span class="text-xs md:text-sm text-text-secondary font-medium tracking-wide uppercase">
+              {stat.label}
+            </span>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>

@@ -13,7 +13,7 @@ Janus Core es la conexión definitiva entre el mundo físico y la inteligencia d
 
 - 🚀 **Performance Extrema**: Construido con **Astro 6** para una carga instantánea y SEO optimizado.
 - 📱 **Mobile-First & Ultra-Compact**: Menú lateral tipo "Command Center" diseñado para eficiencia y estética técnica.
-- 💎 **Diseño Premium**: Interfaz con efectos de *glassmorphism*, desenfoques en tiempo real y animaciones cinemáticas con **Framer Motion**.
+- 💎 **Diseño Premium**: Interfaz con efectos de _glassmorphism_, desenfoques en tiempo real y animaciones cinemáticas con **Framer Motion**.
 - 🛠️ **Arquitectura de Islas**: Componentes interactivos de **React 19** hidratados solo donde es necesario.
 - 📞 **Conversión Directa**: Flujo de contacto profesional integrado con WhatsApp y E-mail, sin formularios pesados.
 
@@ -35,26 +35,33 @@ El proyecto utiliza las herramientas más modernas del ecosistema frontend:
 ## 🚀 Desarrollo y despliegue
 
 ### Requisitos
+
 - Node.js >= 22.12.0
 
 ### Instalación
+
 ```bash
 npm install
 ```
 
 ### Comandos Locales
+
 - `npm run dev`: Inicia el servidor de desarrollo en `localhost:3000`.
 - `npm run build`: Genera los archivos estáticos en la carpeta `dist/`.
 - `npm run preview`: Previsualiza el build de producción localmente.
 
 ### 🧪 Testing
+
 Contamos con una suite de tests automatizados para asegurar la estabilidad visual:
+
 ```bash
 npx playwright test
 ```
 
 ### 🚢 Despliegue (Hostinger)
+
 El despliegue se realiza de forma quirúrgica vía SSH/Rsync para garantizar que los archivos se actualicen sin interrumpir el servicio:
+
 ```bash
 # Ejemplo de despliegue a producción
 rsync -avz --progress -e 'ssh -p <PORT>' dist/ <USER>@<HOST>:<PATH>
@@ -79,9 +86,11 @@ rsync -avz --progress -e 'ssh -p <PORT>' dist/ <USER>@<HOST>:<PATH>
 ---
 
 ## 👨‍💻 Autor
+
 **Jaime Rodriguez** - [jaimedrodriguezf@gmail.com](mailto:jaimedrodriguezf@gmail.com)
 
 ---
+
 <p align="center">
   Hecho con ❤️ por Janus Core Team
 </p>
