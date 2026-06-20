@@ -7,6 +7,7 @@ export default defineConfig({
       '**/dist/**',
       '**/*.spec.ts', // Exclude Playwright tests from Vitest
       '**/tests-examples/**',
+      '**/src/legacy-auth/**',
     ],
   },
 });

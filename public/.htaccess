@@ -1,0 +1,3 @@
+Redirect 301 /login /
+Redirect 301 /register /
+Redirect 301 /dashboard /

@@ -1,12 +1,6 @@
 /// <reference types="astro/client" />
 
 declare namespace App {
-  interface Locals {
-    user: {
-      id: string;
-      email: string;
-      name: string | null;
-      role: string;
-    } | null;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface Locals {}
 }
