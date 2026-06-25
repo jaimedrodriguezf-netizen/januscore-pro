@@ -5,8 +5,6 @@ import { accounts, sessions, users, verificationTokens } from "./src/db/schema";
 import { defineConfig } from "auth-astro";
 import { eq } from "drizzle-orm";
 
-import Google from "@auth/core/providers/google";
-
 export default defineConfig({
   adapter: DrizzleAdapter(db, {
     usersTable: users,
