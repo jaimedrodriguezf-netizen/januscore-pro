@@ -1,0 +1,40 @@
+---
+interface Props {
+  name: string;
+  email: string;
+  image?: string | null;
+  collapsed?: boolean;
+}
+
+const { name, email, image, collapsed = false } = Astro.props;
+
+// Generate initials
+const getInitials = (name: string) => {
+  if (!name) return "U";
+  return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+};
+---
+
+<div class={`flex items-center gap-3 transition-all duration-300 ${collapsed ? 'justify-center' : ''}`}>
+  <!-- Avatar -->
+  <div class="relative shrink-0">
+    {image ? (
+      <img 
+        src={image} 
+        alt={name} 
+        class="w-10 h-10 rounded-xl object-cover border border-white/10 shadow-lg"
+      />
+    ) : (
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-bg font-bold shadow-lg shadow-primary/20">
+        {getInitials(name)}
+      </div>
+    )}
+    <span class="absolute bottom-[-2px] right-[-2px] w-3.5 h-3.5 bg-green-500 border-2 border-bg rounded-full"></span>
+  </div>
+
+  <!-- Info (hidden when collapsed) -->
+  <div class={`flex flex-col overflow-hidden transition-all duration-300 ${collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+    <span class="text-sm font-bold text-text truncate">{name || "Usuario"}</span>
+    <span class="text-xs text-text-secondary truncate">{email}</span>
+  </div>
+</div>

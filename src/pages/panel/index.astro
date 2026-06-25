@@ -1,0 +1,30 @@
+---
+import PanelLayout from "../../layouts/PanelLayout.astro";
+import { getSession } from "auth-astro/server";
+
+const session = await getSession(Astro.request);
+---
+
+<PanelLayout title="Dashboard Principal">
+  <div class="space-y-6">
+    <div class="p-8 rounded-3xl bg-gradient-to-br from-surface to-surface/50 border border-white/5 backdrop-blur-md shadow-2xl">
+      <h2 class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+        ¡Bienvenido de vuelta, {session?.user?.name || "Usuario"}!
+      </h2>
+      <p class="text-text-secondary text-lg">
+        Este es tu panel privado y modular. Desde aquí podrás administrar todos los aspectos de tu cuenta y la plataforma.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Estadísticas Dummy -->
+      {[1, 2, 3].map((_, i) => (
+        <div class="p-6 rounded-2xl bg-surface/50 border border-white/5 shadow-lg flex flex-col gap-2 transition-all hover:-translate-y-1 hover:shadow-primary/5">
+          <span class="text-text-secondary text-sm font-medium">Métrica {i + 1}</span>
+          <span class="text-3xl font-bold text-text">{(Math.random() * 100).toFixed(1)}k</span>
+          <span class="text-xs text-green-400 font-medium">+12% este mes</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</PanelLayout>

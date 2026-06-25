@@ -1,0 +1,43 @@
+---
+interface Props {
+  collapsed?: boolean;
+}
+
+const { collapsed = false } = Astro.props;
+---
+
+<button 
+  id="panel-logout-btn" 
+  class={`w-full group flex items-center gap-3 p-3 rounded-xl transition-all duration-300 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 text-text-secondary hover:text-red-400 ${collapsed ? 'justify-center' : ''}`}
+  title="Cerrar Sesión"
+>
+  <div class="shrink-0">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-hover:-translate-x-1">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+      <polyline points="16 17 21 12 16 7"></polyline>
+      <line x1="21" y1="12" x2="9" y2="12"></line>
+    </svg>
+  </div>
+  
+  <span class={`font-medium text-sm whitespace-nowrap overflow-hidden transition-all duration-300 ${collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+    Cerrar Sesión
+  </span>
+</button>
+
+<script>
+  const setupLogout = () => {
+    const btn = document.querySelector("#panel-logout-btn");
+    if (btn && !btn.hasAttribute('data-initialized')) {
+      btn.setAttribute('data-initialized', 'true');
+      btn.addEventListener("click", async () => {
+        const { signOut } = await import("auth-astro/client");
+        await signOut();
+        window.location.href = "/";
+      });
+    }
+  };
+
+  // Run on first load and after Astro view transitions
+  setupLogout();
+  document.addEventListener('astro:page-load', setupLogout);
+</script>

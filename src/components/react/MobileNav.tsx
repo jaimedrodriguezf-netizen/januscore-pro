@@ -8,6 +8,7 @@ interface MobileNavProps {
   email: string;
   phone: string;
   socialLinks: SocialLink[];
+  isLoggedIn: boolean;
 }
 
 export default function MobileNav({
@@ -15,6 +16,7 @@ export default function MobileNav({
   email,
   phone,
   socialLinks,
+  isLoggedIn,
 }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -202,6 +204,14 @@ export default function MobileNav({
                     {link.label}
                   </motion.a>
                 ))}
+                
+                <motion.a
+                  href={isLoggedIn ? "/panel" : "/api/auth/signin?callbackUrl=/panel"}
+                  variants={itemVariants}
+                  className="block py-1.5 mt-2 text-lg font-bold text-primary hover:text-primary/80 transition-all duration-300 border-b border-white/5"
+                >
+                  {isLoggedIn ? "Panel Privado" : "Iniciar Sesión"}
+                </motion.a>
               </div>
 
               {/* Contact Section */}

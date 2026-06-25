@@ -1,0 +1,13 @@
+---
+import PanelLayout from "../../layouts/PanelLayout.astro";
+import CVManager from "../../components/react/CVManager";
+---
+
+<PanelLayout title="Mi Portafolio / CV">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-text mb-2">Gestión de Perfiles y CV</h1>
+    <p class="text-text-secondary">Comparte la versión exacta de tu experiencia para cada oportunidad laboral.</p>
+  </div>
+
+  <CVManager client:load />
+</PanelLayout>

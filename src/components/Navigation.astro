@@ -1,6 +1,9 @@
 ---
 import { siteData } from '../data/siteData';
 import MobileNav from './react/MobileNav';
+import { getSession } from 'auth-astro/server';
+
+const session = await getSession(Astro.request);
 ---
 
 <header
@@ -12,22 +15,11 @@ import MobileNav from './react/MobileNav';
       href="#inicio"
       class="text-2xl font-bold tracking-tighter flex items-center gap-2 group"
     >
-      <div
-        class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-bg transform group-hover:rotate-12 transition-transform duration-300"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="text-bg"><path d="m8 3 4 8 5-5 5 15H2L8 3z"></path></svg
-        >
-      </div>
+      <img 
+        src="/favicon.svg" 
+        alt="Janus Core Logo" 
+        class="w-10 h-10 rounded-xl shadow-lg shadow-primary/20 transform transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" 
+      />
       <span
         class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-sans"
       >
@@ -35,7 +27,7 @@ import MobileNav from './react/MobileNav';
       </span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-10">
+    <nav class="hidden md:flex items-center gap-6 lg:gap-10">
       {
         siteData.navLinks.map((link) => (
           <a
@@ -47,12 +39,29 @@ import MobileNav from './react/MobileNav';
           </a>
         ))
       }
-      <a
-        href="#contacto"
-        class="px-6 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 text-primary rounded-full text-sm font-bold hover:from-primary hover:to-secondary hover:text-bg transition-all duration-500 shadow-lg shadow-primary/5 hover:shadow-primary/20"
-      >
-        Hablemos
-      </a>
+      <div class="flex items-center gap-4 border-l border-white/10 pl-6 ml-2">
+        {session ? (
+          <a
+            href="/panel"
+            class="text-sm font-medium text-text-secondary hover:text-primary transition-colors duration-200"
+          >
+            Panel
+          </a>
+        ) : (
+          <a
+            href="/api/auth/signin?callbackUrl=/panel"
+            class="text-sm font-medium text-text-secondary hover:text-primary transition-colors duration-200"
+          >
+            Iniciar Sesión
+          </a>
+        )}
+        <a
+          href="#contacto"
+          class="px-6 py-2.5 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 text-primary rounded-full text-sm font-bold hover:from-primary hover:to-secondary hover:text-bg transition-all duration-500 shadow-lg shadow-primary/5 hover:shadow-primary/20"
+        >
+          Hablemos
+        </a>
+      </div>
     </nav>
 
     {
@@ -65,6 +74,7 @@ import MobileNav from './react/MobileNav';
         email={siteData.contactEmail}
         phone={siteData.contactPhone}
         socialLinks={siteData.socialLinks}
+        isLoggedIn={!!session}
       />
     </div>
   </div>

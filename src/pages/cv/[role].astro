@@ -1,0 +1,720 @@
+---
+import { cvProfiles, type CVProfileType } from "../../data/cvProfiles";
+import "../../styles/global.css";
+
+// We disable prerendering to check the token server-side dynamically
+export const prerender = false;
+
+const { role } = Astro.params;
+const profile = cvProfiles[role as CVProfileType];
+
+if (!profile) {
+  return new Response("Perfil no encontrado", { status: 404 });
+}
+
+// Token Check
+const EXPECTED_TOKEN = import.meta.env.CV_ACCESS_TOKEN || "januscore2026";
+const providedToken = Astro.url.searchParams.get("token");
+
+const isAuthorized = providedToken === EXPECTED_TOKEN;
+
+const contactString = `${profile.contact?.location || "Quito, Ecuador"} | ${profile.contact?.phone || "(+593) 0983144424"} | ${profile.contact?.email || "jaimedrodriguezf@gmail.com"}`;
+---
+
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV | {profile.name} - {profile.title}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    /* CSS Variables from Old Project */
+    :root {
+      --cv-bg-primary: #0f172a;
+      --cv-bg-secondary: #1e293b;
+      --cv-accent: #38bdf8;
+      --cv-text-main: #f8fafc;
+      --cv-text-muted: #94a3b8;
+      --cv-border: #334155;
+      --cv-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    html, body {
+      background-color: var(--cv-bg-primary) !important;
+      color: var(--cv-text-main) !important;
+    }
+
+    /* MODERN MODE (Default) */
+    .mode-modern.cv-container {
+      max-width: 1000px;
+      width: 95%;
+      margin: 2rem auto;
+      background: var(--cv-bg-secondary);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      min-height: 100vh;
+      border: 1px solid var(--cv-border);
+      border-radius: 8px;
+      overflow: hidden;
+      color: var(--cv-text-main);
+    }
+
+    .mode-modern .ats-only { display: none !important; }
+
+    .mode-modern .sidebar {
+      background: #111827;
+      padding: 2.5rem;
+      border-right: 1px solid var(--cv-border);
+    }
+
+    .mode-modern .main-content {
+      padding: 3rem;
+      background: var(--cv-bg-secondary);
+    }
+
+    /* Profile Header */
+    .mode-modern .profile-img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 3px solid var(--cv-accent);
+      margin: 0 auto 1.5rem auto;
+      object-fit: cover;
+      display: block;
+    }
+
+    .mode-modern .name {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--cv-text-main);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.025em;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .mode-modern .title {
+      font-size: 1rem;
+      font-family: var(--cv-font-mono);
+      color: var(--cv-accent);
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    /* Sections */
+    .mode-modern .section {
+      margin-bottom: 2.5rem;
+    }
+
+    .mode-modern .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--cv-text-main);
+      border-bottom: 2px solid var(--cv-border);
+      padding-bottom: 0.5rem;
+    }
+
+    .mode-modern .section-title svg {
+      color: var(--cv-accent);
+    }
+
+    /* Sidebar Items */
+    .mode-modern .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: var(--cv-text-muted);
+    }
+
+    .mode-modern .skill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .mode-modern .skill-tag {
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--cv-accent);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-family: var(--cv-font-mono);
+    }
+
+    /* Timeline Experience / Education */
+    .mode-modern .timeline-item {
+      position: relative;
+      padding-left: 1.5rem;
+      border-left: 2px solid var(--cv-border);
+      margin-bottom: 2rem;
+    }
+
+    .mode-modern .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -7px;
+      top: 0;
+      width: 12px;
+      height: 12px;
+      background: var(--cv-accent);
+      border-radius: 50%;
+    }
+
+    .mode-modern .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .mode-modern .item-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .mode-modern .item-date {
+      font-family: var(--cv-font-mono);
+      font-size: 0.8rem;
+      color: var(--cv-accent);
+    }
+
+    .mode-modern .item-subtitle {
+      color: var(--cv-text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .mode-modern .item-desc {
+      color: var(--cv-text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .mode-modern .item-desc ul {
+      padding-left: 1.2rem;
+      margin-top: 0.5rem;
+      list-style-type: disc;
+    }
+
+    /* Projects Grid */
+    .mode-modern .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .mode-modern .project-card {
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--cv-border);
+      border-radius: 8px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .mode-modern .project-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--cv-accent);
+    }
+
+    .mode-modern .project-card strong {
+      color: var(--cv-text-main);
+    }
+
+    .mode-modern .project-link {
+      display: inline-block;
+      margin-top: 0.75rem;
+      color: var(--cv-accent);
+      font-family: var(--cv-font-mono);
+      font-size: 0.85rem;
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    /* Responsive Modern */
+    @media (max-width: 850px) {
+      .mode-modern.cv-container {
+        grid-template-columns: 1fr;
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        border: none;
+      }
+      .mode-modern .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--cv-border);
+        padding: 2rem 1.5rem;
+      }
+      .mode-modern .main-content {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+
+    /* ATS MODE */
+    .mode-ats { 
+      background: white !important; 
+      color: black !important; 
+      font-family: "Times New Roman", Times, serif !important; 
+      padding: 40px !important; 
+      border: none !important; 
+      box-shadow: none !important; 
+      border-radius: 0 !important; 
+      max-width: 850px;
+      margin: 2rem auto;
+      display: block !important;
+    }
+    
+    .mode-ats .ats-only { display: block !important; }
+    .mode-ats .modern-only { display: none !important; }
+
+    /* ATS Header */
+    .mode-ats .ats-header { 
+      display: flex !important; 
+      flex-direction: column !important; 
+      align-items: center !important; 
+      border-bottom: 2pt solid black !important; 
+      padding-bottom: 12px !important; 
+      margin-bottom: 20px !important; 
+    }
+    .mode-ats .ats-name { font-size: 24pt !important; font-weight: bold !important; text-transform: uppercase !important; margin-bottom: 0 !important; color: black !important; line-height: 1.1 !important; text-align: center !important; }
+    .mode-ats .ats-contact { display: block !important; font-size: 10.5pt !important; margin-top: 5px !important; color: black !important; text-align: center !important; }
+    
+    /* Layout Reset */
+    .mode-ats .sidebar, .mode-ats .main-content { display: block !important; padding: 0 !important; border: none !important; background: transparent !important; }
+    
+    /* ATS Sections */
+    .mode-ats .section-title { 
+      font-size: 14pt !important; 
+      font-weight: bold !important; 
+      border-bottom: 1pt solid #666 !important; 
+      margin-bottom: 10px !important; 
+      margin-top: 20px !important; 
+      text-transform: uppercase !important; 
+      color: black !important; 
+      padding-bottom: 0 !important;
+      display: block !important;
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+    }
+    .mode-ats .section-title svg { display: none !important; }
+    
+    .mode-ats .section { margin-bottom: 12px !important; display: block !important; }
+    
+    /* ATS Items */
+    .mode-ats .timeline-item { border: none !important; padding: 0 !important; margin-bottom: 12px !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+    .mode-ats .timeline-item::before { display: none !important; }
+    
+    .mode-ats .item-header { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: baseline !important; margin-bottom: 0 !important; width: 100% !important; }
+    .mode-ats .item-title { font-weight: bold !important; font-size: 12pt !important; margin-bottom: 0 !important; color: black !important; }
+    .mode-ats .item-date { font-weight: normal !important; font-size: 11pt !important; color: black !important; font-family: "Times New Roman", Times, serif !important; }
+    .mode-ats .item-subtitle { font-style: italic !important; font-size: 11pt !important; margin-bottom: 6px !important; margin-top: 2px !important; color: black !important; }
+    
+    .mode-ats .item-desc { font-size: 11pt !important; color: black !important; line-height: 1.4 !important; margin-bottom: 4px !important; }
+    .mode-ats .item-desc ul { margin: 0 !important; padding-left: 10px !important; list-style-type: none !important; }
+    .mode-ats .item-desc ul li { position: relative; padding-left: 10px; margin-bottom: 4px !important; font-size: 11pt !important; line-height: 1.4 !important; color: black !important; }
+    .mode-ats .item-desc ul li::before { content: "•"; position: absolute; left: -2px; }
+    
+    /* ATS Projects */
+    .mode-ats .project-card { padding: 0 !important; border: none !important; background: transparent !important; margin-bottom: 12px !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+    .mode-ats .project-card:hover { transform: none !important; }
+    .mode-ats .project-card .item-header { gap: 0 !important; }
+    .mode-ats .project-card strong { font-weight: normal !important; color: black !important; }
+    .mode-ats .project-link { font-family: "Times New Roman", Times, serif !important; font-size: 11pt !important; color: black !important; display: block !important; margin-bottom: 4px !important; margin-top: 0 !important; font-style: italic !important; }
+    
+    /* ATS Skills */
+    .mode-ats .skill-list { display: block !important; }
+    .mode-ats .skill-tag { display: inline !important; border: none !important; background: transparent !important; padding: 0 !important; font-size: 11pt !important; color: black !important; font-family: "Times New Roman", Times, serif !important; }
+    .mode-ats .skill-tag::after { content: ", "; }
+    .mode-ats .skill-tag:last-child::after { content: ""; }
+
+
+    /* PRINT SUPPORT */
+    @page {
+      margin: 0;
+      size: A4 portrait;
+    }
+
+    @media print {
+      html {
+        /* Aplicamos el fondo al HTML base para que cubra todas las páginas físicas generadas */
+        background: linear-gradient(to right, #111827 240px, #1e293b 240px) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        min-height: 100%;
+      }
+      body { 
+        background: transparent !important; 
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      .no-print { display: none !important; }
+      
+      /* Modern Mode PDF: Keep exact dark theme colors */
+      .mode-modern.cv-container {
+        margin: 0 !important;
+        box-shadow: none !important;
+        grid-template-columns: 240px 1fr !important;
+        min-height: 100vh !important;
+        border: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: transparent !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .mode-modern .sidebar {
+        padding: 1.5rem !important;
+        background: transparent !important;
+        border-right: 1px solid #334155 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .mode-modern .main-content {
+        padding: 1.5rem 2rem !important;
+        background: transparent !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .mode-modern * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      /* Scale down slightly to fit on standard A4 */
+      .mode-modern { font-size: 0.85rem !important; }
+      .mode-modern .name { font-size: 1.6rem !important; color: #f8fafc !important; }
+      .mode-modern .title { font-size: 0.85rem !important; margin-bottom: 1.5rem !important; color: #38bdf8 !important; }
+      .mode-modern .profile-img { width: 100px !important; height: 100px !important; margin-bottom: 1rem !important; border-width: 2px !important; border-color: #38bdf8 !important; }
+      .mode-modern .contact-item { margin-bottom: 0.5rem !important; font-size: 0.8rem !important; color: #94a3b8 !important; }
+      .mode-modern .skill-tag { font-size: 0.75rem !important; padding: 0.15rem 0.5rem !important; background: rgba(56, 189, 248, 0.1) !important; border-color: rgba(56, 189, 248, 0.2) !important; color: #38bdf8 !important; }
+      
+      .mode-modern .section { margin-bottom: 1.5rem !important; }
+      .mode-modern .section-title { font-size: 1.1rem !important; margin-bottom: 1rem !important; padding-bottom: 0.3rem !important; color: #f8fafc !important; border-color: #334155 !important; page-break-after: avoid !important; break-after: avoid !important; }
+      .mode-modern .section-title svg { width: 16px !important; height: 16px !important; color: #38bdf8 !important; }
+      
+      .mode-modern .timeline-item { margin-bottom: 1.2rem !important; border-color: #334155 !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+      .mode-modern .timeline-item::before { background: #38bdf8 !important; }
+      .mode-modern .item-title { font-size: 1rem !important; color: #f8fafc !important; }
+      .mode-modern .item-date { font-size: 0.75rem !important; color: #38bdf8 !important; }
+      .mode-modern .item-subtitle { font-size: 0.85rem !important; margin-bottom: 0.5rem !important; color: #94a3b8 !important; }
+      .mode-modern .item-desc { font-size: 0.85rem !important; color: #94a3b8 !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+      
+      .mode-modern .project-card { padding: 1rem !important; margin-bottom: 1rem !important; background: rgba(255, 255, 255, 0.03) !important; border-color: #334155 !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+      .mode-modern .project-card strong { color: #f8fafc !important; }
+      .mode-modern .project-link { font-size: 0.8rem !important; color: #38bdf8 !important; margin-top: 0.5rem !important; }
+    }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen">
+  {!isAuthorized ? (
+    <div class="flex flex-col items-center justify-center min-h-screen p-6 bg-bg text-text">
+      <div class="max-w-md w-full bg-surface/80 backdrop-blur-xl p-8 rounded-3xl border border-white/5 shadow-2xl text-center">
+        <h1 class="text-2xl font-bold mb-2">Acceso Protegido</h1>
+        <p class="text-text-secondary mb-6">Este currículum requiere una contraseña o ser accedido mediante el código QR original.</p>
+        <form method="GET" action={`/cv/${role}`} class="flex flex-col gap-3">
+          <input 
+            type="password" 
+            name="token" 
+            placeholder="Contraseña de acceso" 
+            class="w-full bg-bg/50 border border-white/10 rounded-xl px-4 py-3 text-text outline-none focus:border-primary transition-colors"
+            required
+          />
+          <button type="submit" class="w-full bg-primary text-bg font-bold py-3 rounded-xl hover:bg-primary/90 transition-colors">
+            Ver Currículum
+          </button>
+        </form>
+      </div>
+    </div>
+  ) : (
+    <div class="max-w-5xl mx-auto p-4 md:p-8">
+      <!-- Top Bar / Toggles -->
+      <div class="no-print flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 bg-[#1e293b] p-4 rounded-xl border border-[#334155] shadow-xl">
+        <div class="flex items-center gap-4 text-[#f8fafc] font-bold">
+          <span class="text-xl tracking-tight">Career Hub Pro</span>
+        </div>
+        
+        <div class="flex items-center gap-2 bg-[#0f172a] p-1.5 rounded-lg border border-[#334155]">
+          <button id="btn-modern" class="flex items-center gap-2 px-4 py-1.5 rounded-md font-medium text-sm transition-all bg-[#38bdf8] text-[#0f172a] shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            Moderno
+          </button>
+          <button id="btn-ats" class="flex items-center gap-2 px-4 py-1.5 rounded-md font-medium text-sm transition-all text-[#94a3b8] hover:text-[#f8fafc]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            ATS-Friendly
+          </button>
+        </div>
+
+        <button onclick="window.print()" class="flex items-center gap-2 bg-[#38bdf8] hover:bg-[#0ea5e9] text-[#0f172a] px-5 py-2 rounded-lg font-bold transition-all shadow-lg text-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Descargar PDF
+        </button>
+      </div>
+
+      <!-- CV Container -->
+      <main id="cv-container" class="mode-modern cv-container">
+        
+        <!-- ATS Header (Hidden in modern mode) -->
+        <header class="ats-only ats-header">
+          <h1 class="ats-name">{profile.name}</h1>
+          <div style="font-size: 11pt; font-style: italic; margin-top: 5px; margin-bottom: 5px; color: black; text-align: center;">{profile.title}</div>
+          <div class="ats-contact">{contactString}</div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <header class="modern-only" style="position: relative; text-align: center;">
+            <img src="/perfil.jpeg" alt={profile.name} class="profile-img" />
+            <h1 class="name">{profile.name}</h1>
+            <p class="title">{profile.title}</p>
+          </header>
+
+          <section class="section modern-only">
+            <h2 class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> 
+              Contacto
+            </h2>
+            <div class="contact-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>{profile.contact?.email || "jaimedrodriguezf@gmail.com"}</span>
+            </div>
+            <div class="contact-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>{profile.contact?.phone || "(+593) 0983144424"}</span>
+            </div>
+            <div class="contact-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>{profile.contact?.location || "Quito, Ecuador"}</span>
+            </div>
+          </section>
+
+          <section class="section">
+            <h2 class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+              Skills Técnicas
+            </h2>
+            <div class="skill-list">
+              {profile.skills.map(skill => (
+                <span class="skill-tag">{skill}</span>
+              ))}
+            </div>
+          </section>
+
+          {profile.languages && profile.languages.length > 0 && (
+            <section class="section">
+              <h2 class="section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                Idiomas
+              </h2>
+              <div class="skill-list" style="flex-direction: column; gap: 0.75rem;">
+                {profile.languages.map(lang => (
+                  <div class="contact-item" style="margin-bottom: 0;">
+                    <strong style="color: var(--cv-text-main); font-family: var(--cv-font-mono); font-size: 0.85rem;">{lang.name}:</strong> 
+                    <span>{lang.level}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+          <section class="section">
+            <h2 class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              Resumen Profesional
+            </h2>
+            <div class="item-desc ats-desc">
+              <p>{profile.summary}</p>
+            </div>
+          </section>
+
+          <section class="section">
+            <h2 class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              Experiencia Profesional
+            </h2>
+            <div class="timeline-container">
+              {profile.experience.map(exp => (
+                <div class="timeline-item">
+                  <div class="item-header">
+                    <span class="item-title">{exp.title}</span>
+                    <span class="item-date">{exp.period}</span>
+                  </div>
+                  <span class="item-subtitle">{exp.company}</span>
+                  <div class="item-desc ats-desc">
+                    <ul class="ats-bullets">
+                      {exp.description.map(item => (
+                        <li>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {profile.education && profile.education.length > 0 && (
+            <section class="section">
+              <h2 class="section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                Educación
+              </h2>
+              <div class="timeline-container">
+                {profile.education.map(edu => (
+                  <div class="timeline-item">
+                    <div class="item-header">
+                      <span class="item-title">{edu.title}</span>
+                      <span class="item-date">{edu.date}</span>
+                    </div>
+                    <span class="item-subtitle">{edu.school}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {profile.certifications && profile.certifications.length > 0 && (
+            <section class="section">
+              <h2 class="section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                Certificaciones
+              </h2>
+              <div class="item-desc ats-desc">
+                <ul class="ats-bullets">
+                  {profile.certifications.map(cert => (
+                    <li>{cert}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )}
+
+          {profile.projects && profile.projects.length > 0 && (
+            <section class="section" style="padding-top: 4rem;">
+              <h2 class="section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                Proyectos Destacados
+              </h2>
+              <div class="projects-grid">
+                {profile.projects.map(proj => (
+                  <div class="project-card">
+                    <div class="item-header">
+                      <span class="item-title">{proj.name}</span>
+                      <span class="item-date">{proj.role}</span>
+                    </div>
+                    <div class="item-desc ats-desc">
+                      <p><strong class="modern-only">Link:</strong> <a href={proj.link} class="project-link">{proj.link}</a></p>
+                      <p><strong class="modern-only">Descripción:</strong> {proj.description}</p>
+                      <p><strong class="modern-only">Impacto:</strong> {proj.impact}</p>
+                      <p><strong class="modern-only">Stack:</strong> {proj.stack}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Job Applications Log (Internal Tracking) */}
+          {profile.applications && profile.applications.length > 0 && (
+            <section class="section no-print mt-12 pt-8 border-t border-[--cv-border] modern-only">
+              <h2 class="section-title" style="color: var(--cv-accent); border-bottom-color: rgba(56, 189, 248, 0.2);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/></svg>
+                Registro de Aplicaciones (Dashboard Privado)
+              </h2>
+              <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {profile.applications.map(app => (
+                  <div class="project-card" style="margin-bottom: 0;">
+                    <div class="item-header">
+                      <span class="item-title" style="color: white;">{app.company}</span>
+                      <span class="item-date" style="color: var(--cv-accent);">{app.dateApplied}</span>
+                    </div>
+                    <span class="item-subtitle">Rol Postulado: {app.role}</span>
+                    
+                    <div style="background: var(--cv-bg-primary); padding: 1rem; border-radius: 6px; border: 1px solid var(--cv-border); margin-top: 1rem;">
+                      {app.emailTo && (
+                        <p style="margin-bottom: 0.5rem; font-size: 0.9rem;">
+                          <strong style="color: white;">Enviar a:</strong> 
+                          <a href={`mailto:${app.emailTo}`} style="color: var(--cv-accent); text-decoration: none;">{app.emailTo}</a>
+                        </p>
+                      )}
+                      <p style="margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        <strong style="color: white;">Asunto:</strong> 
+                        <span style="color: var(--cv-accent);">{app.emailSubject}</span>
+                      </p>
+                      <pre style="white-space: pre-wrap; font-family: inherit; font-size: 0.85rem; color: var(--cv-text-muted); line-height: 1.5;">{app.emailBody}</pre>
+                    </div>
+
+                    {app.recommendedCourses && app.recommendedCourses.length > 0 && (
+                      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--cv-border);">
+                        <h4 style="color: white; font-size: 0.9rem; margin-bottom: 0.5rem;">Cursos a Dominar (Gaps):</h4>
+                        <ul style="list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                          {app.recommendedCourses.map(course => (
+                            <li style="display: flex; align-items: center; gap: 0.5rem;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cv-accent)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                              <a href={course.link} target="_blank" style="color: var(--cv-text-muted); text-decoration: none; font-size: 0.85rem;" onmouseover="this.style.color='var(--cv-accent)'" onmouseout="this.style.color='var(--cv-text-muted)'">
+                                {course.topic}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+        </div>
+      </main>
+    </div>
+  )}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const btnModern = document.getElementById("btn-modern");
+      const btnAts = document.getElementById("btn-ats");
+      const container = document.getElementById("cv-container");
+
+      if (!btnModern || !btnAts || !container) return;
+
+      const setModernMode = () => {
+        container.classList.remove("mode-ats");
+        container.classList.add("mode-modern");
+        
+        btnModern.classList.add("bg-[#38bdf8]", "text-[#0f172a]", "shadow-md");
+        btnModern.classList.remove("text-[#94a3b8]", "hover:text-[#f8fafc]", "bg-transparent");
+        
+        btnAts.classList.remove("bg-[#38bdf8]", "text-[#0f172a]", "shadow-md");
+        btnAts.classList.add("text-[#94a3b8]", "hover:text-[#f8fafc]", "bg-transparent");
+      };
+
+      const setAtsMode = () => {
+        container.classList.remove("mode-modern");
+        container.classList.add("mode-ats");
+        
+        btnAts.classList.add("bg-[#38bdf8]", "text-[#0f172a]", "shadow-md");
+        btnAts.classList.remove("text-[#94a3b8]", "hover:text-[#f8fafc]", "bg-transparent");
+        
+        btnModern.classList.remove("bg-[#38bdf8]", "text-[#0f172a]", "shadow-md");
+        btnModern.classList.add("text-[#94a3b8]", "hover:text-[#f8fafc]", "bg-transparent");
+      };
+
+      btnModern.addEventListener("click", setModernMode);
+      btnAts.addEventListener("click", setAtsMode);
+    });
+  </script>
+</body>
+</html>
