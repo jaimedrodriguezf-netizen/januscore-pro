@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "start": "node ./app.js",
     "astro": "astro",
     "typecheck": "astro check && tsc --noEmit",
     "lint": "eslint .",
