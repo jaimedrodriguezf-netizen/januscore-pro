@@ -12,7 +12,7 @@ export default defineConfig({
   site: 'https://januscore.com',
   output: 'server',
   adapter: node({ mode: "standalone" }),
-  server: { port: 3000, host: true },
+  server: { port: process.env.PORT ? parseInt(process.env.PORT) : 3000, host: true },
   integrations: [react(), sitemap(), auth()],
 
   vite: {
