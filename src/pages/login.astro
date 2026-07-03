@@ -105,7 +105,12 @@ if (session) {
       const formData = new FormData(form);
       const email = formData.get("email") as string;
       const password = formData.get("password") as string;
-      const callbackUrl = urlParams.get("callbackUrl") || "/panel";
+      
+      let callbackUrl = urlParams.get("callbackUrl") || "/panel";
+      // Force HTTPS if Hostinger proxy generated an HTTP callback URL
+      if (callbackUrl.startsWith("http://") && window.location.protocol === "https:") {
+        callbackUrl = callbackUrl.replace("http://", "https://");
+      }
 
       if (errorMsg) errorMsg.classList.add("hidden");
 

@@ -39,6 +39,7 @@ export default defineConfig({
   session: {
     strategy: "jwt",
   },
+  useSecureCookies: process.env.AUTH_URL?.startsWith("https://") ?? true,
   pages: {
     signIn: "/login",
   }
