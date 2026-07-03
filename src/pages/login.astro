@@ -110,11 +110,18 @@ if (session) {
       if (errorMsg) errorMsg.classList.add("hidden");
 
       try {
-        await signIn("credentials", { 
+        const result = await signIn("credentials", { 
           email, 
           password, 
+          redirect: false,
           callbackUrl
         });
+
+        if (result?.error) {
+          if (errorMsg) errorMsg.classList.remove("hidden");
+        } else if (result?.url) {
+          window.location.href = result.url;
+        }
       } catch {
         if (errorMsg) errorMsg.classList.remove("hidden");
       }
