@@ -39,4 +39,7 @@ export default defineConfig({
   session: {
     strategy: "jwt",
   },
+  pages: {
+    signIn: "/login",
+  }
 });

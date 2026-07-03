@@ -1,4 +1,4 @@
-PROVIDER=claude
+PROVIDER=gemini
 FILE_PATTERNS=*.ts,*.tsx,*.js,*.jsx,*.astro
 RULES_FILE=AGENTS.md
 STRICT_MODE=true
