@@ -1,0 +1,17 @@
+# Supabase local development config.
+# Project: januscore-prov2 (receipt-verification-core).
+# Migrations live in supabase/migrations/ and are forward-only.
+project_id = "januscore-prov2"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
