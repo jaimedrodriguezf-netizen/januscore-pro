@@ -96,12 +96,12 @@ export default async function Home() {
                   </form>
                 </div>
               ) : (
-                <Link
+                <a
                   href="/login"
                   className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-bold text-white shadow hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900"
                 >
                   Iniciar Sesión →
-                </Link>
+                </a>
               )}
             </div>
           </div>
