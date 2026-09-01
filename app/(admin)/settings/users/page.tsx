@@ -18,8 +18,8 @@ export default async function UsersAdminPage({
 
   if (!user) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-10">
-        <p className="text-sm text-neutral-600">Please sign in to view users.</p>
+      <main className="mx-auto max-w-5xl px-4 py-10 font-sans">
+        <p className="text-sm text-neutral-600">Por favor inicia sesión para ver los usuarios.</p>
       </main>
     );
   }
@@ -29,8 +29,8 @@ export default async function UsersAdminPage({
 
   if (!activeTenantId) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-10">
-        <p className="text-sm text-neutral-600">No active tenant found.</p>
+      <main className="mx-auto max-w-5xl px-4 py-10 font-sans">
+        <p className="text-sm text-neutral-600">No se encontró una organización activa.</p>
       </main>
     );
   }
@@ -38,9 +38,9 @@ export default async function UsersAdminPage({
   const role = await getMyRole(supabase, activeTenantId);
   if (role !== 'tenant_admin' && role !== 'platform_admin') {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-10">
-        <div className="rounded-md bg-amber-50 p-4 text-sm text-amber-800">
-          <strong>Access Restricted (R13):</strong> Tenant Admin or Platform Superadmin privilege required.
+      <main className="mx-auto max-w-5xl px-4 py-10 font-sans">
+        <div className="rounded-xl bg-amber-50 p-4 text-xs font-semibold text-amber-800">
+          ⚠️ Acceso Restringido: Se requieren privilegios de Administrador o Superadministrador.
         </div>
       </main>
     );
@@ -82,7 +82,7 @@ export default async function UsersAdminPage({
     }
 
     revalidatePath('/settings/users');
-    redirect(`/settings/users?tenantId=${activeTenantId}&ok=User role updated`);
+    redirect(`/settings/users?tenantId=${activeTenantId}&ok=Rol%20de%20usuario%20actualizado`);
   }
 
   async function assignBranchAction(formData: FormData) {
@@ -92,7 +92,7 @@ export default async function UsersAdminPage({
     const branchId = String(formData.get('branchId') || '');
 
     if (!userId || !branchId) {
-      redirect(`/settings/users?tenantId=${activeTenantId}&err=User and branch required`);
+      redirect(`/settings/users?tenantId=${activeTenantId}&err=Falta%20usuario%20o%20sucursal`);
     }
 
     const { error } = await supabase.from('branch_memberships').insert({
@@ -108,61 +108,61 @@ export default async function UsersAdminPage({
     }
 
     revalidatePath('/settings/users');
-    redirect(`/settings/users?tenantId=${activeTenantId}&ok=Branch assigned successfully`);
+    redirect(`/settings/users?tenantId=${activeTenantId}&ok=Sucursal%20asignada%20con%20%C3%A9xito`);
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
+    <main className="mx-auto max-w-6xl px-4 py-8 font-sans">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2 text-xs text-neutral-500">
-            <Link href="/receipts" className="hover:underline">Dashboard</Link>
+            <Link href="/" className="hover:underline">Inicio</Link>
             <span>/</span>
-            <span>Settings</span>
+            <span>Configuración</span>
             <span>/</span>
-            <span className="font-semibold text-neutral-800 dark:text-neutral-200">Users & Roles (R13)</span>
+            <span className="font-semibold text-neutral-800 dark:text-neutral-200">Usuarios & Roles</span>
           </div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
-            User Roles & Permissions
+            Roles de Usuario & Asignación de Sucursales
           </h1>
           <p className="text-xs text-neutral-500">
-            Manage tenant admins, operators, and branch assignments.
+            Administra administradores, operadores, clientes y las sucursales a las que tienen acceso.
           </p>
         </div>
       </div>
 
       {queryParams.ok && (
         <div className="mb-6 rounded-md bg-emerald-50 p-3 text-xs font-medium text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
-          {queryParams.ok}
+          ✓ {queryParams.ok}
         </div>
       )}
       {queryParams.err && (
         <div className="mb-6 rounded-md bg-rose-50 p-3 text-xs font-medium text-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
-          {queryParams.err}
+          ⚠️ {queryParams.err}
         </div>
       )}
 
       {/* Users Table */}
-      <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
         <div className="border-b border-neutral-200 px-5 py-4 dark:border-neutral-800">
-          <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-            Tenant Members ({memberships?.length ?? 0})
+          <h2 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
+            Miembros de la Organización ({memberships?.length ?? 0})
           </h2>
         </div>
-        <table className="min-w-full divide-y divide-neutral-200 text-left text-sm dark:divide-neutral-800">
-          <thead className="bg-neutral-50 text-xs font-medium text-neutral-500 dark:bg-neutral-800/50">
+        <table className="min-w-full divide-y divide-neutral-200 text-left text-xs dark:divide-neutral-800">
+          <thead className="bg-neutral-50 font-medium text-neutral-500 dark:bg-neutral-800/50">
             <tr>
-              <th className="px-4 py-3">User</th>
-              <th className="px-4 py-3">Role (R13)</th>
-              <th className="px-4 py-3">Assigned Branches</th>
-              <th className="px-4 py-3 text-right">Assign Branch</th>
+              <th className="px-4 py-3">Usuario</th>
+              <th className="px-4 py-3">Rol Asignado</th>
+              <th className="px-4 py-3">Sucursales Asignadas</th>
+              <th className="px-4 py-3 text-right">Asignar Sucursal</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
             {!memberships || memberships.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-xs text-neutral-500">
-                  No members found in this tenant.
+                <td colSpan={4} className="px-4 py-6 text-center text-xs text-neutral-400">
+                  No se encontraron miembros registrados en esta organización.
                 </td>
               </tr>
             ) : (
@@ -171,34 +171,34 @@ export default async function UsersAdminPage({
                 const userBranches = (branchMemberships ?? []).filter((bm) => bm.user_id === m.user_id);
                 return (
                   <tr key={m.id} className="hover:bg-neutral-50/50">
-                    <td className="px-4 py-3 text-xs font-medium text-neutral-900 dark:text-neutral-100">
+                    <td className="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">
                       <div>{profile?.full_name || '—'}</div>
                       <div className="font-mono text-[11px] text-neutral-500">{profile?.email}</div>
                     </td>
-                    <td className="px-4 py-3 text-xs">
+                    <td className="px-4 py-3">
                       <form action={updateRoleAction} className="inline-flex items-center gap-2">
                         <input type="hidden" name="membershipId" value={m.id} />
                         <select
                           name="role"
                           defaultValue={m.role}
-                          className="rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
+                          className="rounded-lg border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
                         >
-                          <option value="client">Client</option>
-                          <option value="operator">Operator</option>
-                          <option value="tenant_admin">Tenant Admin</option>
+                          <option value="client">Cliente</option>
+                          <option value="operator">Operador / Mecánico</option>
+                          <option value="tenant_admin">Administrador</option>
                         </select>
                         <button
                           type="submit"
-                          className="rounded bg-neutral-100 px-2 py-1 text-[11px] font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300"
+                          className="rounded-lg bg-neutral-100 px-2 py-1 text-[11px] font-semibold text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300"
                         >
-                          Save
+                          Guardar
                         </button>
                       </form>
                     </td>
-                    <td className="px-4 py-3 text-xs">
+                    <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {userBranches.length === 0 ? (
-                          <span className="text-[11px] text-neutral-400">All (Admin) / None</span>
+                          <span className="text-[11px] text-neutral-400">Todas (Admin) / Ninguna</span>
                         ) : (
                           userBranches.map((ub) => {
                             const b = Array.isArray(ub.branches) ? ub.branches[0] : ub.branches;
@@ -214,12 +214,12 @@ export default async function UsersAdminPage({
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right text-xs">
+                    <td className="px-4 py-3 text-right">
                       <form action={assignBranchAction} className="inline-flex items-center gap-1">
                         <input type="hidden" name="userId" value={m.user_id} />
                         <select
                           name="branchId"
-                          className="rounded border border-neutral-300 bg-white px-2 py-1 text-[11px] dark:border-neutral-700 dark:bg-neutral-800"
+                          className="rounded-lg border border-neutral-300 bg-white px-2 py-1 text-[11px] dark:border-neutral-700 dark:bg-neutral-800"
                         >
                           {branches?.map((b) => (
                             <option key={b.id} value={b.id}>
@@ -229,9 +229,9 @@ export default async function UsersAdminPage({
                         </select>
                         <button
                           type="submit"
-                          className="rounded bg-indigo-600 px-2 py-1 text-[11px] font-semibold text-white shadow hover:bg-indigo-500"
+                          className="rounded-lg bg-indigo-600 px-2.5 py-1 text-[11px] font-bold text-white shadow hover:bg-indigo-500"
                         >
-                          + Add
+                          + Asignar
                         </button>
                       </form>
                     </td>

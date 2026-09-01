@@ -16,44 +16,44 @@ export default async function Home() {
       badge: 'Mecánica',
     },
     {
-      title: 'Client Portal',
-      description: 'Dedicated customer portal for uploading receipts and tracking personal verification status in real time.',
+      title: 'Portal de Clientes',
+      description: 'Portal para clientes y usuarios: carga directa de comprobantes y seguimiento del estado de validación en tiempo real.',
       href: '/portal',
-      badge: 'Client',
+      badge: 'Clientes',
     },
     {
-      title: 'Upload Receipts',
-      description: 'Manual ingestion of bank receipts with immutable storage and automatic OCR/QR triggering (R1).',
+      title: 'Cargar Comprobantes',
+      description: 'Ingreso y procesamiento manual de comprobantes bancarios con almacenamiento inmutable y escaneo automático OCR y QR.',
       href: '/upload',
-      badge: 'Operator',
+      badge: 'Operador',
     },
     {
-      title: 'Receipts Repository',
-      description: 'Searchable repository, human second-person review workflow, and fraud detection badges (R6, R9).',
+      title: 'Repositorio de Comprobantes',
+      description: 'Bandeja general, revisión a cuatro ojos, historial de auditoría y detección automática de posibles fraudes.',
       href: '/receipts',
-      badge: 'Operator',
+      badge: 'Operador',
     },
     {
-      title: 'Branch Metrics',
-      description: 'Real-time analytics, QR verification success rates, fraud detection rates, and CSV export (R10, R11).',
+      title: 'Métricas & Reportes',
+      description: 'Analíticas en tiempo real por sucursal, tasa de éxito en verificación criptográfica QR y exportación a CSV.',
       href: '/metrics',
-      badge: 'Analytics',
+      badge: 'Analítica',
     },
     {
-      title: 'Bank Public Keys',
-      description: 'Manage and activate/deactivate 32-byte Ed25519 public keys per financial institution (R14).',
+      title: 'Claves Públicas Bancarias',
+      description: 'Gestión y activación de claves criptográficas Ed25519 por institución financiera para validación QR.',
       href: '/settings/keys',
       badge: 'Admin',
     },
     {
-      title: 'Beneficiary Accounts',
-      description: 'Configure expected destination accounts for automatic reconciliation and fraud flags (R15).',
+      title: 'Cuentas Beneficiarias',
+      description: 'Configuración de cuentas bancarias de destino autorizadas para conciliación automática y alertas.',
       href: '/settings/beneficiaries',
       badge: 'Admin',
     },
     {
-      title: 'Branches & Users',
-      description: 'Manage physical branches, user memberships, and multi-tenant access control (R12, R13).',
+      title: 'Sucursales & Usuarios',
+      description: 'Administración de sucursales físicas, asignación de membresías y control de roles multi-inquilino.',
       href: '/settings/branches',
       badge: 'Admin',
     },
@@ -67,7 +67,7 @@ export default async function Home() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-                  Enterprise Command Center
+                  Centro de Control Empresarial
                 </span>
                 <span className="rounded-full bg-indigo-50 border border-indigo-200 px-2 py-0.5 font-mono text-[10px] font-bold text-indigo-700 dark:bg-indigo-950/60 dark:border-indigo-800 dark:text-indigo-300">
                   {APP_VERSION}
@@ -77,7 +77,7 @@ export default async function Home() {
                 JanusCore Pro
               </h1>
               <p className="mt-1 text-sm text-neutral-500">
-                Multi-Tenant Receipt Verification, Ed25519 Cryptographic Proofs & Invoicing Core
+                Verificación de Comprobantes, Validación Criptográfica Ed25519 & Gestión de Servicios
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -91,7 +91,7 @@ export default async function Home() {
                       type="submit"
                       className="rounded bg-neutral-200 px-3 py-1 text-xs font-semibold text-neutral-800 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-200"
                     >
-                      Sign Out
+                      Cerrar Sesión
                     </button>
                   </form>
                 </div>
@@ -100,7 +100,7 @@ export default async function Home() {
                   href="/login"
                   className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-bold text-white shadow hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900"
                 >
-                  Sign In →
+                  Iniciar Sesión →
                 </Link>
               )}
             </div>
@@ -120,7 +120,7 @@ export default async function Home() {
                     {sec.badge}
                   </span>
                   <span className="text-xs font-medium text-indigo-600 opacity-0 transition group-hover:opacity-100 dark:text-indigo-400">
-                    Launch →
+                    Ingresar →
                   </span>
                 </div>
                 <h2 className="mt-3 text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
@@ -136,7 +136,7 @@ export default async function Home() {
 
         <footer className="mt-auto border-t border-neutral-200 pt-8 text-center text-xs text-neutral-400 dark:border-neutral-800">
           <p>
-            Powered by <strong className="font-semibold text-neutral-600 dark:text-neutral-300">januscore.pro</strong> • Strict RLS & Cryptographic Trust Layer • <span className="font-mono text-[11px] font-bold text-neutral-500">{APP_VERSION}</span>
+            Desarrollado con <strong className="font-semibold text-neutral-600 dark:text-neutral-300">januscore.pro</strong> • Seguridad Multi-inquilino RLS & Criptografía • <span className="font-mono text-[11px] font-bold text-neutral-500">{APP_VERSION}</span>
           </p>
         </footer>
       </main>

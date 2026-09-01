@@ -16,8 +16,8 @@ export default async function MetricsPage({
 
   if (!user) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-10">
-        <p className="text-sm text-neutral-600">Please sign in to view branch metrics.</p>
+      <main className="mx-auto max-w-5xl px-4 py-10 font-sans">
+        <p className="text-sm text-neutral-600">Por favor inicia sesión para ver las métricas.</p>
       </main>
     );
   }
@@ -57,38 +57,38 @@ export default async function MetricsPage({
   const overallMetrics = calculateBranchMetrics(rawMetricsList);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
+    <main className="mx-auto max-w-6xl px-4 py-8 font-sans">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
-            Branch Verification Metrics
+            Métricas de Verificación & Fraude
           </h1>
           <p className="text-sm text-neutral-500">
-            Real-time analytics, QR verification rates, and fraud detection (R10)
+            Analítica en tiempo real por sucursal, tasa de validación QR y alertas de seguridad
           </p>
         </div>
         <div className="flex items-center gap-3">
           <a
             href={`/api/receipts/export${params.branchId ? `?branchId=${params.branchId}` : ''}`}
             download
-            className="inline-flex items-center justify-center rounded-md border border-neutral-300 bg-white px-4 py-2 text-xs font-semibold text-neutral-800 shadow-sm hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+            className="inline-flex items-center justify-center rounded-lg border border-neutral-300 bg-white px-4 py-2 text-xs font-semibold text-neutral-800 shadow-sm hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
           >
-            ↓ Export CSV (R11)
+            ↓ Exportar Reporte CSV
           </a>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <form method="GET" className="mt-6 flex items-center gap-3 rounded-lg border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-800 dark:bg-neutral-900/50">
+      <form method="GET" className="mt-6 flex items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-800 dark:bg-neutral-900/50">
         <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
-          Scope Branch:
+          Filtrar por Sucursal:
           <select
             name="branchId"
             defaultValue={params.branchId ?? 'all'}
-            className="ml-2 rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
+            className="ml-2 rounded-lg border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
           >
-            <option value="all">All Accessible Branches</option>
+            <option value="all">Todas las sucursales accesibles</option>
             {branches?.map((b) => (
               <option key={b.id} value={b.id}>
                 {b.name} ({b.code})
@@ -98,29 +98,29 @@ export default async function MetricsPage({
         </label>
         <button
           type="submit"
-          className="rounded bg-neutral-200 px-3 py-1 text-xs font-medium text-neutral-800 hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-200"
+          className="rounded-lg bg-neutral-200 px-3 py-1 text-xs font-semibold text-neutral-800 hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-200"
         >
-          Apply
+          Aplicar Filtro
         </button>
       </form>
 
       {/* Metrics Stat Cards */}
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-          <dt className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Total Receipts
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Total Comprobantes
           </dt>
           <dd className="mt-2 text-3xl font-extrabold text-neutral-900 dark:text-neutral-100">
             {overallMetrics.totalReceipts}
           </dd>
           <p className="mt-1 text-[11px] text-neutral-400">
-            Pending: {overallMetrics.statusCounts.pending} • Review: {overallMetrics.statusCounts.needs_review}
+            Pendientes: {overallMetrics.statusCounts.pending} • En Revisión: {overallMetrics.statusCounts.needs_review}
           </p>
         </div>
 
-        <div className="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-          <dt className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Approved Rate
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Tasa de Aprobación
           </dt>
           <dd className="mt-2 text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
             {overallMetrics.statusCounts.approved}
@@ -128,25 +128,25 @@ export default async function MetricsPage({
           <p className="mt-1 text-[11px] text-neutral-400">
             {overallMetrics.totalReceipts > 0
               ? `${((overallMetrics.statusCounts.approved / overallMetrics.totalReceipts) * 100).toFixed(1)}%`
-              : '0%'} of total volume
+              : '0%'} del volumen total
           </p>
         </div>
 
-        <div className="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-          <dt className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            QR Verified Rate
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Validación QR Exitosa
           </dt>
           <dd className="mt-2 text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">
             {overallMetrics.qrVerifiedRatePercent.toFixed(1)}%
           </dd>
           <p className="mt-1 text-[11px] text-neutral-400">
-            {overallMetrics.qrVerifiedCount} cryptographic signatures valid
+            {overallMetrics.qrVerifiedCount} firmas criptográficas válidas
           </p>
         </div>
 
-        <div className="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-          <dt className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Fraud Flag Rate (R4)
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Tasa de Alertas de Fraude
           </dt>
           <dd
             className={`mt-2 text-3xl font-extrabold ${
@@ -156,35 +156,35 @@ export default async function MetricsPage({
             {overallMetrics.fraudRatePercent.toFixed(1)}%
           </dd>
           <p className="mt-1 text-[11px] text-neutral-400">
-            {overallMetrics.fraudCount} receipts flagged for signature failure
+            {overallMetrics.fraudCount} comprobantes con firma inválida
           </p>
         </div>
       </div>
 
       {/* Per-Branch Breakdown Table */}
-      <div className="mt-8 overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="mt-8 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
         <div className="border-b border-neutral-200 px-5 py-4 dark:border-neutral-800">
-          <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-            Per-Branch Summary (R10)
+          <h2 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
+            Resumen por Sucursal
           </h2>
         </div>
-        <table className="min-w-full divide-y divide-neutral-200 text-left text-sm dark:divide-neutral-800">
-          <thead className="bg-neutral-50 text-xs font-medium text-neutral-500 dark:bg-neutral-800/50 dark:text-neutral-400">
+        <table className="min-w-full divide-y divide-neutral-200 text-left text-xs dark:divide-neutral-800">
+          <thead className="bg-neutral-50 font-medium text-neutral-500 dark:bg-neutral-800/50 dark:text-neutral-400">
             <tr>
-              <th className="px-4 py-3">Branch</th>
+              <th className="px-4 py-3">Sucursal</th>
               <th className="px-4 py-3">Total</th>
-              <th className="px-4 py-3">Approved</th>
-              <th className="px-4 py-3">Needs Review</th>
-              <th className="px-4 py-3">QR Verified %</th>
-              <th className="px-4 py-3">Fraud Flags</th>
-              <th className="px-4 py-3 text-right">Action</th>
+              <th className="px-4 py-3">Aprobados</th>
+              <th className="px-4 py-3">En Revisión</th>
+              <th className="px-4 py-3">% Verificados QR</th>
+              <th className="px-4 py-3">Alertas Fraude</th>
+              <th className="px-4 py-3 text-right">Acción</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
             {!branches || branches.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-xs text-neutral-500">
-                  No branches configured.
+                <td colSpan={7} className="px-4 py-6 text-center text-xs text-neutral-400">
+                  No hay sucursales configuradas.
                 </td>
               </tr>
             ) : (
@@ -193,14 +193,14 @@ export default async function MetricsPage({
                 const bMetrics = calculateBranchMetrics(branchReceipts);
                 return (
                   <tr key={b.id} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30">
-                    <td className="px-4 py-3 font-medium text-neutral-900 dark:text-neutral-100">
+                    <td className="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">
                       {b.name} <span className="font-mono text-xs text-neutral-400">({b.code})</span>
                     </td>
-                    <td className="px-4 py-3 text-xs">{bMetrics.totalReceipts}</td>
-                    <td className="px-4 py-3 text-xs text-emerald-600 font-semibold">{bMetrics.statusCounts.approved}</td>
-                    <td className="px-4 py-3 text-xs text-orange-600 font-semibold">{bMetrics.statusCounts.needs_review}</td>
-                    <td className="px-4 py-3 text-xs">{bMetrics.qrVerifiedRatePercent.toFixed(1)}%</td>
-                    <td className="px-4 py-3 text-xs">
+                    <td className="px-4 py-3">{bMetrics.totalReceipts}</td>
+                    <td className="px-4 py-3 text-emerald-600 font-bold">{bMetrics.statusCounts.approved}</td>
+                    <td className="px-4 py-3 text-orange-600 font-bold">{bMetrics.statusCounts.needs_review}</td>
+                    <td className="px-4 py-3">{bMetrics.qrVerifiedRatePercent.toFixed(1)}%</td>
+                    <td className="px-4 py-3">
                       {bMetrics.fraudCount > 0 ? (
                         <span className="font-bold text-rose-600">⚠️ {bMetrics.fraudCount}</span>
                       ) : (
@@ -210,9 +210,9 @@ export default async function MetricsPage({
                     <td className="px-4 py-3 text-right">
                       <Link
                         href={`/receipts?branchId=${b.id}`}
-                        className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                        className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
                       >
-                        View Receipts →
+                        Ver Comprobantes →
                       </Link>
                     </td>
                   </tr>

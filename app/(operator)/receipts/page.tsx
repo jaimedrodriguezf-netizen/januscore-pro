@@ -20,7 +20,7 @@ export default async function ReceiptsListPage({
   if (!user) {
     return (
       <main className="mx-auto max-w-5xl px-4 py-10">
-        <p className="text-sm text-neutral-600">Please sign in to view receipts.</p>
+        <p className="text-sm text-neutral-600">Por favor inicia sesión para ver los comprobantes.</p>
       </main>
     );
   }
@@ -53,51 +53,51 @@ export default async function ReceiptsListPage({
   const { data: receipts } = await query;
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
+    <main className="mx-auto max-w-6xl px-4 py-8 font-sans">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
-            Receipts Repository
+            Repositorio de Comprobantes
           </h1>
           <p className="text-sm text-neutral-500">
-            Branch-scoped receipt verification & human review (R6, R9)
+            Bandeja general, revisión a cuatro ojos y validación por sucursal
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             href="/upload"
-            className="inline-flex items-center justify-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900"
+            className="inline-flex items-center justify-center rounded-lg bg-neutral-900 px-4 py-2 text-xs font-bold text-white shadow hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900"
           >
-            Upload receipt
+            + Cargar Comprobante
           </Link>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <form method="GET" className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-800 dark:bg-neutral-900/50">
+      <form method="GET" className="mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-800 dark:bg-neutral-900/50">
         <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
-          Status:
+          Estado:
           <select
             name="status"
             defaultValue={params.status ?? 'all'}
-            className="ml-1 rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
+            className="ml-1 rounded-lg border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
           >
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="needs_review">Needs Review</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
+            <option value="all">Todos los estados</option>
+            <option value="pending">Pendiente</option>
+            <option value="needs_review">Requiere Revisión</option>
+            <option value="approved">Aprobado</option>
+            <option value="rejected">Rechazado</option>
           </select>
         </label>
 
         <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
-          Branch:
+          Sucursal:
           <select
             name="branchId"
             defaultValue={params.branchId ?? 'all'}
-            className="ml-1 rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
+            className="ml-1 rounded-lg border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
           >
-            <option value="all">All branches</option>
+            <option value="all">Todas las sucursales</option>
             {branches?.map((b) => (
               <option key={b.id} value={b.id}>
                 {b.name} ({b.code})
@@ -106,7 +106,7 @@ export default async function ReceiptsListPage({
           </select>
         </label>
 
-        <label className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+        <label className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400">
           <input
             type="checkbox"
             name="fraud"
@@ -114,81 +114,81 @@ export default async function ReceiptsListPage({
             defaultChecked={params.fraud === '1'}
             className="rounded border-neutral-300"
           />
-          Fraud Flagged Only (R4)
+          Solo con Alerta de Fraude
         </label>
 
         <button
           type="submit"
-          className="ml-auto rounded bg-neutral-200 px-3 py-1 text-xs font-medium text-neutral-800 hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-200"
+          className="ml-auto rounded-lg bg-neutral-200 px-3 py-1 text-xs font-semibold text-neutral-800 hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-200"
         >
-          Filter
+          Filtrar
         </button>
       </form>
 
       {/* Receipts Table */}
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-        <table className="min-w-full divide-y divide-neutral-200 text-left text-sm dark:divide-neutral-800">
-          <thead className="bg-neutral-50 text-xs font-medium text-neutral-500 dark:bg-neutral-800/50 dark:text-neutral-400">
+      <div className="mt-6 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <table className="min-w-full divide-y divide-neutral-200 text-left text-xs dark:divide-neutral-800">
+          <thead className="bg-neutral-50 font-medium text-neutral-500 dark:bg-neutral-800/50 dark:text-neutral-400">
             <tr>
-              <th className="px-4 py-3">Created</th>
-              <th className="px-4 py-3">File</th>
-              <th className="px-4 py-3">Branch</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Signals</th>
-              <th className="px-4 py-3 text-right">Action</th>
+              <th className="px-4 py-3">Fecha de Creación</th>
+              <th className="px-4 py-3">Archivo Original</th>
+              <th className="px-4 py-3">Sucursal</th>
+              <th className="px-4 py-3">Estado</th>
+              <th className="px-4 py-3">Alertas</th>
+              <th className="px-4 py-3 text-right">Acción</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
             {!receipts || receipts.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm text-neutral-500">
-                  No receipts found matching your criteria.
+                <td colSpan={6} className="px-4 py-8 text-center text-xs text-neutral-400">
+                  No se encontraron comprobantes con los filtros seleccionados.
                 </td>
               </tr>
             ) : (
               receipts.map((r) => {
                 const branchObj = Array.isArray(r.branches) ? r.branches[0] : r.branches;
-                const statusStyles: Record<string, string> = {
-                  pending: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300',
-                  needs_review: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300',
-                  approved: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300',
-                  rejected: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300',
+                const statusStyles: Record<string, { label: string; class: string }> = {
+                  pending: { label: 'Pendiente', class: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300' },
+                  needs_review: { label: 'En Revisión', class: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300' },
+                  approved: { label: 'Aprobado ✓', class: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300' },
+                  rejected: { label: 'Rechazado ✕', class: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300' },
                 };
+                const s = statusStyles[r.status] || { label: r.status, class: 'bg-neutral-100 text-neutral-800' };
+
                 return (
                   <tr key={r.id} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30">
-                    <td className="whitespace-nowrap px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400">
+                    <td className="whitespace-nowrap px-4 py-3 text-neutral-500">
                       {new Date(r.created_at).toLocaleString()}
                     </td>
                     <td className="px-4 py-3 font-medium text-neutral-900 dark:text-neutral-100">
                       {r.original_filename}
                     </td>
-                    <td className="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400">
+                    <td className="px-4 py-3 text-neutral-500">
                       {branchObj ? `${branchObj.name} (${branchObj.code})` : r.branch_id}
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-                          statusStyles[r.status] || 'bg-neutral-100 text-neutral-800'
-                        }`}
+                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${s.class}`}
                       >
-                        {r.status}
+                        {s.label}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       {r.fraud_flag ? (
-                        <span className="inline-flex items-center gap-1 rounded bg-red-100 px-2 py-0.5 text-xs font-bold text-red-800 dark:bg-red-950/60 dark:text-red-300">
-                          ⚠️ Fraud Flag
+                        <span className="inline-flex items-center gap-1 rounded-md bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-800 dark:bg-rose-950/60 dark:text-rose-300">
+                          ⚠️ Posible Fraude
                         </span>
                       ) : (
-                        <span className="text-xs text-neutral-400">—</span>
+                        <span className="text-neutral-400">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link
                         href={`/receipts/${r.id}`}
-                        className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                        className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
                       >
-                        Review →
+                        Revisar →
                       </Link>
                     </td>
                   </tr>
