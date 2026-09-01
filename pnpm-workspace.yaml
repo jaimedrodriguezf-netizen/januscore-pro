@@ -1,0 +1,8 @@
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
+onlyBuiltDependencies:
+  - esbuild
+  - unrs-resolver
+  - sharp
+  - "@img/sharp-libvips-linux-x64"
