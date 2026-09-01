@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
+import { APP_VERSION } from '@/lib/version';
 
 function LoginFormContent() {
   const router = useRouter();
@@ -72,9 +73,14 @@ function LoginFormContent() {
   return (
     <div className="w-full max-w-md space-y-8 rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
       <div>
-        <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-          JanusCore Pro
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+            JanusCore Pro
+          </span>
+          <span className="rounded-full bg-neutral-100 border border-neutral-200 px-2 py-0.5 font-mono text-[10px] font-bold text-neutral-600 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
+            {APP_VERSION}
+          </span>
+        </div>
         <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100">
           {isSignUp ? 'Crear cuenta' : 'Ingresar a JanusCore Pro'}
         </h2>

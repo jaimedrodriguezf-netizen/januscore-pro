@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { formatPlate, isServiceDue } from '@/lib/mechanics/service';
-import type { MaintenanceRecord, Vehicle } from '@/lib/mechanics/types';
+import type { MaintenanceRecord, ServiceType, Vehicle } from '@/lib/mechanics/types';
+import { APP_VERSION } from '@/lib/version';
 
 export const dynamic = 'force-dynamic';
 
@@ -216,7 +217,7 @@ export default async function VehiclePublicPage({
 
         {/* Footer */}
         <footer className="mt-12 text-center text-[10px] text-neutral-600">
-          <p>Potenciado por <strong>januscore.pro</strong> — Sistema de Trazabilidad Automotriz</p>
+          <p>Potenciado por <strong>januscore.pro</strong> — Sistema de Trazabilidad Automotriz • <span className="font-mono text-[9px]">{APP_VERSION}</span></p>
         </footer>
       </main>
     </div>

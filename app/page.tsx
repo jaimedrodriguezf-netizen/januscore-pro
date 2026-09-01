@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { APP_VERSION } from '@/lib/version';
 
 export default async function Home() {
   const supabase = await createSupabaseServerClient();
@@ -64,9 +65,14 @@ export default async function Home() {
         <header className="mb-12 border-b border-neutral-200 pb-6 dark:border-neutral-800">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-                Enterprise Command Center
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                  Enterprise Command Center
+                </span>
+                <span className="rounded-full bg-indigo-50 border border-indigo-200 px-2 py-0.5 font-mono text-[10px] font-bold text-indigo-700 dark:bg-indigo-950/60 dark:border-indigo-800 dark:text-indigo-300">
+                  {APP_VERSION}
+                </span>
+              </div>
               <h1 className="mt-1 text-3xl font-extrabold tracking-tight">
                 JanusCore Pro
               </h1>
@@ -130,7 +136,7 @@ export default async function Home() {
 
         <footer className="mt-auto border-t border-neutral-200 pt-8 text-center text-xs text-neutral-400 dark:border-neutral-800">
           <p>
-            Powered by <strong className="font-semibold text-neutral-600 dark:text-neutral-300">januscore.pro</strong> • Strict RLS & Cryptographic Trust Layer
+            Powered by <strong className="font-semibold text-neutral-600 dark:text-neutral-300">januscore.pro</strong> • Strict RLS & Cryptographic Trust Layer • <span className="font-mono text-[11px] font-bold text-neutral-500">{APP_VERSION}</span>
           </p>
         </footer>
       </main>
