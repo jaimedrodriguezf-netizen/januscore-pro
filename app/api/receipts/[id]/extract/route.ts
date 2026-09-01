@@ -5,9 +5,10 @@ import { createSupabaseServiceClient } from '@/lib/supabase/service';
 import { canAccessBranch } from '@/lib/tenancy/branch';
 import { getDefaultOcrEngine } from '@/lib/ocr/tesseract';
 import { runExtractionPipeline } from '@/lib/ocr/pipeline';
+import { runQrVerificationPipeline, type QrImageDecoder } from '@/lib/qr/pipeline';
 
 /**
- * R2 / R5 — POST /api/receipts/[id]/extract.
+ * R2 / R3 / R5 — POST /api/receipts/[id]/extract.
  *
  * Orchestrates server-side OCR after a receipt has been ingested (Phase 2). The
  * handler authenticates the operator, verifies the receipt belongs to one of
@@ -25,14 +26,34 @@ import { runExtractionPipeline } from '@/lib/ocr/pipeline';
  * and surfaces the missing-config error server-side (R2 threat matrix:
  * missing/hanging binary → graceful error, receipt stays `pending`).
  *
+ * Phase 4 (R3 / R4): after OCR, the same `after` boundary runs the QR + Ed25519
+ * verification stage. The QR stage needs a decoded raw QR string; the
+ * `QrImageDecoder` provides it (pixels → raw string). v1 ships NO image decoder
+ * (no decoder lib is approved), so `getDefaultQrDecoder()` returns null and the
+ * QR stage is skipped honestly (no qr_verifications row, no fraud flag) — the
+ * verify pipeline + parser/crypto are exercised by tests/qr/* directly. A later
+ * PR can plug in a decoder and the route lights up with zero further edits.
+ *
  * Phase boundary: R5 beneficiary matching is wired structurally (the pipeline
- * leaves the receipt `pending` on complete; QR/Ed25519/beneficiary/review arrive
- * in Phases 4–5 and augment this same route handler).
+ * leaves the receipt `pending` on complete; beneficiary/review arrive in Phases
+ * 5).
  */
 export const dynamic = 'force-dynamic';
 
-interface ExtractRouteContext {
+export interface ExtractRouteContext {
   params: Promise<{ id: string }>;
+}
+
+/**
+ * Resolve the QR *image* decoder (pixels → raw QR string). v1 ships NO decoder
+ * (no decoder library is approved yet), so this returns null and the QR stage
+ * is skipped honestly. The QR verification domain (parser + Ed25519 + pipeline)
+ * is fully implemented and green via tests/qr/*. A later PR that installs a
+ * decoder lib and returns an implementation here lights up QR verification in
+ * the route with NO route-handler edits beyond this resolver.
+ */
+function getDefaultQrDecoder(): QrImageDecoder | null {
+  return null;
 }
 
 export async function POST(_req: NextRequest, ctx: ExtractRouteContext) {
@@ -110,12 +131,83 @@ export async function POST(_req: NextRequest, ctx: ExtractRouteContext) {
       // Surface it to platform logs; never escalate to a 500 the client already
       // received 202 for. (Phase 5 audit wire can record this failure.)
     }
+
+    // Phase 4 (R3 / R4): QR + Ed25519 verification stage. Same `after` boundary
+    // as OCR. Requires a QR image decoder (pixels → raw string). v2 ships NO
+    // decoder (getDefaultQrDecoder → null), so the QR stage is skipped honestly;
+    // when a decoder is plugged in this branch runs the verify pipeline (parser
+    // → bank key lookup → Ed25519 verify → fraud flag on signature failure).
+    const qrDecoder = getDefaultQrDecoder();
+    if (qrDecoder) {
+      try {
+        await runQrStage({
+          decoder: qrDecoder,
+          supabase: serviceClient,
+          receiptId,
+          tenantId,
+          branchId,
+          storagePath,
+          mime,
+        });
+      } catch {
+        // Same threat-matrix posture as OCR: never escalate to a 500. An
+        // unhandled QR error leaves the receipt in its OCR-result status.
+      }
+    }
   });
 
   return Response.json(
     { status: 'accepted', receiptId, message: 'OCR scheduled' },
     { status: 202 },
   );
+}
+
+/**
+ * R3/R4 QR stage: download the original to a temp file, decode the QR image →
+ * raw string, run the verification pipeline. Errors are caught by the caller.
+ */
+async function runQrStage(args: {
+  decoder: QrImageDecoder;
+  supabase: ReturnType<typeof createSupabaseServiceClient>;
+  receiptId: string;
+  tenantId: string;
+  branchId: string;
+  storagePath: string;
+  mime: string;
+}): Promise<void> {
+  const { mkdtemp, writeFile, rm } = await import('node:fs/promises');
+  const os = (await import('node:os')).default;
+  const path = (await import('node:path')).default;
+  const { RECEIPTS_BUCKET } = await import('@/lib/upload/storage');
+
+  const ext = mimeToExt(args.mime);
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'qr-decode-'));
+  const localPath = path.join(dir, `input${ext}`);
+  try {
+    const { data, error } = await args.supabase.storage
+      .from(RECEIPTS_BUCKET)
+      .download(args.storagePath);
+    if (error || !data) return; // nothing to decode; honest skip
+    await writeFile(localPath, new Uint8Array(await data.arrayBuffer()));
+    const raw = await args.decoder.decode(localPath, args.mime);
+    if (!raw) return; // no QR code found; honest skip (no fraud flag)
+    await runQrVerificationPipeline({
+      receiptId: args.receiptId,
+      tenantId: args.tenantId,
+      branchId: args.branchId,
+      rawQr: raw,
+      supabase: args.supabase,
+    });
+  } finally {
+    await rm(localPath, { force: true });
+  }
+}
+
+function mimeToExt(mime: string): string {
+  if (mime === 'application/pdf') return '.pdf';
+  if (mime === 'image/png') return '.png';
+  if (mime === 'image/jpeg' || mime === 'image/jpg') return '.jpg';
+  return '.bin';
 }
 
 /**
