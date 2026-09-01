@@ -54,3 +54,6 @@ next-env.d.ts
 # supabase local
 /supabase/.branches
 /supabase/.temp
+
+# Project MCP config with secrets
+.agents/mcp_config.json
