@@ -1,7 +1,19 @@
 import Link from 'next/link';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const sections = [
+    {
+      title: 'Client Portal',
+      description: 'Dedicated customer portal for uploading receipts and tracking personal verification status in real time.',
+      href: '/portal',
+      badge: 'Client',
+    },
     {
       title: 'Upload Receipts',
       description: 'Manual ingestion of bank receipts with immutable storage and automatic OCR/QR triggering (R1).',
@@ -44,7 +56,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-zinc-50 font-sans text-neutral-900 dark:bg-black dark:text-neutral-100">
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 py-12">
         <header className="mb-12 border-b border-neutral-200 pb-6 dark:border-neutral-800">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
                 Enterprise Command Center
@@ -56,10 +68,29 @@ export default function Home() {
                 Multi-Tenant Receipt Verification, Ed25519 Cryptographic Proofs & Invoicing Core
               </p>
             </div>
-            <div className="hidden sm:block">
-              <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-                ● System Ready
-              </span>
+            <div className="flex items-center gap-3">
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
+                    {user.email}
+                  </span>
+                  <form action="/api/auth/signout" method="POST">
+                    <button
+                      type="submit"
+                      className="rounded bg-neutral-200 px-3 py-1 text-xs font-semibold text-neutral-800 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-200"
+                    >
+                      Sign Out
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-bold text-white shadow hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900"
+                >
+                  Sign In →
+                </Link>
+              )}
             </div>
           </div>
         </header>
