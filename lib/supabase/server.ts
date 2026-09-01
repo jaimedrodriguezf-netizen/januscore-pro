@@ -20,7 +20,7 @@ export async function createSupabaseServerClient() {
     {
       cookies: {
         getAll() {
-          return parseCookieHeader(cookieStore.toString());
+          return cookieStore.getAll();
         },
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           cookiesToSet.forEach(({ name, value, options }) => {
