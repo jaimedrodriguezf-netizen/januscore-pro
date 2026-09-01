@@ -9,6 +9,12 @@ export default async function Home() {
 
   const sections = [
     {
+      title: 'Taller Mecánico & QR',
+      description: 'Control de vehículos, órdenes de servicio, proyección de próximos mantenimientos y stickers QR para parabrisas.',
+      href: '/workshop',
+      badge: 'Mecánica',
+    },
+    {
       title: 'Client Portal',
       description: 'Dedicated customer portal for uploading receipts and tracking personal verification status in real time.',
       href: '/portal',
