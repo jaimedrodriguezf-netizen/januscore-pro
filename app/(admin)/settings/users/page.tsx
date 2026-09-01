@@ -69,7 +69,7 @@ export default async function UsersAdminPage({
     'use server';
     const supabase = await createSupabaseServerClient();
     const membershipId = String(formData.get('membershipId') || '');
-    const newRole = formData.get('role') as 'tenant_admin' | 'operator';
+    const newRole = formData.get('role') as 'tenant_admin' | 'operator' | 'client';
 
     const { error } = await supabase
       .from('tenant_memberships')
@@ -183,6 +183,7 @@ export default async function UsersAdminPage({
                           defaultValue={m.role}
                           className="rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
                         >
+                          <option value="client">Client</option>
                           <option value="operator">Operator</option>
                           <option value="tenant_admin">Tenant Admin</option>
                         </select>
