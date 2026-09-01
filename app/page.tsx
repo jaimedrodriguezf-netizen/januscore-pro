@@ -1,68 +1,101 @@
-import Image from "next/image";
+import Link from 'next/link';
 
 export default function Home() {
+  const sections = [
+    {
+      title: 'Upload Receipts',
+      description: 'Manual ingestion of bank receipts with immutable storage and automatic OCR/QR triggering (R1).',
+      href: '/upload',
+      badge: 'Operator',
+    },
+    {
+      title: 'Receipts Repository',
+      description: 'Searchable repository, human second-person review workflow, and fraud detection badges (R6, R9).',
+      href: '/receipts',
+      badge: 'Operator',
+    },
+    {
+      title: 'Branch Metrics',
+      description: 'Real-time analytics, QR verification success rates, fraud detection rates, and CSV export (R10, R11).',
+      href: '/metrics',
+      badge: 'Analytics',
+    },
+    {
+      title: 'Bank Public Keys',
+      description: 'Manage and activate/deactivate 32-byte Ed25519 public keys per financial institution (R14).',
+      href: '/settings/keys',
+      badge: 'Admin',
+    },
+    {
+      title: 'Beneficiary Accounts',
+      description: 'Configure expected destination accounts for automatic reconciliation and fraud flags (R15).',
+      href: '/settings/beneficiaries',
+      badge: 'Admin',
+    },
+    {
+      title: 'Branches & Users',
+      description: 'Manage physical branches, user memberships, and multi-tenant access control (R12, R13).',
+      href: '/settings/branches',
+      badge: 'Admin',
+    },
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="flex min-h-screen flex-col bg-zinc-50 font-sans text-neutral-900 dark:bg-black dark:text-neutral-100">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 py-12">
+        <header className="mb-12 border-b border-neutral-200 pb-6 dark:border-neutral-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                Enterprise Command Center
+              </span>
+              <h1 className="mt-1 text-3xl font-extrabold tracking-tight">
+                JanusCore Pro
+              </h1>
+              <p className="mt-1 text-sm text-neutral-500">
+                Multi-Tenant Receipt Verification, Ed25519 Cryptographic Proofs & Invoicing Core
+              </p>
+            </div>
+            <div className="hidden sm:block">
+              <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                ● System Ready
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {sections.map((sec) => (
+            <Link
+              key={sec.title}
+              href={sec.href}
+              className="group flex flex-col justify-between rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:border-neutral-400 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-600"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="rounded bg-neutral-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                    {sec.badge}
+                  </span>
+                  <span className="text-xs font-medium text-indigo-600 opacity-0 transition group-hover:opacity-100 dark:text-indigo-400">
+                    Launch →
+                  </span>
+                </div>
+                <h2 className="mt-3 text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+                  {sec.title}
+                </h2>
+                <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+                  {sec.description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </section>
+
+        <footer className="mt-auto border-t border-neutral-200 pt-8 text-center text-xs text-neutral-400 dark:border-neutral-800">
+          <p>
+            Powered by <strong className="font-semibold text-neutral-600 dark:text-neutral-300">januscore.pro</strong> • Strict RLS & Cryptographic Trust Layer
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        </footer>
       </main>
     </div>
   );
