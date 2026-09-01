@@ -6,6 +6,7 @@ import { canAccessBranch } from '@/lib/tenancy/branch';
 import { getDefaultOcrEngine } from '@/lib/ocr/tesseract';
 import { runExtractionPipeline } from '@/lib/ocr/pipeline';
 import { runQrVerificationPipeline, type QrImageDecoder } from '@/lib/qr/pipeline';
+import { getDefaultQrDecoder } from '@/lib/qr/decoder';
 
 /**
  * R2 / R3 / R5 — POST /api/receipts/[id]/extract.
@@ -44,17 +45,7 @@ export interface ExtractRouteContext {
   params: Promise<{ id: string }>;
 }
 
-/**
- * Resolve the QR *image* decoder (pixels → raw QR string). v1 ships NO decoder
- * (no decoder library is approved yet), so this returns null and the QR stage
- * is skipped honestly. The QR verification domain (parser + Ed25519 + pipeline)
- * is fully implemented and green via tests/qr/*. A later PR that installs a
- * decoder lib and returns an implementation here lights up QR verification in
- * the route with NO route-handler edits beyond this resolver.
- */
-function getDefaultQrDecoder(): QrImageDecoder | null {
-  return null;
-}
+
 
 export async function POST(_req: NextRequest, ctx: ExtractRouteContext) {
   const { id } = await ctx.params;
