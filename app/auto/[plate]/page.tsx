@@ -19,7 +19,7 @@ export default async function VehiclePublicPage({
   // Query vehicle by plate (Case-insensitive)
   const { data: vehicleData } = await supabase
     .from('vehicles')
-    .select('*, tenants(name)')
+    .select('*')
     .ilike('plate', formattedPlate)
     .maybeSingle();
 
