@@ -29,9 +29,9 @@ export default async function WorkshopAdminPage({
 
   if (!activeTenantId) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-10">
-        <p className="text-sm text-neutral-600">No hay talleres/tenants asignados.</p>
-      </main>
+      <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center">
+        <p className="text-sm text-slate-400">No hay organizaciones o talleres asignados a este usuario.</p>
+      </div>
     );
   }
 
@@ -55,7 +55,7 @@ export default async function WorkshopAdminPage({
     const v = vehicles?.find((veh) => veh.id === params.print);
     if (v) {
       printVehicle = v;
-      printStickerQr = await generateVehicleQrDataUrl('http://100.111.124.85:3000', v.plate);
+      printStickerQr = await generateVehicleQrDataUrl('https://januscore.pro', v.plate);
     }
   }
 
@@ -146,359 +146,385 @@ export default async function WorkshopAdminPage({
     redirect(`/workshop?tenantId=${activeTenantId}&print=${vehicleId}&ok=Mantenimiento%20registrado`);
   }
 
+  const totalVehicles = vehicles?.length ?? 0;
+  const totalServices = vehicles?.reduce((acc, v) => acc + (v.maintenance_records?.length ?? 0), 0) ?? 0;
+
   return (
-    <div className="min-h-screen bg-neutral-50 pb-16 text-neutral-900 dark:bg-black dark:text-neutral-100 font-sans">
-      {/* Top Bar */}
-      <header className="border-b border-neutral-200 bg-white px-6 py-4 dark:border-neutral-800 dark:bg-neutral-900">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div>
-            <span className="text-[10px] font-bold tracking-widest uppercase text-indigo-600 dark:text-indigo-400">
-              Módulo de Mecánica Automotriz
-            </span>
-            <h1 className="text-xl font-extrabold tracking-tight">Control de Taller & QR</h1>
+    <div className="space-y-6">
+      {/* Header & Metric Cards */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-5">
+        <div>
+          <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+            Control de Taller & Flotas
+          </span>
+          <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-100">
+            Módulo de Mecánica Automotriz
+          </h1>
+          <p className="text-xs text-slate-400">
+            Registro de fichas técnicas, órdenes de servicio, proyección de mantenimientos y stickers QR
+          </p>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="flex items-center gap-3">
+          <div className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 text-center">
+            <span className="text-[10px] uppercase font-bold text-slate-400">Vehículos</span>
+            <p className="text-lg font-extrabold text-slate-100">{totalVehicles}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 text-center">
+            <span className="text-[10px] uppercase font-bold text-slate-400">Servicios</span>
+            <p className="text-lg font-extrabold text-indigo-400">{totalServices}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Notifications */}
+      {params.ok && (
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/40 p-3 text-xs font-medium text-emerald-300">
+          ✓ {params.ok}
+        </div>
+      )}
+      {params.err && (
+        <div className="rounded-xl border border-rose-500/20 bg-rose-950/40 p-3 text-xs font-medium text-rose-300">
+          ⚠️ {params.err}
+        </div>
+      )}
+
+      {/* Printable Sticker Banner */}
+      {printVehicle && printStickerQr && (
+        <div className="rounded-2xl border border-indigo-500/40 bg-indigo-950/20 p-6 shadow-xl backdrop-blur-xs">
+          <div className="flex items-center justify-between border-b border-indigo-500/20 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🏷️</span>
+              <h2 className="text-sm font-bold text-indigo-300">
+                Sticker QR Listo para Impresión (Parabrisas del Cliente)
+              </h2>
+            </div>
             <Link
-              href="/"
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              href={`/workshop?tenantId=${activeTenantId}`}
+              className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-slate-200 text-xs"
             >
-              ← Volver al Hub
+              ✕ Cerrar
             </Link>
           </div>
-        </div>
-      </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        {/* Notifications */}
-        {params.ok && (
-          <div className="mb-6 rounded-lg bg-emerald-50 p-3 text-xs font-medium text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
-            ✓ {params.ok}
-          </div>
-        )}
-        {params.err && (
-          <div className="mb-6 rounded-lg bg-rose-50 p-3 text-xs font-medium text-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
-            ⚠️ {params.err}
-          </div>
-        )}
-
-        {/* Printable Sticker Modal (if print triggered) */}
-        {printVehicle && printStickerQr && (
-          <div className="mb-8 rounded-2xl border-2 border-indigo-500 bg-white p-6 shadow-xl dark:bg-neutral-900">
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-3 dark:border-neutral-800">
-              <h2 className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                🏷️ Sticker QR Listo para Imprimir (Parabrisas)
-              </h2>
-              <Link
-                href={`/workshop?tenantId=${activeTenantId}`}
-                className="text-xs text-neutral-400 hover:text-neutral-600"
-              >
-                ✕ Cerrar
-              </Link>
+          <div className="mt-4 flex flex-col sm:flex-row items-center gap-6">
+            {/* Actual printable sticker box */}
+            <div className="rounded-xl border-2 border-dashed border-slate-700 bg-slate-900 p-4 text-center">
+              <div className="text-[10px] font-bold tracking-wider uppercase text-slate-400">
+                JanusCore Auto Service
+              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={printStickerQr}
+                alt={`QR ${printVehicle.plate}`}
+                className="mx-auto my-2 h-36 w-36 rounded-lg bg-white p-2"
+              />
+              <div className="font-mono text-lg font-black text-slate-100">
+                {printVehicle.plate}
+              </div>
+              <div className="text-[10px] text-slate-400">
+                Escanea para ver tu próximo mantenimiento
+              </div>
             </div>
 
-            <div className="mt-4 flex flex-col sm:flex-row items-center gap-6">
-              {/* Actual printable sticker box */}
-              <div className="rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 p-4 text-center dark:border-neutral-700 dark:bg-neutral-950">
-                <div className="text-[10px] font-black tracking-wider uppercase text-neutral-500">
-                  JanusCore Auto Service
-                </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={printStickerQr}
-                  alt={`QR ${printVehicle.plate}`}
-                  className="mx-auto my-2 h-36 w-36 rounded-lg"
-                />
-                <div className="font-mono text-lg font-black text-neutral-900 dark:text-white">
-                  {printVehicle.plate}
-                </div>
-                <div className="text-[10px] text-neutral-500">
-                  Escaneá para ver tu próximo mantenimiento
-                </div>
-              </div>
-
+            <div className="space-y-3">
               <div>
-                <div className="text-sm font-bold">
+                <h3 className="text-base font-bold text-slate-100">
                   {printVehicle.brand} {printVehicle.model} ({printVehicle.plate})
-                </div>
-                <p className="mt-1 text-xs text-neutral-500">
-                  Imprimí este sticker en papel adhesivo para colocarlo en el parabrisas del cliente. El cliente podrá escanearlo en cualquier momento sin necesidad de registrarse.
+                </h3>
+                <p className="text-xs text-slate-400 mt-1 max-w-lg">
+                  Imprime este sticker en papel adhesivo para colocarlo en el parabrisas. El cliente podrá consultar el historial de mantenimiento y las fechas de cambio de aceite escaneando el código sin necesidad de iniciar sesión.
                 </p>
-                <div className="mt-4 flex items-center gap-3">
-                  <a
-                    href={`/auto/${printVehicle.plate}`}
-                    target="_blank"
-                    className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-bold text-white shadow hover:bg-neutral-800 dark:bg-white dark:text-neutral-900"
-                  >
-                    Ver Ficha Pública →
-                  </a>
-                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <a
+                  href={`/auto/${printVehicle.plate}`}
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-500 transition"
+                >
+                  <span>Ver Ficha Pública ↗</span>
+                </a>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Forms Grid */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* 1. Register Vehicle Card */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 className="text-sm font-bold">1. Registrar Nuevo Vehículo</h2>
-            <p className="mt-1 text-xs text-neutral-500">
-              Ingresá los datos del auto para generar su código QR único.
-            </p>
-
-            <form action={createVehicleAction} className="mt-4 space-y-3">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Placa</label>
-                  <input
-                    type="text"
-                    name="plate"
-                    placeholder="PBX-1234"
-                    required
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs uppercase font-mono font-bold dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Kilometraje Actual</label>
-                  <input
-                    type="number"
-                    name="mileage"
-                    placeholder="45000"
-                    required
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <div className="col-span-1">
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Marca</label>
-                  <input
-                    type="text"
-                    name="brand"
-                    placeholder="Toyota"
-                    required
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Modelo</label>
-                  <input
-                    type="text"
-                    name="model"
-                    placeholder="Corolla"
-                    required
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Año</label>
-                  <input
-                    type="number"
-                    name="year"
-                    placeholder="2022"
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Propietario</label>
-                  <input
-                    type="text"
-                    name="ownerName"
-                    placeholder="Juan Pérez"
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Celular / WhatsApp</label>
-                  <input
-                    type="text"
-                    name="ownerPhone"
-                    placeholder="0991234567"
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="mt-2 w-full rounded-lg bg-neutral-900 py-2 text-xs font-bold text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900"
-              >
-                + Registrar Vehículo
-              </button>
-            </form>
+      {/* Grid: Vehicle Form & Maintenance Form */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* 1. Register Vehicle Card */}
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-base">🚗</span>
+            <h2 className="text-sm font-bold text-slate-100">1. Registrar Nuevo Vehículo</h2>
           </div>
+          <p className="mt-1 text-xs text-slate-400">
+            Ingresa los datos técnicos del vehículo para generar su código QR único.
+          </p>
 
-          {/* 2. Add Maintenance Service Card */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 className="text-sm font-bold">2. Asentar Servicio de Mantenimiento</h2>
-            <p className="mt-1 text-xs text-neutral-500">
-              Registrá el trabajo realizado; el sistema proyectará el próximo servicio automáticamente.
-            </p>
-
-            <form action={addMaintenanceAction} className="mt-4 space-y-3">
+          <form action={createVehicleAction} className="mt-4 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Vehículo</label>
-                <select
-                  name="vehicleId"
+                <label className="block text-[11px] font-medium text-slate-300">Placa</label>
+                <input
+                  type="text"
+                  name="plate"
+                  placeholder="Ej. PBX-1234"
                   required
-                  className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800 font-mono"
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-mono font-bold uppercase text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300">Kilometraje Actual</label>
+                <input
+                  type="number"
+                  name="mileage"
+                  placeholder="Ej. 45000"
+                  required
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300">Marca</label>
+                <input
+                  type="text"
+                  name="brand"
+                  placeholder="Toyota"
+                  required
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300">Modelo</label>
+                <input
+                  type="text"
+                  name="model"
+                  placeholder="Corolla"
+                  required
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300">Año</label>
+                <input
+                  type="number"
+                  name="year"
+                  placeholder="2022"
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300">Propietario</label>
+                <input
+                  type="text"
+                  name="ownerName"
+                  placeholder="Juan Pérez"
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300">Celular / WhatsApp</label>
+                <input
+                  type="text"
+                  name="ownerPhone"
+                  placeholder="0991234567"
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="mt-2 w-full rounded-lg bg-indigo-600 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-indigo-500 transition"
+            >
+              + Registrar Vehículo
+            </button>
+          </form>
+        </div>
+
+        {/* 2. Add Maintenance Service Card */}
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-base">🛠️</span>
+            <h2 className="text-sm font-bold text-slate-100">2. Asentar Orden de Servicio / Mantenimiento</h2>
+          </div>
+          <p className="mt-1 text-xs text-slate-400">
+            Registra los trabajos realizados; el sistema calculará automáticamente la próxima fecha.
+          </p>
+
+          <form action={addMaintenanceAction} className="mt-4 space-y-3">
+            <div>
+              <label className="block text-[11px] font-medium text-slate-300">Vehículo</label>
+              <select
+                name="vehicleId"
+                required
+                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-mono text-slate-100 focus:border-indigo-500 focus:outline-hidden"
+              >
+                {!vehicles || vehicles.length === 0 ? (
+                  <option value="">No hay vehículos registrados</option>
+                ) : (
+                  vehicles.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.plate} — {v.brand} {v.model} ({v.current_mileage.toLocaleString()} km)
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300">Tipo de Servicio</label>
+                <select
+                  name="serviceType"
+                  required
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-hidden"
                 >
-                  {!vehicles || vehicles.length === 0 ? (
-                    <option value="">No hay vehículos registrados</option>
-                  ) : (
-                    vehicles.map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {v.plate} — {v.brand} {v.model} ({v.current_mileage.toLocaleString()} km)
-                      </option>
-                    ))
-                  )}
+                  <option value="oil_change">Cambio de Aceite (+5,000 km / 3m)</option>
+                  <option value="brakes">Frenos (+10,000 km / 6m)</option>
+                  <option value="full_abc">ABC de Motor Mayor (+10,000 km / 6m)</option>
+                  <option value="suspension">Suspensión & Dirección (+10,000 km)</option>
+                  <option value="alignment_balancing">Alineación & Balanceo (+5,000 km)</option>
+                  <option value="general_repair">Reparación General</option>
                 </select>
               </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Tipo de Servicio</label>
-                  <select
-                    name="serviceType"
-                    required
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  >
-                    <option value="oil_change">Cambio de Aceite (+5,000 km / 3m)</option>
-                    <option value="brakes">Frenos (+10,000 km / 6m)</option>
-                    <option value="full_abc">ABC de Motor Mayor (+10,000 km / 6m)</option>
-                    <option value="suspension">Suspensión & Dirección (+10,000 km)</option>
-                    <option value="alignment_balancing">Alineación & Balanceo (+5,000 km)</option>
-                    <option value="general_repair">Reparación General</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Kilometraje del Servicio</label>
-                  <input
-                    type="number"
-                    name="mileage"
-                    placeholder="45000"
-                    required
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
-              </div>
-
               <div>
-                <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Detalle de Trabajos & Repuestos</label>
-                <textarea
-                  name="description"
-                  rows={2}
-                  placeholder="Cambio de aceite sintético 10W-30 + filtro de aceite y filtro de aire."
+                <label className="block text-[11px] font-medium text-slate-300">Kilometraje del Servicio</label>
+                <input
+                  type="number"
+                  name="mileage"
+                  placeholder="Ej. 45000"
                   required
-                  className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
                 />
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Mecánico Responsable</label>
-                  <input
-                    type="text"
-                    name="technicianName"
-                    placeholder="Carlos Mendoza"
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">Costo Total ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="cost"
-                    placeholder="45.00"
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-                  />
-                </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-300">Detalle de Trabajos & Repuestos</label>
+              <textarea
+                name="description"
+                rows={2}
+                placeholder="Cambio de aceite sintético 10W-30 + filtro de aceite y filtro de aire."
+                required
+                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300">Mecánico Responsable</label>
+                <input
+                  type="text"
+                  name="technicianName"
+                  placeholder="Carlos Mendoza"
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+                />
               </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300">Costo Total ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="cost"
+                  placeholder="45.00"
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+                />
+              </div>
+            </div>
 
-              <button
-                type="submit"
-                className="mt-2 w-full rounded-lg bg-indigo-600 py-2 text-xs font-bold text-white hover:bg-indigo-500"
-              >
-                ✓ Guardar Mantenimiento & Generar Sticker
-              </button>
-            </form>
+            <button
+              type="submit"
+              className="mt-2 w-full rounded-lg bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-500 transition"
+            >
+              ✓ Guardar Mantenimiento & Generar Sticker
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Vehicles Table */}
+      <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 px-6 py-4">
+          <div>
+            <h2 className="text-sm font-bold text-slate-100">Vehículos en Taller ({totalVehicles})</h2>
+            <p className="text-xs text-slate-400">Padrón vehicular registrado y accesos a fichas técnicas públicas</p>
           </div>
+          <form method="GET" className="flex items-center gap-2">
+            <input type="hidden" name="tenantId" value={activeTenantId} />
+            <input
+              type="text"
+              name="q"
+              defaultValue={params.q || ''}
+              placeholder="Buscar por placa..."
+              className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-slate-800 border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition"
+            >
+              Buscar
+            </button>
+          </form>
         </div>
 
-        {/* Vehicles Table */}
-        <div className="mt-8 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-          <div className="flex items-center justify-between border-b border-neutral-200 px-6 py-4 dark:border-neutral-800">
-            <h2 className="text-sm font-bold">Vehículos en Taller ({vehicles?.length ?? 0})</h2>
-            <form method="GET" className="flex items-center gap-2">
-              <input type="hidden" name="tenantId" value={activeTenantId} />
-              <input
-                type="text"
-                name="q"
-                defaultValue={params.q || ''}
-                placeholder="Buscar por placa..."
-                className="rounded-lg border border-neutral-300 px-3 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800"
-              />
-              <button
-                type="submit"
-                className="rounded-lg bg-neutral-100 px-3 py-1 text-xs font-semibold hover:bg-neutral-200 dark:bg-neutral-800"
-              >
-                Buscar
-              </button>
-            </form>
-          </div>
-
-          <table className="min-w-full divide-y divide-neutral-200 text-left text-xs dark:divide-neutral-800">
-            <thead className="bg-neutral-50 text-neutral-500 dark:bg-neutral-800/50">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-800 text-left text-xs">
+            <thead className="bg-slate-900/90 text-slate-400 font-semibold">
               <tr>
-                <th className="px-6 py-3">Placa</th>
-                <th className="px-6 py-3">Vehículo</th>
-                <th className="px-6 py-3">Km Actual</th>
-                <th className="px-6 py-3">Propietario</th>
-                <th className="px-6 py-3">Historial</th>
-                <th className="px-6 py-3 text-right">Acciones</th>
+                <th className="px-6 py-3.5">Placa</th>
+                <th className="px-6 py-3.5">Vehículo</th>
+                <th className="px-6 py-3.5">Km Actual</th>
+                <th className="px-6 py-3.5">Propietario</th>
+                <th className="px-6 py-3.5">Historial</th>
+                <th className="px-6 py-3.5 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+            <tbody className="divide-y divide-slate-800/60">
               {!vehicles || vehicles.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-neutral-400">
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
                     No hay vehículos registrados en este taller.
                   </td>
                 </tr>
               ) : (
                 vehicles.map((v) => (
-                  <tr key={v.id} className="hover:bg-neutral-50/50">
-                    <td className="px-6 py-3 font-mono font-bold text-neutral-900 dark:text-white">
+                  <tr key={v.id} className="hover:bg-slate-800/40 transition">
+                    <td className="px-6 py-3.5 font-mono font-bold text-slate-100">
                       {v.plate}
                     </td>
-                    <td className="px-6 py-3 text-neutral-600 dark:text-neutral-300">
+                    <td className="px-6 py-3.5 text-slate-300">
                       {v.brand} {v.model} {v.year ? `(${v.year})` : ''}
                     </td>
-                    <td className="px-6 py-3 font-mono font-medium text-neutral-700 dark:text-neutral-300">
+                    <td className="px-6 py-3.5 font-mono font-semibold text-indigo-400">
                       {v.current_mileage.toLocaleString()} km
                     </td>
-                    <td className="px-6 py-3 text-neutral-500">
+                    <td className="px-6 py-3.5 text-slate-400">
                       {v.owner_name || '—'} {v.owner_phone ? `(${v.owner_phone})` : ''}
                     </td>
-                    <td className="px-6 py-3 text-neutral-500">
-                      {v.maintenance_records?.length ?? 0} servicios
+                    <td className="px-6 py-3.5 text-slate-400">
+                      <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-300 border border-slate-700">
+                        {v.maintenance_records?.length ?? 0} servicios
+                      </span>
                     </td>
-                    <td className="px-6 py-3 text-right space-x-2">
+                    <td className="px-6 py-3.5 text-right space-x-2">
                       <Link
                         href={`/workshop?tenantId=${activeTenantId}&print=${v.id}`}
-                        className="rounded bg-indigo-50 px-2.5 py-1 text-[11px] font-bold text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-400"
+                        className="inline-flex items-center rounded-lg bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 text-[11px] font-semibold text-indigo-400 hover:bg-indigo-500/20 transition"
                       >
                         🏷️ Sticker QR
                       </Link>
                       <a
                         href={`/auto/${v.plate}`}
                         target="_blank"
-                        className="rounded bg-neutral-100 px-2.5 py-1 text-[11px] font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300"
+                        className="inline-flex items-center rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition"
                       >
                         Ficha Pública ↗
                       </a>
@@ -509,7 +535,7 @@ export default async function WorkshopAdminPage({
             </tbody>
           </table>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
