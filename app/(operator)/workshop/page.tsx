@@ -166,8 +166,15 @@ export default async function WorkshopAdminPage({
           </p>
         </div>
 
-        {/* Public Portal Access Card */}
+        {/* Public Portal & A4 Print Access */}
         <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={`/workshop/print-sheet?tenantId=${activeTenantId}`}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/40 bg-indigo-600/15 px-3.5 py-2 text-xs font-bold text-indigo-300 hover:bg-indigo-600/25 hover:border-indigo-400 transition"
+          >
+            <span>🖨️ Plancha A4 (15 Stickers)</span>
+          </Link>
+
           <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2">
             <span className="text-sm">🌐</span>
             <div>
@@ -276,6 +283,13 @@ export default async function WorkshopAdminPage({
 
               {/* Actions */}
               <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href={`/workshop/print-sheet?tenantId=${activeTenantId}&plate=${printVehicle.plate}`}
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-500 transition"
+                >
+                  <span>🖨️ Imprimir Plancha A4 (15)</span>
+                </Link>
                 <a
                   href={`/auto/${printVehicle.plate}`}
                   target="_blank"
