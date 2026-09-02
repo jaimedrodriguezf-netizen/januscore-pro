@@ -9,8 +9,14 @@ const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3Mi
  * user. Session refresh happens automatically through this client.
  */
 export function createSupabaseBrowserClient() {
-  const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL).trim();
-  const key = (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || DEFAULT_SUPABASE_ANON_KEY).trim();
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const rawKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    DEFAULT_SUPABASE_ANON_KEY;
+
+  const url = rawUrl.replace(/\s+/g, '');
+  const key = rawKey.replace(/\s+/g, '');
 
   return createBrowserClient(url, key);
 }

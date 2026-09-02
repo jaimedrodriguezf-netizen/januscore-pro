@@ -11,12 +11,14 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL).trim();
-  const key = (
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const rawKey =
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    DEFAULT_SUPABASE_ANON_KEY
-  ).trim();
+    DEFAULT_SUPABASE_ANON_KEY;
+
+  const url = rawUrl.replace(/\s+/g, '');
+  const key = rawKey.replace(/\s+/g, '');
 
   const supabase = createServerClient(url, key, {
     cookies: {
@@ -43,13 +45,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public assets (.svg, .png, .jpg, etc.)
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
