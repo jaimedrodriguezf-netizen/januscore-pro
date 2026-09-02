@@ -17,7 +17,7 @@ export default async function ClientPortalPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/signin');
   }
 
   // Fetch accessible branches for upload (or tenant branches)

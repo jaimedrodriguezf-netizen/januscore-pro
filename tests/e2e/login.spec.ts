@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Login & Authentication Flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/login');
+    await page.goto('/signin');
   });
 
   test('renders the login page elements in Latin American Spanish', async ({ page }) => {
@@ -11,17 +11,15 @@ test.describe('Login & Authentication Flow', () => {
     await expect(page.getByText('Correo Electrónico')).toBeVisible();
     await expect(page.getByText('Contraseña')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Iniciar Sesión' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Regístrate' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Regístrate' })).toBeVisible();
   });
 
   test('toggles between Sign In and Registration modes', async ({ page }) => {
-    await page.getByRole('link', { name: 'Regístrate' }).click();
-    await expect(page).toHaveURL(/mode=signup/);
+    await page.getByRole('button', { name: 'Regístrate' }).click();
     await expect(page.getByRole('heading', { name: 'Crear cuenta' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Registrar Cuenta' })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Inicia sesión' }).click();
-    await expect(page).toHaveURL(/\/login$/);
+    await page.getByRole('button', { name: 'Inicia sesión' }).click();
     await expect(page.getByRole('heading', { name: 'Ingresar a JanusCore Pro' })).toBeVisible();
   });
 
