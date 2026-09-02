@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { APP_VERSION } from '@/lib/version';
+import { loginServerAction, signupServerAction } from './actions';
 
 function LoginFormContent() {
   const router = useRouter();
@@ -17,8 +18,6 @@ function LoginFormContent() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(searchParams.get('err') || null);
   const [successMsg, setSuccessMsg] = useState<string | null>(searchParams.get('ok') || null);
-
-  const supabase = createSupabaseBrowserClient();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -36,6 +35,7 @@ function LoginFormContent() {
     setLoading(true);
 
     try {
+      const supabase = createSupabaseBrowserClient();
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
           email: cleanEmail,
@@ -57,13 +57,11 @@ function LoginFormContent() {
         if (error) {
           setErrorMsg(error.message);
         } else {
-          // Success: Navigate to hub
-          router.push('/');
-          router.refresh();
+          window.location.href = '/';
         }
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error inesperado al conectar con el servidor';
+      const msg = err instanceof Error ? err.message : 'Error al conectar con el servicio de autenticación';
       setErrorMsg(msg);
     } finally {
       setLoading(false);
@@ -101,13 +99,18 @@ function LoginFormContent() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+      <form
+        action={isSignUp ? signupServerAction : loginServerAction}
+        onSubmit={handleSubmit}
+        className="mt-8 space-y-4"
+      >
         <div>
           <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300">
             Correo Electrónico
           </label>
           <input
             type="email"
+            name="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -122,6 +125,7 @@ function LoginFormContent() {
           </label>
           <input
             type="password"
+            name="password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
