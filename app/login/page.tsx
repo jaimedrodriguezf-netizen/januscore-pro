@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { APP_VERSION } from '@/lib/version';
-import { loginServerAction, signupServerAction } from './actions';
 
 function LoginFormContent() {
   const router = useRouter();
@@ -25,9 +24,8 @@ function LoginFormContent() {
     setSuccessMsg(null);
 
     const cleanEmail = email.trim();
-    const cleanPassword = password.trim();
 
-    if (!cleanEmail || !cleanPassword) {
+    if (!cleanEmail || !password) {
       setErrorMsg('Por favor ingresa tu correo y contraseña.');
       return;
     }
@@ -39,7 +37,7 @@ function LoginFormContent() {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
           email: cleanEmail,
-          password: cleanPassword,
+          password: password,
         });
 
         if (error) {
@@ -51,12 +49,13 @@ function LoginFormContent() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
-          password: cleanPassword,
+          password: password,
         });
 
         if (error) {
           setErrorMsg(error.message);
         } else {
+          // Hard navigation to trigger clean server-side cookie read
           window.location.href = '/';
         }
       }
@@ -99,11 +98,7 @@ function LoginFormContent() {
         </div>
       )}
 
-      <form
-        action={isSignUp ? signupServerAction : loginServerAction}
-        onSubmit={handleSubmit}
-        className="mt-8 space-y-4"
-      >
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
           <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300">
             Correo Electrónico

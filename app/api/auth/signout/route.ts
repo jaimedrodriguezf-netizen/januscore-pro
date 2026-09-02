@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
-  return NextResponse.redirect(new URL('/login', 'http://localhost:3000'));
+
+  const redirectUrl = new URL('/login', request.url);
+  return NextResponse.redirect(redirectUrl, { status: 302 });
 }
