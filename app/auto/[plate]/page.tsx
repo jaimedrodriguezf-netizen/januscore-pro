@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { formatPlate, isServiceDue, getNextServicePlan } from '@/lib/mechanics/service';
+import { MileageTrackerForm } from '@/components/mechanics/mileage-tracker-form';
 import type { MaintenanceRecord, Vehicle } from '@/lib/mechanics/types';
 import { APP_VERSION } from '@/lib/version';
 
@@ -88,6 +90,25 @@ export default async function VehiclePublicPage({
     general_repair: 'Reparación / Mantenimiento Especial',
   };
 
+  // Server Action: Update vehicle odometer in real time
+  async function updateMileageServerAction(formData: FormData) {
+    'use server';
+    const supabase = await createSupabaseServerClient();
+    const vId = String(formData.get('vehicleId') || '');
+    const p = String(formData.get('plate') || '');
+    const m = Number(formData.get('mileage')) || 0;
+
+    if (vId && m > 0) {
+      await supabase
+        .from('vehicles')
+        .update({ current_mileage: m })
+        .eq('id', vId);
+
+      revalidatePath(`/auto/${p}`);
+      revalidatePath('/workshop');
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 antialiased font-sans pb-16">
       {/* Top Bar */}
@@ -139,7 +160,7 @@ export default async function VehiclePublicPage({
 
           <div className="mt-6 flex items-center justify-between border-t border-slate-800/80 pt-4">
             <div>
-              <span className="text-[10px] uppercase font-bold text-slate-500">Kilometraje Actual</span>
+              <span className="text-[10px] uppercase font-bold text-slate-500">Último Km Registrado</span>
               <div className="text-lg font-bold text-indigo-400 font-mono">
                 {vehicle.current_mileage.toLocaleString()} km
               </div>
@@ -155,105 +176,16 @@ export default async function VehiclePublicPage({
           </div>
         </div>
 
-        {/* Next Service Plan & Breakdown (Highlighted Card) */}
-        {hasNextService && (
-          <div
-            className={`rounded-3xl border p-6 shadow-xl backdrop-blur-xs transition ${
-              due
-                ? 'border-rose-500/30 bg-rose-950/20 text-rose-100'
-                : 'border-indigo-500/30 bg-slate-900/90 text-slate-100'
-            }`}
-          >
-            {/* Header / Status */}
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
-              <div className="flex items-center gap-2.5">
-                <span className="text-2xl">{due ? '⚠️' : '🛠️'}</span>
-                <div>
-                  <span className="rounded bg-indigo-500/15 border border-indigo-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
-                    {nextPlan.typeBadge}
-                  </span>
-                  <h2 className="mt-1 text-base font-extrabold text-white">
-                    {nextPlan.title}
-                  </h2>
-                </div>
-              </div>
-              <div className="text-right">
-                <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                  due ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                }`}>
-                  {due ? 'Vencido / Requerido' : 'Al Día'}
-                </span>
-              </div>
-            </div>
-
-            {/* Target Mileage & Countdown */}
-            <div className="mt-4 grid grid-cols-2 gap-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-500">Objetivo del Servicio</span>
-                <p className="text-sm font-bold text-white font-mono">
-                  {latestRecord.next_service_mileage ? `${latestRecord.next_service_mileage.toLocaleString()} km` : 'Fecha programada'}
-                </p>
-                {latestRecord.next_service_date && (
-                  <p className="text-[11px] text-slate-400">
-                    O antes del {new Date(latestRecord.next_service_date).toLocaleDateString()}
-                  </p>
-                )}
-              </div>
-              <div className="text-right">
-                <span className="text-[10px] uppercase font-bold text-slate-500">Estado de Kilometraje</span>
-                <p className={`text-sm font-bold font-mono ${due ? 'text-rose-400' : 'text-emerald-400'}`}>
-                  {due
-                    ? '¡Atención requerida!'
-                    : `Faltan ~${nextPlan.remainingKm.toLocaleString()} km`}
-                </p>
-                <p className="text-[11px] text-slate-400">
-                  {due ? 'Superó el kilometraje' : 'En rango óptimo'}
-                </p>
-              </div>
-            </div>
-
-            {/* Recommended Works Checklist */}
-            <div className="mt-5 space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                📋 ¿Qué le toca realizar en este mantenimiento?
-              </h3>
-              <ul className="space-y-2 text-xs text-slate-300">
-                {nextPlan.items.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-indigo-400 font-bold shrink-0">✓</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Recommended Fluids / Specs */}
-            {nextPlan.fluidSpecs.length > 0 && (
-              <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/40 p-3.5 text-xs text-slate-400 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Especificaciones Técnicas Recomendadas:</span>
-                {nextPlan.fluidSpecs.map((spec, i) => (
-                  <p key={i} className="text-[11px] text-slate-300">• {spec}</p>
-                ))}
-              </div>
-            )}
-
-            {/* WhatsApp Call to Action */}
-            <div className="mt-5 pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <p className="text-[11px] text-slate-400">
-                {nextPlan.recommendation}
-              </p>
-              <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  `Hola, deseo solicitar una cotización o agendar el "${nextPlan.title}" para mi vehículo (${vehicle.plate} - ${vehicle.brand} ${vehicle.model}).`
-                )}`}
-                target="_blank"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-500 transition shrink-0"
-              >
-                <span>📲 Agendar por WhatsApp</span>
-              </a>
-            </div>
-          </div>
-        )}
+        {/* Dynamic Interactive Mileage Calculator & Mechanic Lead */}
+        <MileageTrackerForm
+          vehicleId={vehicle.id}
+          plate={vehicle.plate}
+          brand={vehicle.brand}
+          model={vehicle.model}
+          initialMileage={vehicle.current_mileage}
+          nextMileageTarget={latestRecord?.next_service_mileage}
+          onUpdateMileageAction={updateMileageServerAction}
+        />
 
         {/* Maintenance History Timeline */}
         <div className="space-y-4 pt-2">
