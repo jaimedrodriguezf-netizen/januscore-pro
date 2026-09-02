@@ -78,17 +78,25 @@ export default async function VehiclePublicPage({
       {/* Header / Brand Banner */}
       <header className="border-b border-neutral-800 bg-neutral-900/60 backdrop-blur px-4 py-4">
         <div className="mx-auto flex max-w-lg items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link href="/auto" className="flex items-center gap-2 hover:opacity-80 transition">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-black text-white">
               J
             </span>
             <span className="text-xs font-extrabold tracking-wider uppercase text-neutral-300">
               {vehicle.tenants?.name || 'JanusCore Auto'}
             </span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/auto"
+              className="rounded-lg border border-neutral-800 bg-neutral-900 px-2.5 py-1 text-[10px] font-medium text-neutral-400 hover:text-white"
+            >
+              🔍 Otra Placa
+            </Link>
+            <span className="rounded-full bg-emerald-950/80 border border-emerald-800/80 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400">
+              QR Verificado ✓
+            </span>
           </div>
-          <span className="rounded-full bg-emerald-950/80 border border-emerald-800/80 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400">
-            QR Verificado ✓
-          </span>
         </div>
       </header>
 
