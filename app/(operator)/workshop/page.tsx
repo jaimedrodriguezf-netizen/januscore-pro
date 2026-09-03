@@ -7,8 +7,7 @@ import { formatPlate, calculateNextService } from '@/lib/mechanics/service';
 import { generateVehicleQrDataUrl } from '@/lib/mechanics/qr-sticker';
 import { formatWorkOrderDescription, type WorkOrderItem } from '@/lib/mechanics/work-order';
 import { WorkOrderForm } from '@/components/mechanics/work-order-form';
-import { TemplateExplorer } from '@/components/mechanics/template-explorer';
-import { WorkshopProfileSettings } from '@/components/mechanics/workshop-profile-settings';
+import { WorkshopNavigation } from '@/components/mechanics/workshop-navigation';
 import { sanitizeSlug, type WorkshopProfile } from '@/lib/mechanics/workshop-profile';
 import { CopyButton } from '@/components/ui/copy-button';
 import type { ServiceType } from '@/lib/mechanics/types';
@@ -282,6 +281,13 @@ export default async function WorkshopAdminPage({
 
   return (
     <div className="space-y-6">
+      {/* Sub-module Navigation Bar */}
+      <WorkshopNavigation
+        tenantId={activeTenantId}
+        totalVehicles={totalVehicles}
+        workshopSlug={workshopProfile.slug}
+      />
+
       {/* Header & Quick Links Banner */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-5">
         <div>
@@ -650,16 +656,7 @@ export default async function WorkshopAdminPage({
         onSaveWorkOrderAction={saveWorkOrderAction}
       />
 
-      {/* 4. OEM Master Catalog of 100+ Vehicles & Custom Template Creator */}
-      <TemplateExplorer />
-
-      {/* 5. Professional Workshop Profile & Branding Settings */}
-      <WorkshopProfileSettings
-        initialProfile={workshopProfile}
-        onSaveAction={saveWorkshopProfileAction}
-      />
-
-      {/* 6. Vehicles Table */}
+      {/* 4. Vehicles Table */}
       <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 px-6 py-4">
           <div>
