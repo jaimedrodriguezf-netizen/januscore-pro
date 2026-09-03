@@ -24,27 +24,46 @@ export default async function WorkshopPrintSheetPage({
   const tenantIds = await getAccessibleTenantIds(supabase);
   const activeTenantId = params.tenantId || tenantIds[0];
 
-  // Fetch tenant information for logo / name
+  // Fetch tenant information for logo / name / slug
   let tenantName = 'JanusCore Auto Service';
+  let targetUrl = 'https://januscore.pro/auto';
+  let workshopPhone: string | undefined = undefined;
+  let logoUrl: string | undefined = undefined;
+
   if (activeTenantId) {
     const { data: tenant } = await supabase
       .from('tenants')
-      .select('name')
+      .select('name, slug, logo_url, whatsapp_phone, phone')
       .eq('id', activeTenantId)
       .maybeSingle();
+
     if (tenant?.name) {
       tenantName = tenant.name;
     }
-  }
+    if (tenant?.whatsapp_phone || tenant?.phone) {
+      workshopPhone = tenant.whatsapp_phone || tenant.phone || undefined;
+    }
+    if (tenant?.logo_url) {
+      logoUrl = tenant.logo_url;
+    }
 
-  const targetUrl = params.plate
-    ? `https://januscore.pro/auto/${encodeURIComponent(params.plate)}`
-    : 'https://januscore.pro/auto';
+    if (tenant?.slug) {
+      targetUrl = params.plate
+        ? `https://januscore.pro/m/${tenant.slug}/${encodeURIComponent(params.plate)}`
+        : `https://januscore.pro/m/${tenant.slug}`;
+    } else {
+      targetUrl = params.plate
+        ? `https://januscore.pro/auto/${encodeURIComponent(params.plate)}`
+        : 'https://januscore.pro/auto';
+    }
+  }
 
   const stickerData = await generatePrintableStickerData({
     tenantName,
     targetUrl,
     plate: params.plate,
+    workshopPhone,
+    logoUrl,
   });
 
   const layout = calculateA4SheetLayout({ totalStickers: 15, columns: 3 });

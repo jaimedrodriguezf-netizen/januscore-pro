@@ -8,6 +8,8 @@ import { generateVehicleQrDataUrl } from '@/lib/mechanics/qr-sticker';
 import { formatWorkOrderDescription, type WorkOrderItem } from '@/lib/mechanics/work-order';
 import { WorkOrderForm } from '@/components/mechanics/work-order-form';
 import { TemplateExplorer } from '@/components/mechanics/template-explorer';
+import { WorkshopProfileSettings } from '@/components/mechanics/workshop-profile-settings';
+import { sanitizeSlug, type WorkshopProfile } from '@/lib/mechanics/workshop-profile';
 import { CopyButton } from '@/components/ui/copy-button';
 import type { ServiceType } from '@/lib/mechanics/types';
 
@@ -39,6 +41,68 @@ export default async function WorkshopAdminPage({
     );
   }
 
+  // Fetch active tenant profile
+  const { data: tenantData } = await supabase
+    .from('tenants')
+    .select('*')
+    .eq('id', activeTenantId)
+    .maybeSingle();
+
+  const workshopProfile: WorkshopProfile = {
+    id: activeTenantId,
+    name: tenantData?.name || 'Mi Mecánica',
+    slug: tenantData?.slug || 'taller',
+    logoUrl: tenantData?.logo_url,
+    whatsappPhone: tenantData?.whatsapp_phone,
+    phone: tenantData?.phone,
+    address: tenantData?.address,
+    city: tenantData?.city,
+    googleMapsUrl: tenantData?.google_maps_url,
+    operatingHours: tenantData?.operating_hours,
+    description: tenantData?.description,
+    isActive: tenantData?.is_active ?? true,
+  };
+
+  async function saveWorkshopProfileAction(formData: FormData) {
+    'use server';
+    const supabase = await createSupabaseServerClient();
+    const tId = String(formData.get('tenantId') || '');
+    const name = String(formData.get('name') || '').trim();
+    const rawSlug = String(formData.get('slug') || '').trim();
+    const logoUrl = String(formData.get('logoUrl') || '').trim() || null;
+    const whatsappPhone = String(formData.get('whatsappPhone') || '').trim() || null;
+    const phone = String(formData.get('phone') || '').trim() || null;
+    const address = String(formData.get('address') || '').trim() || null;
+    const city = String(formData.get('city') || '').trim() || null;
+    const googleMapsUrl = String(formData.get('googleMapsUrl') || '').trim() || null;
+    const operatingHours = String(formData.get('operatingHours') || '').trim() || null;
+    const description = String(formData.get('description') || '').trim() || null;
+
+    const slug = sanitizeSlug(rawSlug || name);
+
+    if (tId && name && slug) {
+      await supabase
+        .from('tenants')
+        .update({
+          name,
+          slug,
+          logo_url: logoUrl,
+          whatsapp_phone: whatsappPhone,
+          phone,
+          address,
+          city,
+          google_maps_url: googleMapsUrl,
+          operating_hours: operatingHours,
+          description,
+        })
+        .eq('id', tId);
+
+      revalidatePath('/workshop');
+      revalidatePath(`/m/${slug}`);
+      redirect(`/workshop?tenantId=${tId}&ok=Perfil%20del%20taller%20actualizado%20correctamente`);
+    }
+  }
+
   // Fetch vehicles in this tenant
   let vehicleQuery = supabase
     .from('vehicles')
@@ -59,7 +123,7 @@ export default async function WorkshopAdminPage({
     const v = vehicles?.find((veh) => veh.id === params.print);
     if (v) {
       printVehicle = v;
-      printStickerQr = await generateVehicleQrDataUrl('https://januscore.pro', v.plate);
+      printStickerQr = await generateVehicleQrDataUrl('https://januscore.pro', v.plate, workshopProfile.slug);
     }
   }
 
@@ -244,11 +308,11 @@ export default async function WorkshopAdminPage({
           <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2">
             <span className="text-sm">🌐</span>
             <div>
-              <span className="block text-[10px] font-bold uppercase text-slate-400">Portal Público</span>
-              <span className="font-mono text-xs font-semibold text-indigo-400">januscore.pro/auto</span>
+              <span className="block text-[10px] font-bold uppercase text-slate-400">Portal de tu Taller</span>
+              <span className="font-mono text-xs font-semibold text-indigo-400">januscore.pro/m/{workshopProfile.slug}</span>
             </div>
             <CopyButton
-              text="https://januscore.pro/auto"
+              text={`https://januscore.pro/m/${workshopProfile.slug}`}
               label="Copiar"
               copiedLabel="✓"
               className="ml-2 inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition"
@@ -589,7 +653,13 @@ export default async function WorkshopAdminPage({
       {/* 4. OEM Master Catalog of 100+ Vehicles & Custom Template Creator */}
       <TemplateExplorer />
 
-      {/* 5. Vehicles Table */}
+      {/* 5. Professional Workshop Profile & Branding Settings */}
+      <WorkshopProfileSettings
+        initialProfile={workshopProfile}
+        onSaveAction={saveWorkshopProfileAction}
+      />
+
+      {/* 6. Vehicles Table */}
       <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 px-6 py-4">
           <div>

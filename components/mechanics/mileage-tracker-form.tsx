@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { getNextServicePlan, type NextServicePlan } from '@/lib/mechanics/service';
+import { formatWhatsAppUrl } from '@/lib/mechanics/workshop-profile';
 
 interface MileageTrackerFormProps {
   vehicleId: string;
@@ -10,6 +11,7 @@ interface MileageTrackerFormProps {
   model?: string;
   initialMileage: number;
   nextMileageTarget?: number;
+  whatsappPhone?: string;
   onUpdateMileageAction: (formData: FormData) => Promise<void>;
 }
 
@@ -20,6 +22,7 @@ export function MileageTrackerForm({
   model,
   initialMileage,
   nextMileageTarget,
+  whatsappPhone,
   onUpdateMileageAction,
 }: MileageTrackerFormProps) {
   const [mileageInput, setMileageInput] = useState<string>('');
@@ -240,10 +243,15 @@ export function MileageTrackerForm({
               {plan.recommendation}
             </p>
             <a
-              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                `Hola, acabo de ingresar el odómetro de mi vehículo (${plate} - ${brand || ''} ${model || ''}) a ${currentKm.toLocaleString()} km y deseo solicitar una cita/cotización para el "${plan.title}".`
-              )}`}
+              href={formatWhatsAppUrl({
+                phone: whatsappPhone,
+                plate,
+                vehicleModel: `${brand || ''} ${model || ''}`.trim() || undefined,
+                currentKm,
+                serviceTitle: plan.title,
+              })}
               target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-xs font-bold text-white shadow-lg hover:bg-emerald-500 transition shrink-0"
             >
               <span>📲 Agendar este Servicio por WhatsApp</span>

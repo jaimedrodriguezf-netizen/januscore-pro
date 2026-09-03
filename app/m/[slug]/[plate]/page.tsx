@@ -1,55 +1,78 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { notFound } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { formatPlate, isServiceDue, getNextServicePlan } from '@/lib/mechanics/service';
 import { MileageTrackerForm } from '@/components/mechanics/mileage-tracker-form';
+import { WorkshopProfileCard } from '@/components/mechanics/workshop-profile-card';
 import type { MaintenanceRecord, Vehicle } from '@/lib/mechanics/types';
+import type { WorkshopProfile } from '@/lib/mechanics/workshop-profile';
 import { APP_VERSION } from '@/lib/version';
 
 export const dynamic = 'force-dynamic';
 
-export default async function VehiclePublicPage({
+export default async function WorkshopBrandedVehiclePage({
   params,
 }: {
-  params: Promise<{ plate: string }>;
+  params: Promise<{ slug: string; plate: string }>;
 }) {
-  const { plate } = await params;
+  const { slug, plate } = await params;
   const formattedPlate = formatPlate(plate || '');
 
   const supabase = await createSupabaseServerClient();
 
-  // Query vehicle by plate (Case-insensitive) with tenant slug
-  const { data: vehicleData } = await supabase
-    .from('vehicles')
-    .select('*, tenants(slug)')
-    .ilike('plate', formattedPlate)
+  // 1. Fetch Tenant / Workshop
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_active', true)
     .maybeSingle();
 
-  if (vehicleData?.tenants?.slug) {
-    redirect(`/m/${vehicleData.tenants.slug}/${formattedPlate}`);
+  if (!tenant) {
+    notFound();
   }
+
+  const workshop: WorkshopProfile = {
+    id: tenant.id,
+    name: tenant.name,
+    slug: tenant.slug,
+    logoUrl: tenant.logo_url,
+    whatsappPhone: tenant.whatsapp_phone,
+    phone: tenant.phone,
+    address: tenant.address,
+    city: tenant.city,
+    googleMapsUrl: tenant.google_maps_url,
+    operatingHours: tenant.operating_hours,
+    description: tenant.description,
+    isActive: tenant.is_active,
+  };
+
+  // 2. Query vehicle by plate and tenant_id
+  const { data: vehicleData } = await supabase
+    .from('vehicles')
+    .select('*')
+    .eq('tenant_id', tenant.id)
+    .ilike('plate', formattedPlate)
+    .maybeSingle();
 
   if (!vehicleData) {
     return (
       <div className="min-h-screen bg-slate-950 px-4 py-16 text-slate-100 font-sans">
-        <div className="mx-auto max-w-md text-center">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 border border-slate-800 text-3xl shadow-inner">
+        <div className="mx-auto max-w-md text-center space-y-4">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 border border-slate-800 text-3xl">
             🚗
           </div>
-          <h1 className="mt-4 text-xl font-black text-slate-100">Vehículo No Encontrado</h1>
-          <p className="mt-2 text-xs text-slate-400">
-            La placa <span className="font-mono font-bold text-indigo-400">{formattedPlate}</span> no registra mantenimientos en el sistema.
+          <h1 className="text-xl font-black text-slate-100">Vehículo No Registrado en este Taller</h1>
+          <p className="text-xs text-slate-400">
+            La placa <span className="font-mono font-bold text-indigo-400">{formattedPlate}</span> no registra mantenimientos en <strong className="text-slate-200">{workshop.name}</strong>.
           </p>
-          <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/60 p-5 text-xs text-slate-400">
-            Si realizaste un servicio recientemente, solicita a tu taller o mecánico que registre tu vehículo para habilitar el seguimiento por QR.
-          </div>
-          <div className="mt-6">
+          <div className="pt-4 flex items-center justify-center gap-2">
             <Link
-              href="/auto"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition"
+              href={`/m/${slug}`}
+              className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition"
             >
-              ← Buscar otra placa
+              ← Volver al buscador del taller
             </Link>
           </div>
         </div>
@@ -57,9 +80,9 @@ export default async function VehiclePublicPage({
     );
   }
 
-  const vehicle = vehicleData as Vehicle & { tenants?: { name: string } };
+  const vehicle = vehicleData as Vehicle;
 
-  // Fetch maintenance records
+  // 3. Fetch completed maintenance records
   const { data: recordsData } = await supabase
     .from('maintenance_records')
     .select('*')
@@ -70,22 +93,6 @@ export default async function VehiclePublicPage({
   const records = (recordsData ?? []) as MaintenanceRecord[];
   const latestRecord = records[0];
 
-  const hasNextService = latestRecord && (latestRecord.next_service_mileage || latestRecord.next_service_date);
-  const due = latestRecord
-    ? isServiceDue(vehicle.current_mileage, new Date(), {
-        nextMileage: latestRecord.next_service_mileage,
-        nextDate: latestRecord.next_service_date,
-      })
-    : false;
-
-  const nextPlan = getNextServicePlan({
-    nextMileage: latestRecord?.next_service_mileage,
-    currentMileage: vehicle.current_mileage,
-    nextDate: latestRecord?.next_service_date,
-    brand: vehicle.brand,
-    model: vehicle.model,
-  });
-
   const serviceLabels: Record<string, string> = {
     oil_change: 'Cambio de Aceite y Filtros',
     brakes: 'Mantenimiento de Frenos',
@@ -95,7 +102,7 @@ export default async function VehiclePublicPage({
     general_repair: 'Reparación / Mantenimiento Especial',
   };
 
-  // Server Action: Update vehicle odometer in real time
+  // Server action to update odometer
   async function updateMileageServerAction(formData: FormData) {
     'use server';
     const supabase = await createSupabaseServerClient();
@@ -109,6 +116,7 @@ export default async function VehiclePublicPage({
         .update({ current_mileage: m })
         .eq('id', vId);
 
+      revalidatePath(`/m/${slug}/${p}`);
       revalidatePath(`/auto/${p}`);
       revalidatePath('/workshop');
     }
@@ -116,32 +124,46 @@ export default async function VehiclePublicPage({
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 antialiased font-sans pb-16">
-      {/* Top Bar */}
+      {/* Top Header */}
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md px-4 py-3.5 sticky top-0 z-20">
         <div className="mx-auto flex max-w-xl items-center justify-between">
-          <Link href="/auto" className="flex items-center gap-2 hover:opacity-80 transition">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-black text-white">
-              J
-            </span>
-            <span className="text-xs font-extrabold tracking-wider uppercase text-slate-200">
-              {vehicle.tenants?.name || 'JanusCore Auto'}
+          <Link href={`/m/${slug}`} className="flex items-center gap-2 hover:opacity-80 transition">
+            {workshop.logoUrl ? (
+              <img src={workshop.logoUrl} alt={workshop.name} className="h-7 w-7 object-contain rounded-lg" />
+            ) : (
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-black text-white">
+                {workshop.name.slice(0, 1)}
+              </span>
+            )}
+            <span className="text-xs font-extrabold tracking-wider uppercase text-slate-200 truncate max-w-[200px]">
+              {workshop.name}
             </span>
           </Link>
+
           <div className="flex items-center gap-2">
             <Link
-              href="/auto"
+              href={`/m/${slug}`}
               className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] font-semibold text-slate-300 hover:text-white transition"
             >
               🔍 Otra Placa
             </Link>
             <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400">
-              QR Verificado ✓
+              QR Oficial ✓
             </span>
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-xl px-4 py-6 space-y-6">
+        {/* Workshop Profile Card */}
+        <WorkshopProfileCard
+          workshop={workshop}
+          plate={vehicle.plate}
+          vehicleModel={`${vehicle.brand} ${vehicle.model}`}
+          currentKm={vehicle.current_mileage}
+          serviceTitle="Mantenimiento Automotriz"
+        />
+
         {/* Vehicle Identity Card */}
         <div className="rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-6 shadow-xl">
           <div className="flex items-center justify-between">
@@ -181,7 +203,7 @@ export default async function VehiclePublicPage({
           </div>
         </div>
 
-        {/* Dynamic Interactive Mileage Calculator & Mechanic Lead */}
+        {/* Dynamic Mileage Tracker & Service Recommendation */}
         <MileageTrackerForm
           vehicleId={vehicle.id}
           plate={vehicle.plate}
@@ -190,26 +212,27 @@ export default async function VehiclePublicPage({
           initialMileage={vehicle.current_mileage}
           nextMileageTarget={latestRecord?.next_service_mileage}
           onUpdateMileageAction={updateMileageServerAction}
+          whatsappPhone={workshop.whatsappPhone || workshop.phone || undefined}
         />
 
-        {/* Maintenance History Timeline */}
+        {/* Maintenance History */}
         <div className="space-y-4 pt-2">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div>
               <h3 className="text-sm font-bold text-slate-100">
                 Historial de Servicios ({records.length})
               </h3>
-              <p className="text-[11px] text-slate-400">Registro cronológico de mantenimientos asentados</p>
+              <p className="text-[11px] text-slate-400">Mantenimientos asentados en {workshop.name}</p>
             </div>
             <span className="rounded bg-slate-900 border border-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-400">
-              Más reciente primero
+              Cronológico
             </span>
           </div>
 
           <div className="space-y-3">
             {records.length === 0 ? (
               <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-8 text-center text-xs text-slate-500">
-                No hay registros de mantenimiento asentados aún.
+                No hay registros de mantenimiento asentados aún para este vehículo.
               </div>
             ) : (
               records.map((r) => (
@@ -238,7 +261,7 @@ export default async function VehiclePublicPage({
 
                   {r.technician_name && (
                     <div className="border-t border-slate-800/60 pt-2 text-[11px] text-slate-400 flex items-center justify-between">
-                      <span>Taller / Mecánico: <strong className="text-slate-300">{r.technician_name}</strong></span>
+                      <span>Mecánico a cargo: <strong className="text-slate-300">{r.technician_name}</strong></span>
                       {r.cost && (
                         <span className="font-mono font-semibold text-slate-200">${Number(r.cost).toFixed(2)}</span>
                       )}
@@ -252,7 +275,9 @@ export default async function VehiclePublicPage({
 
         {/* Footer */}
         <footer className="pt-8 text-center text-[10px] text-slate-600">
-          <p>Potenciado por <strong>januscore.pro</strong> — Sistema de Trazabilidad Automotriz & QR • <span className="font-mono">{APP_VERSION}</span></p>
+          <p>
+            {workshop.name} • Potenciado por <strong>januscore.pro</strong> • <span className="font-mono">{APP_VERSION}</span>
+          </p>
         </footer>
       </main>
     </div>

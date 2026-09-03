@@ -14,6 +14,8 @@ export interface PrintableStickerData {
   qrDataUrl: string;
   plate?: string;
   instruction: string;
+  workshopPhone?: string;
+  logoUrl?: string;
 }
 
 /**
@@ -44,6 +46,8 @@ export async function generatePrintableStickerData(params: {
   tenantName?: string;
   targetUrl?: string;
   plate?: string;
+  workshopPhone?: string;
+  logoUrl?: string;
 }): Promise<PrintableStickerData> {
   const tenantName = params.tenantName || 'JanusCore Auto Service';
   const website = 'januscore.pro';
@@ -71,5 +75,7 @@ export async function generatePrintableStickerData(params: {
     qrDataUrl,
     plate: params.plate,
     instruction,
+    workshopPhone: params.workshopPhone,
+    logoUrl: params.logoUrl,
   };
 }
