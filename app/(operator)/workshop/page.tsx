@@ -7,6 +7,7 @@ import { formatPlate, calculateNextService } from '@/lib/mechanics/service';
 import { generateVehicleQrDataUrl } from '@/lib/mechanics/qr-sticker';
 import { formatWorkOrderDescription, type WorkOrderItem } from '@/lib/mechanics/work-order';
 import { WorkOrderForm } from '@/components/mechanics/work-order-form';
+import { TemplateExplorer } from '@/components/mechanics/template-explorer';
 import { CopyButton } from '@/components/ui/copy-button';
 import type { ServiceType } from '@/lib/mechanics/types';
 
@@ -585,7 +586,10 @@ export default async function WorkshopAdminPage({
         onSaveWorkOrderAction={saveWorkOrderAction}
       />
 
-      {/* Vehicles Table */}
+      {/* 4. OEM Master Catalog of 100+ Vehicles & Custom Template Creator */}
+      <TemplateExplorer />
+
+      {/* 5. Vehicles Table */}
       <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 px-6 py-4">
           <div>
