@@ -7,6 +7,8 @@ import {
   calculateWorkOrderTotals,
   type WorkOrderItem,
 } from '@/lib/mechanics/work-order';
+import { CarDamageMap } from '@/components/mechanics/car-damage-map';
+import { formatDamageMarkersSummary, type DamageMarker } from '@/lib/mechanics/damage-map';
 import type { Vehicle } from '@/lib/mechanics/types';
 
 interface WorkOrderFormProps {
@@ -51,6 +53,11 @@ export function WorkOrderForm({
     extintor: true,
     tapaGasolina: true,
   });
+
+  // Body damage inspection markers (A, B, C)
+  const [damageMarkers, setDamageMarkers] = useState<DamageMarker[]>([
+    { id: '1', zone: 'Puerta Delantera Derecha', damageType: 'C', label: 'Rayadura superficial' },
+  ]);
 
   // Dynamic parts & labor items
   const [items, setItems] = useState<WorkOrderItem[]>([
@@ -332,35 +339,44 @@ export function WorkOrderForm({
         </div>
       </div>
 
-      {/* 2. Vehicle Reception Checklist */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-4 shadow-sm">
+      {/* 2. Vehicle Reception Checklist & Visual Damage Map */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-5 shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
-            <span>2.</span> Inventario de Recepción del Vehículo
+            <span>2.</span> Inventario de Recepción & Estado de Carrocería
           </h3>
-          <span className="text-[11px] text-slate-400">Toca para marcar elementos presentes</span>
+          <span className="text-[11px] text-slate-400">Accesorios presentes y mapa de novedades</span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
-          {RECEPTION_INVENTORY_ITEMS.map((item) => {
-            const isPresent = !!inventory[item.id];
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => toggleInventory(item.id)}
-                className={`flex items-center justify-between rounded-xl border p-2.5 text-left text-xs transition ${
-                  isPresent
-                    ? 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300 font-semibold'
-                    : 'border-slate-800 bg-slate-950/60 text-slate-500'
-                }`}
-              >
-                <span className="truncate">{item.label}</span>
-                <span className="text-xs">{isPresent ? '✓' : '—'}</span>
-              </button>
-            );
-          })}
+        {/* Accessories Checklist */}
+        <div className="space-y-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+            Accesorios del Vehículo (Toca para marcar):
+          </span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+            {RECEPTION_INVENTORY_ITEMS.map((item) => {
+              const isPresent = !!inventory[item.id];
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => toggleInventory(item.id)}
+                  className={`flex items-center justify-between rounded-xl border p-2.5 text-left text-xs transition ${
+                    isPresent
+                      ? 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300 font-semibold'
+                      : 'border-slate-800 bg-slate-950/60 text-slate-500'
+                  }`}
+                >
+                  <span className="truncate">{item.label}</span>
+                  <span className="text-xs">{isPresent ? '✓' : '—'}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
+
+        {/* Visual Car Silhouette Diagram (A. Abolladuras, B. Golpes, C. Rayaduras) */}
+        <CarDamageMap markers={damageMarkers} onChange={setDamageMarkers} />
       </div>
 
       {/* 3. Operations Matrix by Category */}
