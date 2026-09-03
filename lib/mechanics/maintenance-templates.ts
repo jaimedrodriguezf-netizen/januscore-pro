@@ -29,6 +29,7 @@ export interface MaintenanceTemplate {
   generationYears: string;
   engineDisplacement: string;
   fuelType: FuelType;
+  imageUrl?: string;
   engineOil: EngineOilSpec;
   sparkPlugs?: SparkPlugSpec;
   brakeFluid: string;

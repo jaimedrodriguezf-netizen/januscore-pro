@@ -157,69 +157,97 @@ export function TemplateExplorer({
       </div>
 
       {/* Grid of Vehicle Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredTemplates.map((t) => (
           <div
             key={t.id}
-            className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 space-y-3 hover:border-slate-700 transition flex flex-col justify-between"
+            className="group overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80 hover:border-indigo-500/50 transition-all flex flex-col justify-between shadow-md"
           >
-            <div className="space-y-2">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">
-                    {t.brand} {t.generationYears ? `(${t.generationYears})` : ''}
-                  </span>
-                  <h3 className="text-sm font-bold text-white leading-snug">{t.model}</h3>
+            {/* Vehicle Photo Banner */}
+            <div className="relative h-36 w-full overflow-hidden bg-slate-950 border-b border-slate-800">
+              {t.imageUrl ? (
+                <img
+                  src={t.imageUrl}
+                  alt={`${t.brand} ${t.model}`}
+                  className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-950/40">
+                  <span className="text-3xl">🚗</span>
                 </div>
-                {t.isCustom ? (
-                  <span className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-[9px] font-bold text-indigo-300 border border-indigo-500/30">
-                    Taller
+              )}
+              
+              {/* Floating Badges */}
+              <div className="absolute top-2 left-2 flex items-center gap-1.5">
+                <span className="rounded-md bg-slate-950/80 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-xs border border-white/10">
+                  {t.brand}
+                </span>
+                {t.fuelType === 'hybrid' && (
+                  <span className="rounded-md bg-emerald-950/80 px-2 py-0.5 text-[10px] font-bold text-emerald-300 backdrop-blur-xs border border-emerald-500/30">
+                    ⚡ Híbrido
                   </span>
-                ) : (
-                  <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[9px] font-mono text-slate-400">
-                    OEM
+                )}
+                {t.fuelType === 'electric' && (
+                  <span className="rounded-md bg-cyan-950/80 px-2 py-0.5 text-[10px] font-bold text-cyan-300 backdrop-blur-xs border border-cyan-500/30">
+                    🔋 100% Eléctrico
                   </span>
                 )}
               </div>
 
-              <p className="text-[11px] text-slate-400 font-medium truncate">
-                {t.engineDisplacement}
-              </p>
-
-              {/* Specs Pills */}
-              <div className="space-y-1.5 pt-1 text-[11px]">
-                <div className="flex items-center justify-between rounded-lg bg-slate-950/80 px-2.5 py-1 border border-slate-800">
-                  <span className="text-slate-400">Aceite Motor:</span>
-                  <span className="font-mono font-bold text-amber-300">
-                    {t.engineOil.viscosity} ({t.engineOil.capacityLiters}L)
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between rounded-lg bg-slate-950/80 px-2.5 py-1 border border-slate-800">
-                  <span className="text-slate-400">Bujías:</span>
-                  <span className="font-mono text-indigo-300 truncate max-w-[150px]">
-                    {t.sparkPlugs?.spec || 'N/A (Diésel)'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between rounded-lg bg-slate-950/80 px-2.5 py-1 border border-slate-800 text-[10px]">
-                  <span className="text-slate-400">Frenos / Coolant:</span>
-                  <span className="text-slate-300 truncate max-w-[150px]">
-                    {t.brakeFluid} • {t.coolant.split(' ')[0]}
-                  </span>
-                </div>
-              </div>
+              <span className="absolute bottom-2 right-2 rounded-md bg-slate-950/90 px-2 py-0.5 text-[10px] font-mono font-bold text-amber-300 backdrop-blur-xs border border-amber-500/20">
+                {t.engineOil.viscosity}
+              </span>
             </div>
 
-            {/* Actions */}
-            <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveModalTemplate(t)}
-                className="flex-1 rounded-xl border border-slate-700 bg-slate-800/80 py-2 text-center text-xs font-bold text-slate-200 hover:bg-slate-700 transition"
-              >
-                📋 Ver Plan ({t.intervals.length} Intervalos)
-              </button>
+            {/* Card Content */}
+            <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+              <div className="space-y-1.5">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-sm font-bold text-white leading-snug">
+                    {t.model} {t.generationYears ? `(${t.generationYears})` : ''}
+                  </h3>
+                </div>
+
+                <p className="text-[11px] text-slate-400 font-medium truncate">
+                  {t.engineDisplacement}
+                </p>
+
+                {/* Specs Pills */}
+                <div className="space-y-1.5 pt-1 text-[11px]">
+                  <div className="flex items-center justify-between rounded-lg bg-slate-950/80 px-2.5 py-1 border border-slate-800">
+                    <span className="text-slate-400">Aceite Motor:</span>
+                    <span className="font-mono font-bold text-amber-300">
+                      {t.engineOil.viscosity} ({t.engineOil.capacityLiters}L)
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-lg bg-slate-950/80 px-2.5 py-1 border border-slate-800">
+                    <span className="text-slate-400">Bujías:</span>
+                    <span className="font-mono text-indigo-300 truncate max-w-[150px]">
+                      {t.sparkPlugs?.spec || 'N/A (Diésel/EV)'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-lg bg-slate-950/80 px-2.5 py-1 border border-slate-800 text-[10px]">
+                    <span className="text-slate-400">Frenos / Coolant:</span>
+                    <span className="text-slate-300 truncate max-w-[150px]">
+                      {t.brakeFluid} • {t.coolant.split(' ')[0]}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="pt-2 border-t border-slate-800/80">
+                <button
+                  type="button"
+                  onClick={() => setActiveModalTemplate(t)}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800/80 py-2 text-center text-xs font-bold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                >
+                  📋 Ver Plan ({t.intervals.length} Intervalos)
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -228,27 +256,49 @@ export function TemplateExplorer({
       {/* Modal / Drawer with 10k - 100k km Roadmap */}
       {activeModalTemplate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xs">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl space-y-5">
-            <div className="flex items-start justify-between border-b border-slate-800 pb-4">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
-                  {activeModalTemplate.brand} • Ficha Técnica Oficial
-                </span>
-                <h3 className="text-lg font-black text-white">
-                  {activeModalTemplate.model} ({activeModalTemplate.generationYears})
-                </h3>
-                <p className="text-xs text-slate-400">{activeModalTemplate.engineDisplacement}</p>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl space-y-5">
+            {/* Modal Image Hero Banner */}
+            {activeModalTemplate.imageUrl && (
+              <div className="relative h-48 w-full overflow-hidden bg-slate-950">
+                <img
+                  src={activeModalTemplate.imageUrl}
+                  alt={`${activeModalTemplate.brand} ${activeModalTemplate.model}`}
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                <button
+                  type="button"
+                  onClick={() => setActiveModalTemplate(null)}
+                  className="absolute top-4 right-4 rounded-full bg-slate-950/80 p-2 text-slate-300 hover:text-white backdrop-blur-xs border border-white/10"
+                >
+                  ✕
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setActiveModalTemplate(null)}
-                className="rounded-full bg-slate-800 p-2 text-slate-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
+            )}
 
-            {/* Technical Specs Summary */}
+            <div className="p-6 pt-2 space-y-5">
+              <div className="flex items-start justify-between border-b border-slate-800 pb-4">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+                    {activeModalTemplate.brand} • Ficha Técnica Oficial
+                  </span>
+                  <h3 className="text-xl font-black text-white">
+                    {activeModalTemplate.model} ({activeModalTemplate.generationYears})
+                  </h3>
+                  <p className="text-xs text-slate-400">{activeModalTemplate.engineDisplacement}</p>
+                </div>
+                {!activeModalTemplate.imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveModalTemplate(null)}
+                    className="rounded-full bg-slate-800 p-2 text-slate-400 hover:text-white"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* Technical Specs Summary */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 rounded-2xl border border-slate-800 bg-slate-950 p-4 text-xs">
               <div>
                 <span className="text-[10px] text-slate-500 block">Aceite Recomendado:</span>
@@ -336,6 +386,7 @@ export function TemplateExplorer({
               >
                 Cerrar
               </button>
+            </div>
             </div>
           </div>
         </div>

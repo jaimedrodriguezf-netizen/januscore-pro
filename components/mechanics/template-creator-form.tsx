@@ -26,6 +26,7 @@ export function TemplateCreatorForm({
   const [generationYears, setGenerationYears] = useState(initialData?.generationYears || '2022-2025');
   const [engineDisplacement, setEngineDisplacement] = useState(initialData?.engineDisplacement || '1.5L DOHC 16V');
   const [fuelType, setFuelType] = useState<FuelType>(initialData?.fuelType || 'gasoline');
+  const [imageUrl, setImageUrl] = useState<string>(initialData?.imageUrl || '');
   
   // Fluids & parts
   const [oilViscosity, setOilViscosity] = useState(initialData?.engineOil?.viscosity || '5W-30');
@@ -53,6 +54,7 @@ export function TemplateCreatorForm({
       generationYears,
       engineDisplacement,
       fuelType,
+      imageUrl: imageUrl.trim() || undefined,
       engineOil: {
         viscosity: oilViscosity,
         spec: oilSpec,
@@ -182,6 +184,27 @@ export function TemplateCreatorForm({
             <option value="hybrid">Híbrido (HEV / MHEV / PHEV)</option>
             <option value="electric">100% Eléctrico (EV)</option>
           </select>
+        </div>
+      </div>
+
+      {/* Image URL with live preview */}
+      <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-2">
+        <label className="block text-[11px] font-medium text-slate-300">
+          🖼️ URL de Foto del Vehículo (Opcional):
+        </label>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <input
+            type="url"
+            placeholder="https://images.unsplash.com/... o enlace directo a imagen"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            className="flex-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-indigo-300 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden font-mono"
+          />
+          {imageUrl && (
+            <div className="h-12 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-700 bg-slate-950">
+              <img src={imageUrl} alt="Vista previa" className="h-full w-full object-cover" />
+            </div>
+          )}
         </div>
       </div>
 
