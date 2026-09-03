@@ -178,12 +178,16 @@ export function WorkOrderForm({
         </button>
       </div>
 
-      {/* 1. Reception & Vehicle Information */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-4 shadow-sm">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
-          <span>1.</span> Datos de Recepción & Vehículo
-        </h3>
+      {/* 1. Reception, Client & Vehicle Information */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-5 shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+            <span>1.</span> Datos del Taller, Cliente & Vehículo
+          </h3>
+          <span className="font-mono text-xs font-bold text-indigo-300">ORDEN N° {orderNumber}</span>
+        </div>
 
+        {/* Order Meta */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-[11px] font-medium text-slate-300">N° de Orden de Trabajo</label>
@@ -212,7 +216,7 @@ export function WorkOrderForm({
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium text-slate-300">Fecha del Servicio</label>
+            <label className="block text-[11px] font-medium text-slate-300">Fecha de Recepción</label>
             <input
               type="date"
               name="serviceDate"
@@ -224,56 +228,105 @@ export function WorkOrderForm({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800/80">
-          <div>
-            <label className="block text-[11px] font-medium text-slate-300">Seleccionar Vehículo</label>
-            <select
-              value={selectedVehicleId}
-              onChange={(e) => {
-                setSelectedVehicleId(e.target.value);
-                const found = vehicles.find((v) => v.id === e.target.value);
-                if (found) setMileage(found.current_mileage);
-              }}
-              required
-              className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 text-xs text-white focus:border-indigo-500 focus:outline-hidden"
-            >
-              {vehicles.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.plate} — {v.brand} {v.model} ({v.owner_name || 'Sin titular'})
-                </option>
-              ))}
-            </select>
+        {/* Parallel Columns: Client Data & Vehicle Data */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          {/* Box A: Datos del Cliente */}
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 border-b border-slate-800/80 pb-1.5 flex items-center gap-1.5">
+              <span>👤</span> Datos del Cliente
+            </h4>
+            <div className="space-y-2 text-xs">
+              <div>
+                <span className="text-[10px] text-slate-400 block">Propietario / Cliente:</span>
+                <strong className="text-slate-100">{selectedVehicle?.owner_name || 'Jaime Rodríguez'}</strong>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <span className="text-[10px] text-slate-400 block">CI / RUC:</span>
+                  <span className="font-mono text-slate-200">1719623512001</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Teléfono:</span>
+                  <span className="font-mono text-slate-200">{selectedVehicle?.owner_phone || '0983144424'}</span>
+                </div>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 block">Correo Electrónico:</span>
+                <span className="text-slate-300">jaimedrodriguezf@gmail.com</span>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-[11px] font-medium text-slate-300">Kilometraje de Ingreso (Odómetro)</label>
-            <input
-              type="number"
-              value={mileage}
-              onChange={(e) => setMileage(Number(e.target.value) || 0)}
-              required
-              placeholder="60036"
-              className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 font-mono text-sm font-bold text-white focus:border-indigo-500 focus:outline-hidden"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[11px] font-medium text-slate-300">Nivel de Combustible</label>
-            <div className="mt-1 flex items-center gap-1.5">
-              {['E', '1/4', '1/2', '3/4', 'F'].map((lvl) => (
-                <button
-                  key={lvl}
-                  type="button"
-                  onClick={() => setFuelLevel(lvl)}
-                  className={`flex-1 rounded-lg py-1.5 text-xs font-mono font-bold transition ${
-                    fuelLevel === lvl
-                      ? 'bg-indigo-600 text-white shadow-md'
-                      : 'border border-slate-700 bg-slate-950 text-slate-400 hover:text-slate-200'
-                  }`}
+          {/* Box B: Datos del Vehículo */}
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 border-b border-slate-800/80 pb-1.5 flex items-center gap-1.5">
+              <span>🚗</span> Datos del Vehículo
+            </h4>
+            <div className="space-y-2">
+              <div>
+                <label className="block text-[10px] text-slate-400">Seleccionar Vehículo en Taller:</label>
+                <select
+                  value={selectedVehicleId}
+                  onChange={(e) => {
+                    setSelectedVehicleId(e.target.value);
+                    const found = vehicles.find((v) => v.id === e.target.value);
+                    if (found) setMileage(found.current_mileage);
+                  }}
+                  required
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-white focus:border-indigo-500 focus:outline-hidden"
                 >
-                  {lvl}
-                </button>
-              ))}
+                  {vehicles.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.plate} — {v.brand} {v.model} ({v.current_mileage.toLocaleString()} km)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Marca / Modelo:</span>
+                  <strong className="text-slate-100">{selectedVehicle?.brand} {selectedVehicle?.model}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Año / Color:</span>
+                  <span className="text-slate-200">{selectedVehicle?.year || '2023'} • Gris</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div>
+                  <label className="block text-[10px] text-slate-400">Kilometraje (Odómetro):</label>
+                  <input
+                    type="number"
+                    value={mileage}
+                    onChange={(e) => setMileage(Number(e.target.value) || 0)}
+                    required
+                    placeholder="60036"
+                    className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 font-mono text-xs font-bold text-indigo-300 focus:border-indigo-500 focus:outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] text-slate-400">Nivel de Combustible:</label>
+                  <div className="mt-1 flex items-center gap-1">
+                    {['E', '1/4', '1/2', '3/4', 'F'].map((lvl) => (
+                      <button
+                        key={lvl}
+                        type="button"
+                        onClick={() => setFuelLevel(lvl)}
+                        className={`flex-1 rounded py-1 text-[10px] font-mono font-bold transition ${
+                          fuelLevel === lvl
+                            ? 'bg-indigo-600 text-white shadow-xs'
+                            : 'border border-slate-700 bg-slate-900 text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        {lvl}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
