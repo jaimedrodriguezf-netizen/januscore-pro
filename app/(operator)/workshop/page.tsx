@@ -5,6 +5,8 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleTenantIds } from '@/lib/tenancy/tenant';
 import { formatPlate, calculateNextService } from '@/lib/mechanics/service';
 import { generateVehicleQrDataUrl } from '@/lib/mechanics/qr-sticker';
+import { formatWorkOrderDescription, type WorkOrderItem } from '@/lib/mechanics/work-order';
+import { WorkOrderForm } from '@/components/mechanics/work-order-form';
 import { CopyButton } from '@/components/ui/copy-button';
 import type { ServiceType } from '@/lib/mechanics/types';
 
@@ -145,6 +147,69 @@ export default async function WorkshopAdminPage({
 
     revalidatePath('/workshop');
     redirect(`/workshop?tenantId=${activeTenantId}&print=${vehicleId}&ok=Mantenimiento%20registrado`);
+  }
+
+  // Server Action: Save Full Work Order (Pilozo Vasco Form)
+  async function saveWorkOrderAction(formData: FormData) {
+    'use server';
+    const supabase = await createSupabaseServerClient();
+    const vehicleId = String(formData.get('vehicleId') || '');
+    const orderNumber = String(formData.get('orderNumber') || '');
+    const technicianName = String(formData.get('technicianName') || '');
+    const serviceDate = String(formData.get('serviceDate') || new Date().toISOString());
+    const mileage = Number(formData.get('mileage')) || 0;
+    const cost = parseFloat(String(formData.get('cost') || '0')) || 0;
+    const nextMileage = Number(formData.get('nextMileage')) || (mileage + 10000);
+    const nextDate = String(formData.get('nextDate') || '');
+    const recommendations = String(formData.get('recommendations') || '');
+
+    let selectedOperations: string[] = [];
+    try {
+      selectedOperations = JSON.parse(String(formData.get('selectedOperations') || '[]'));
+    } catch {}
+
+    let items: WorkOrderItem[] = [];
+    try {
+      items = JSON.parse(String(formData.get('items') || '[]'));
+    } catch {}
+
+    const description = formatWorkOrderDescription({
+      orderNumber,
+      technicianName,
+      selectedOperations,
+      items,
+      recommendations,
+    });
+
+    // 1. Insert maintenance record
+    const { error: mErr } = await supabase.from('maintenance_records').insert({
+      tenant_id: activeTenantId,
+      vehicle_id: vehicleId,
+      service_date: serviceDate,
+      mileage,
+      service_type: 'full_abc',
+      description,
+      technician_name: technicianName,
+      cost,
+      status: 'completed',
+      next_service_mileage: nextMileage,
+      next_service_date: nextDate || null,
+    });
+
+    if (mErr) {
+      redirect(`/workshop?tenantId=${activeTenantId}&err=${encodeURIComponent(mErr.message)}`);
+    }
+
+    // 2. Update vehicle current mileage
+    if (vehicleId && mileage > 0) {
+      await supabase
+        .from('vehicles')
+        .update({ current_mileage: mileage })
+        .eq('id', vehicleId);
+    }
+
+    revalidatePath('/workshop');
+    redirect(`/workshop?tenantId=${activeTenantId}&print=${vehicleId}&ok=Orden%20de%20trabajo%20${orderNumber}%20guardada%20exitosamente`);
   }
 
   const totalVehicles = vehicles?.length ?? 0;
@@ -512,6 +577,13 @@ export default async function WorkshopAdminPage({
           </form>
         </div>
       </div>
+
+      {/* 3. Official Work Order Comprehensive Form (Pilozo Vasco Layout) */}
+      <WorkOrderForm
+        vehicles={vehicles || []}
+        activeTenantId={activeTenantId}
+        onSaveWorkOrderAction={saveWorkOrderAction}
+      />
 
       {/* Vehicles Table */}
       <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70 shadow-sm">
