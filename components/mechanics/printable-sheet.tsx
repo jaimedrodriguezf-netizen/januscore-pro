@@ -88,9 +88,6 @@ export function PrintableSheet({
                   <div className="text-[10px] font-black uppercase tracking-tight text-gray-900 leading-tight truncate">
                     {tenantName || stickerData.tenantName}
                   </div>
-                  <div className="text-[7.5px] font-bold text-indigo-700 tracking-wider font-mono">
-                    {stickerData.website}
-                  </div>
                 </div>
 
                 {/* High-Resolution QR Code */}
@@ -103,7 +100,7 @@ export function PrintableSheet({
                   />
                 </div>
 
-                {/* Plate / Client Info */}
+                {/* Plate / Client Info & Website Footer */}
                 <div className="w-full border-t border-gray-200 pt-1 space-y-0.5">
                   {vehiclePlate ? (
                     <div className="font-mono text-xs font-black text-gray-900 tracking-wider">
@@ -117,6 +114,9 @@ export function PrintableSheet({
                   )}
                   <div className="text-[6.5px] font-semibold text-gray-600 leading-tight">
                     Escanea para ver tu próximo mantenimiento
+                  </div>
+                  <div className="text-[7.5px] font-bold text-indigo-700 tracking-wider font-mono pt-0.5">
+                    {stickerData.website}
                   </div>
                 </div>
 
