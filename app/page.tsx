@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleTenantIds } from '@/lib/tenancy/tenant';
 import { getUserRoleInfo } from '@/lib/tenancy/role';
 import { AppShell } from '@/components/layout/app-shell';
+import { TenantWizard } from '@/components/onboarding/tenant-wizard';
 import { LandingPage } from '@/components/landing/landing-page';
 import { APP_VERSION } from '@/lib/version';
 
@@ -19,7 +20,7 @@ export default async function Home() {
   const tenantIds = await getAccessibleTenantIds(supabase);
   const roleInfo = await getUserRoleInfo(supabase, tenantIds[0]);
 
-  // If the user has no tenant and is not a platform superadmin, show unassigned view
+  // If the user has no tenant and is not a platform superadmin, show self-serve onboarding wizard
   if (tenantIds.length === 0 && !roleInfo.isPlatformAdmin) {
     return (
       <AppShell
@@ -29,33 +30,7 @@ export default async function Home() {
         roleBadgeColor={roleInfo.badgeColor}
         isPlatformAdmin={false}
       >
-        <div className="mx-auto max-w-2xl py-16 text-center space-y-6">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20 text-3xl">
-            ⏳
-          </div>
-          <div className="space-y-3">
-            <span className="inline-flex rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-1 font-mono text-xs font-bold text-amber-300">
-              {roleInfo.label}
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Cuenta Registrada en JanusCore Pro
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-lg mx-auto">
-              Tu cuenta (<strong className="text-white">{user.email}</strong>) ha sido verificada, pero aún no perteneces a ninguna organización o empresa activa.
-            </p>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
-              Para acceder a los módulos de trabajo (Taller Mecánico, Comprobantes o Catálogo), el administrador de tu negocio o el Superadmin debe invitarte o asignarte tu rol desde el panel de usuarios.
-            </p>
-          </div>
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="/auto"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 text-xs font-semibold text-slate-300 hover:text-white transition"
-            >
-              <span>🔍 Consultar Ficha QR de Taller</span>
-            </Link>
-          </div>
-        </div>
+        <TenantWizard userEmail={user.email || ''} />
       </AppShell>
     );
   }
