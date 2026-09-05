@@ -19,12 +19,21 @@ export async function GET(request: Request) {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(new URL(next, origin));
+      const targetPath = next.startsWith('/') ? next : `/${next}`;
+      return new NextResponse(null, {
+        status: 302,
+        headers: {
+          Location: targetPath,
+        },
+      });
     }
   }
 
   // If code exchange failed or was not provided
-  return NextResponse.redirect(
-    new URL('/signin?err=No%20se%20pudo%20completar%20la%20autenticaci%C3%B3n%20con%20Google', origin)
-  );
+  return new NextResponse(null, {
+    status: 302,
+    headers: {
+      Location: '/signin?err=No%20se%20pudo%20completar%20la%20autenticaci%C3%B3n%20con%20Google',
+    },
+  });
 }
