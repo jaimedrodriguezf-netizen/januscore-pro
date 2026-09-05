@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleTenantIds } from '@/lib/tenancy/tenant';
 import { getMyRole } from '@/lib/tenancy/role';
+import { addTenantMemberByEmail } from '@/lib/admin/members';
 
 export default async function UsersAdminPage({
   searchParams,
@@ -111,6 +112,32 @@ export default async function UsersAdminPage({
     redirect(`/settings/users?tenantId=${activeTenantId}&ok=Sucursal%20asignada%20con%20%C3%A9xito`);
   }
 
+  async function addMemberAction(formData: FormData) {
+    'use server';
+    const supabase = await createSupabaseServerClient();
+    const email = String(formData.get('email') || '').trim();
+    const role = (formData.get('role') || 'operator') as 'tenant_admin' | 'operator' | 'client';
+    const branchId = String(formData.get('branchId') || '').trim() || null;
+
+    try {
+      await addTenantMemberByEmail(supabase, {
+        tenantId: activeTenantId,
+        email,
+        role,
+        branchId,
+      });
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'digest' in err && String((err as Record<string, unknown>).digest).startsWith('NEXT_REDIRECT')) {
+        throw err;
+      }
+      const msg = err instanceof Error ? err.message : 'Error al sumar usuario';
+      redirect(`/settings/users?tenantId=${activeTenantId}&err=${encodeURIComponent(msg)}`);
+    }
+
+    revalidatePath('/settings/users');
+    redirect(`/settings/users?tenantId=${activeTenantId}&ok=Usuario%20${encodeURIComponent(email)}%20sumado%20con%20%C3%A9xito`);
+  }
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 font-sans">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -141,6 +168,74 @@ export default async function UsersAdminPage({
           ⚠️ {queryParams.err}
         </div>
       )}
+
+      {/* Add New Member Card */}
+      <div className="mb-6 rounded-xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+            <span>➕ Sumar Miembro / Empleado por Correo</span>
+          </h2>
+          <p className="text-xs text-neutral-500">
+            Ingresa el correo de tu colaborador para vincularlo a tu organización y asignarle su rol y sucursal.
+          </p>
+        </div>
+
+        <form action={addMemberAction} className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+          <div className="sm:col-span-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
+              Correo Electrónico *
+            </label>
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="ej. danyronew@gmail.com"
+              className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs text-neutral-900 placeholder-neutral-400 focus:border-indigo-500 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
+              Rol Inicial *
+            </label>
+            <select
+              name="role"
+              defaultValue="operator"
+              className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs text-neutral-900 focus:border-indigo-500 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+            >
+              <option value="operator">🔧 Operador / Mecánico</option>
+              <option value="tenant_admin">🏢 Admin de Empresa</option>
+              <option value="client">👤 Cliente</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
+              Sucursal Asignada
+            </label>
+            <select
+              name="branchId"
+              className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs text-neutral-900 focus:border-indigo-500 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+            >
+              <option value="">Todas (Sin sucursal fija)</option>
+              {branches?.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name} ({b.code})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-indigo-500 transition cursor-pointer"
+            >
+              + Agregar Miembro
+            </button>
+          </div>
+        </form>
+      </div>
 
       {/* Users Table */}
       <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
