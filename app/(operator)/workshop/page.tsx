@@ -617,26 +617,14 @@ export default async function WorkshopAdminPage({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Mecánico Responsable</label>
-                <input
-                  type="text"
-                  name="technicianName"
-                  placeholder="Carlos Mendoza"
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Costo Total ($)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  name="cost"
-                  placeholder="45.00"
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-300">Mecánico Responsable</label>
+              <input
+                type="text"
+                name="technicianName"
+                placeholder="Carlos Mendoza"
+                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+              />
             </div>
 
             <button

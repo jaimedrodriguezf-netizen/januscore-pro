@@ -144,8 +144,7 @@ export function formatWorkOrderDescription(payload: Partial<WorkOrderPayload>): 
   if (payload.items && payload.items.length > 0) {
     const itemDetails = payload.items.map((it) => {
       const specText = it.spec ? ` (${it.spec})` : '';
-      const costText = it.cost ? ` - $${it.cost.toFixed(2)}` : '';
-      return `${it.name}${specText}${costText}`;
+      return `${it.name}${specText}`;
     });
     parts.push(`Detalle: ${itemDetails.join(' | ')}`);
   }

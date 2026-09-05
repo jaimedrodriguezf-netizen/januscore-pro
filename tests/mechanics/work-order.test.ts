@@ -40,5 +40,7 @@ describe('Workshop Work Order Domain & Form (SDD/TDD)', () => {
     expect(description).toContain('PETRONAS 5W30');
     expect(description).toContain('IRIDIO DENSO');
     expect(description).toContain('Fabricio Pilozo');
+    expect(description).not.toContain('$');
+    expect(description).not.toContain('50.00');
   });
 });

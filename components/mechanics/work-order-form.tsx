@@ -445,7 +445,7 @@ export function WorkOrderForm({
             <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
               <span>4.</span> Desglose de Repuestos, Fluidos & Mano de Obra
             </h3>
-            <p className="text-[11px] text-slate-400">Especifica marcas, viscosidades y costos facturados</p>
+            <p className="text-[11px] text-slate-400">Especifica marcas, viscosidades y especificaciones técnicas utilizadas</p>
           </div>
           <button
             type="button"
@@ -483,23 +483,10 @@ export function WorkOrderForm({
                 />
               </div>
 
-              <div className="w-28 relative">
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0.00"
-                  value={it.cost || ''}
-                  onChange={(e) => handleItemChange(idx, 'cost', parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-900 pl-6 pr-2 py-1.5 font-mono text-xs font-bold text-white focus:border-indigo-500 focus:outline-hidden text-right"
-                />
-                <span className="absolute left-2.5 top-2 text-xs font-bold text-slate-500">$</span>
-              </div>
-
               <button
                 type="button"
                 onClick={() => handleRemoveItem(idx)}
-                className="text-slate-500 hover:text-rose-400 p-1 text-xs"
+                className="text-slate-500 hover:text-rose-400 p-1 text-xs shrink-0 self-end sm:self-auto"
                 title="Eliminar fila"
               >
                 ✕
@@ -508,10 +495,10 @@ export function WorkOrderForm({
           ))}
         </div>
 
-        {/* Totals & Payment Method */}
+        {/* Payment Method / Settlement */}
         <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-slate-800/80 pt-4">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-slate-400">Método de Pago:</span>
+            <span className="text-xs font-medium text-slate-400">Condición / Forma de Pago:</span>
             <select
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
@@ -522,13 +509,6 @@ export function WorkOrderForm({
               <option value="Tarjeta de Crédito/Débito">Tarjeta de Crédito / Débito</option>
               <option value="Crédito Taller">Crédito Taller</option>
             </select>
-          </div>
-
-          <div className="text-right">
-            <span className="text-xs text-slate-400">TOTAL FACTURADO:</span>
-            <span className="ml-3 font-mono text-2xl font-black text-emerald-400">
-              ${totals.total.toFixed(2)}
-            </span>
           </div>
         </div>
       </div>

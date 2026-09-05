@@ -260,11 +260,8 @@ export default async function WorkshopBrandedVehiclePage({
                   </div>
 
                   {r.technician_name && (
-                    <div className="border-t border-slate-800/60 pt-2 text-[11px] text-slate-400 flex items-center justify-between">
+                    <div className="border-t border-slate-800/60 pt-2 text-[11px] text-slate-400">
                       <span>Mecánico a cargo: <strong className="text-slate-300">{r.technician_name}</strong></span>
-                      {r.cost && (
-                        <span className="font-mono font-semibold text-slate-200">${Number(r.cost).toFixed(2)}</span>
-                      )}
                     </div>
                   )}
                 </div>
