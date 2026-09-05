@@ -48,13 +48,13 @@ export default async function WorkshopBrandedVehiclePage({
     isActive: tenant.is_active,
   };
 
-  // 2. Query vehicle by plate and tenant_id
-  const { data: vehicleData } = await supabase
-    .from('vehicles')
-    .select('*')
-    .eq('tenant_id', tenant.id)
-    .ilike('plate', formattedPlate)
-    .maybeSingle();
+  // 2. Query vehicle by plate and tenant_id via secure public RPC
+  const { data: vehicles } = await supabase.rpc('get_public_vehicle_by_plate', {
+    p_plate: formattedPlate,
+    p_tenant_id: tenant.id,
+  });
+
+  const vehicleData = Array.isArray(vehicles) && vehicles.length > 0 ? vehicles[0] : null;
 
   if (!vehicleData) {
     return (
@@ -80,15 +80,12 @@ export default async function WorkshopBrandedVehiclePage({
     );
   }
 
-  const vehicle = vehicleData as Vehicle;
+  const vehicle = vehicleData as unknown as Vehicle;
 
-  // 3. Fetch completed maintenance records
-  const { data: recordsData } = await supabase
-    .from('maintenance_records')
-    .select('*')
-    .eq('vehicle_id', vehicle.id)
-    .eq('status', 'completed')
-    .order('service_date', { ascending: false });
+  // 3. Fetch completed maintenance records via secure public RPC
+  const { data: recordsData } = await supabase.rpc('get_public_maintenance_records', {
+    p_vehicle_id: vehicle.id,
+  });
 
   const records = (recordsData ?? []) as MaintenanceRecord[];
   const latestRecord = records[0];

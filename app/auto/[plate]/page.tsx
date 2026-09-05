@@ -19,15 +19,15 @@ export default async function VehiclePublicPage({
 
   const supabase = await createSupabaseServerClient();
 
-  // Query vehicle by plate (Case-insensitive) with tenant slug
-  const { data: vehicleData } = await supabase
-    .from('vehicles')
-    .select('*, tenants(slug)')
-    .ilike('plate', formattedPlate)
-    .maybeSingle();
+  // Query vehicle by plate via secure public RPC
+  const { data: vehicles } = await supabase.rpc('get_public_vehicle_by_plate', {
+    p_plate: formattedPlate,
+  });
 
-  if (vehicleData?.tenants?.slug) {
-    redirect(`/m/${vehicleData.tenants.slug}/${formattedPlate}`);
+  const vehicleData = Array.isArray(vehicles) && vehicles.length > 0 ? vehicles[0] : null;
+
+  if (vehicleData?.tenant_slug) {
+    redirect(`/m/${vehicleData.tenant_slug}/${formattedPlate}`);
   }
 
   if (!vehicleData) {
@@ -57,15 +57,15 @@ export default async function VehiclePublicPage({
     );
   }
 
-  const vehicle = vehicleData as Vehicle & { tenants?: { name: string } };
+  const vehicle = {
+    ...vehicleData,
+    tenants: { name: vehicleData.tenant_name, slug: vehicleData.tenant_slug },
+  } as unknown as Vehicle & { tenants?: { name: string } };
 
-  // Fetch maintenance records
-  const { data: recordsData } = await supabase
-    .from('maintenance_records')
-    .select('*')
-    .eq('vehicle_id', vehicle.id)
-    .eq('status', 'completed')
-    .order('service_date', { ascending: false });
+  // Fetch maintenance records via secure public RPC
+  const { data: recordsData } = await supabase.rpc('get_public_maintenance_records', {
+    p_vehicle_id: vehicle.id,
+  });
 
   const records = (recordsData ?? []) as MaintenanceRecord[];
   const latestRecord = records[0];
