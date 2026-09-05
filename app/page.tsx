@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleTenantIds } from '@/lib/tenancy/tenant';
 import { AppShell } from '@/components/layout/app-shell';
+import { LandingPage } from '@/components/landing/landing-page';
 import { APP_VERSION } from '@/lib/version';
 
 export default async function Home() {
@@ -10,7 +11,11 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const tenantIds = user ? await getAccessibleTenantIds(supabase) : [];
+  if (!user) {
+    return <LandingPage />;
+  }
+
+  const tenantIds = await getAccessibleTenantIds(supabase);
   let businessType: 'all' | 'mechanics' | 'financial_receipts' = 'all';
   let tenantName = 'Tu Organización';
 
@@ -217,13 +222,6 @@ export default async function Home() {
     </div>
   );
 
-  if (user) {
-    return <AppShell userEmail={user.email} businessType={businessType}>{content}</AppShell>;
-  }
-
-  return (
-    <div className="min-h-screen bg-slate-950 font-sans text-slate-100 p-6 lg:p-12">
-      <div className="mx-auto max-w-6xl">{content}</div>
-    </div>
-  );
+  return <AppShell userEmail={user.email} businessType={businessType}>{content}</AppShell>;
 }
+
