@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getAccessibleTenantIds } from '@/lib/tenancy/tenant';
 import { AppShell } from '@/components/layout/app-shell';
 import { APP_VERSION } from '@/lib/version';
 
@@ -9,30 +10,70 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const sections = [
+  const tenantIds = user ? await getAccessibleTenantIds(supabase) : [];
+  let businessType: 'all' | 'mechanics' | 'financial_receipts' = 'all';
+  let tenantName = 'Tu Organización';
+
+  if (tenantIds.length > 0) {
+    const { data: tenant } = await supabase
+      .from('tenants')
+      .select('business_type, name')
+      .eq('id', tenantIds[0])
+      .maybeSingle();
+
+    if (tenant?.business_type) {
+      businessType = tenant.business_type as 'all' | 'mechanics' | 'financial_receipts';
+    }
+    if (tenant?.name) {
+      tenantName = tenant.name;
+    }
+  }
+
+  const allSections = [
     {
-      title: 'Taller Mecánico & QR',
-      description: 'Control de vehículos, órdenes de servicio, proyección de próximos mantenimientos y stickers QR para parabrisas.',
+      title: 'Órdenes de Trabajo & Flotas',
+      description: 'Control de vehículos, órdenes de servicio, inspección 2D de carrocería y stickers QR para parabrisas.',
       href: '/workshop',
-      badge: 'Mecánica',
+      badge: 'Taller',
       icon: '🔧',
       color: 'border-slate-800 hover:border-indigo-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'mechanics'],
     },
     {
-      title: 'Portal de Clientes',
-      description: 'Portal para clientes y usuarios: carga directa de comprobantes y seguimiento del estado de validación en tiempo real.',
-      href: '/portal',
-      badge: 'Clientes',
-      icon: '👤',
+      title: 'Catálogo OEM & Fichas 100+',
+      description: 'Catálogo oficial de más de 136 modelos con especificaciones y creador de fichas de mantenimiento.',
+      href: '/workshop/templates',
+      badge: 'Fichas',
+      icon: '📚',
+      color: 'border-slate-800 hover:border-cyan-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'mechanics'],
+    },
+    {
+      title: 'Ajustes del Taller & Marca',
+      description: 'Configuración del logo, WhatsApp oficial de agendamiento, Google Maps, horarios y enlace de marca /m/[slug].',
+      href: '/workshop/settings',
+      badge: 'Perfil',
+      icon: '⚙️',
       color: 'border-slate-800 hover:border-emerald-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'mechanics'],
+    },
+    {
+      title: 'Plancha A4 (15 Stickers)',
+      description: 'Generación e impresión de planchas de stickers QR con los datos de contacto y logo de tu mecánica.',
+      href: '/workshop/print-sheet',
+      badge: 'Impresión',
+      icon: '🖨️',
+      color: 'border-slate-800 hover:border-blue-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'mechanics'],
     },
     {
       title: 'Cargar Comprobantes',
-      description: 'Ingreso y procesamiento manual de comprobantes bancarios con almacenamiento inmutable y escaneo automático OCR y QR.',
+      description: 'Ingreso y procesamiento manual de comprobantes bancarios con almacenamiento inmutable y escaneo OCR y QR.',
       href: '/upload',
       badge: 'Operador',
       icon: '📥',
       color: 'border-slate-800 hover:border-blue-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'financial_receipts'],
     },
     {
       title: 'Bandeja de Comprobantes',
@@ -41,6 +82,7 @@ export default async function Home() {
       badge: 'Operador',
       icon: '📋',
       color: 'border-slate-800 hover:border-amber-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'financial_receipts'],
     },
     {
       title: 'Métricas & Reportes',
@@ -49,6 +91,16 @@ export default async function Home() {
       badge: 'Analítica',
       icon: '📊',
       color: 'border-slate-800 hover:border-purple-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'financial_receipts'],
+    },
+    {
+      title: 'Portal de Clientes',
+      description: 'Portal para clientes y usuarios: carga directa de comprobantes y seguimiento del estado de validación.',
+      href: '/portal',
+      badge: 'Clientes',
+      icon: '👤',
+      color: 'border-slate-800 hover:border-emerald-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'financial_receipts'],
     },
     {
       title: 'Sucursales & Sedes',
@@ -57,6 +109,7 @@ export default async function Home() {
       badge: 'Admin',
       icon: '🏢',
       color: 'border-slate-800 hover:border-cyan-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'mechanics', 'financial_receipts'],
     },
     {
       title: 'Usuarios & Permisos',
@@ -65,6 +118,7 @@ export default async function Home() {
       badge: 'Admin',
       icon: '👥',
       color: 'border-slate-800 hover:border-teal-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'mechanics', 'financial_receipts'],
     },
     {
       title: 'Cuentas Beneficiarias',
@@ -73,6 +127,7 @@ export default async function Home() {
       badge: 'Admin',
       icon: '🏦',
       color: 'border-slate-800 hover:border-rose-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'financial_receipts'],
     },
     {
       title: 'Claves Públicas Ed25519',
@@ -81,8 +136,14 @@ export default async function Home() {
       badge: 'Admin',
       icon: '🔑',
       color: 'border-slate-800 hover:border-yellow-500/50 bg-slate-900/60',
+      forBusinessType: ['all', 'financial_receipts'],
     },
   ];
+
+  const sections = allSections.filter((s) => {
+    if (!('forBusinessType' in s) || !s.forBusinessType) return true;
+    return s.forBusinessType.includes(businessType);
+  });
 
   const content = (
     <div className="space-y-8">
@@ -91,17 +152,26 @@ export default async function Home() {
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
-              Centro de Control Empresarial
+              Centro de Control • {tenantName}
             </span>
             <span className="rounded-full bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 font-mono text-[10px] font-bold text-indigo-300">
+              {businessType === 'mechanics'
+                ? '🚗 Taller Mecánico'
+                : businessType === 'financial_receipts'
+                ? '💳 Verificación Financiera'
+                : '🏢 Multi-Negocio'}
+            </span>
+            <span className="rounded-full bg-slate-800 border border-slate-700 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-400">
               {APP_VERSION}
             </span>
           </div>
           <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100">
-            JanusCore Pro
+            {businessType === 'mechanics' ? 'Gestión Automotriz & Fichas QR' : 'JanusCore Pro'}
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-slate-400">
-            Plataforma Integral de Verificación de Pagos, Auditoría & Gestión de Taller Mecánico
+            {businessType === 'mechanics'
+              ? 'Control de vehículos, órdenes de servicio, proyección de mantenimientos y portal de marca'
+              : 'Plataforma Integral de Verificación de Pagos, Auditoría & Control de Negocios'}
           </p>
         </div>
 
@@ -125,19 +195,19 @@ export default async function Home() {
           >
             <div>
               <div className="flex items-center justify-between">
-                <span className="text-xl">{sec.icon}</span>
-                <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-300 border border-slate-700">
+                <span className="text-2xl">{sec.icon}</span>
+                <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-300 border border-slate-700/60">
                   {sec.badge}
                 </span>
               </div>
-              <h2 className="mt-3 text-base font-bold tracking-tight text-slate-100 group-hover:text-indigo-400 transition-colors">
+              <h3 className="mt-3 text-sm font-bold text-slate-100 group-hover:text-indigo-400 transition-colors">
                 {sec.title}
-              </h2>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+              </h3>
+              <p className="mt-1 text-xs text-slate-400 leading-relaxed">
                 {sec.description}
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-indigo-400 group-hover:translate-x-0.5 transition-transform">
+            <div className="mt-4 flex items-center gap-1 text-[11px] font-semibold text-indigo-400 group-hover:translate-x-1 transition-transform">
               <span>Acceder al módulo</span>
               <span>→</span>
             </div>
@@ -148,7 +218,7 @@ export default async function Home() {
   );
 
   if (user) {
-    return <AppShell userEmail={user.email}>{content}</AppShell>;
+    return <AppShell userEmail={user.email} businessType={businessType}>{content}</AppShell>;
   }
 
   return (

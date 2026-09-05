@@ -7,9 +7,10 @@ import { Header } from './header';
 interface AppShellProps {
   children: React.ReactNode;
   userEmail?: string | null;
+  businessType?: 'all' | 'mechanics' | 'financial_receipts';
 }
 
-export function AppShell({ children, userEmail }: AppShellProps) {
+export function AppShell({ children, userEmail, businessType = 'all' }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -17,6 +18,7 @@ export function AppShell({ children, userEmail }: AppShellProps) {
       {/* Desktop & Mobile Sidebar */}
       <Sidebar
         userEmail={userEmail}
+        businessType={businessType}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />

@@ -44,14 +44,23 @@ export default async function SuperadminTenantsPage({
     const supabase = await createSupabaseServerClient();
     const name = String(formData.get('name') || '').trim();
     const slug = String(formData.get('slug') || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    const businessType = String(formData.get('businessType') || 'mechanics') as 'all' | 'mechanics' | 'financial_receipts';
 
     if (!name || !slug) {
       redirect(`/tenants?err=El%20nombre%20y%20slug%20son%20obligatorios`);
     }
 
+    const modules = businessType === 'mechanics'
+      ? ['mechanics']
+      : businessType === 'financial_receipts'
+      ? ['financial_receipts']
+      : ['mechanics', 'financial_receipts'];
+
     const { error } = await supabase.from('tenants').insert({
       name,
       slug,
+      business_type: businessType,
+      modules,
       is_active: true,
     });
 
@@ -144,6 +153,20 @@ export default async function SuperadminTenantsPage({
                 className="mt-1 block w-full font-mono rounded-lg border border-neutral-300 px-3 py-2 text-xs dark:border-neutral-700 dark:bg-neutral-800"
               />
             </div>
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                Rubro / Módulo Asignado
+              </label>
+              <select
+                name="businessType"
+                defaultValue="mechanics"
+                className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-800"
+              >
+                <option value="mechanics">🚗 Mecánica Automotriz & Taller (Exclusivo)</option>
+                <option value="financial_receipts">💳 Verificación Financiera & Comprobantes</option>
+                <option value="all">🏢 Suite Completa Multi-Negocio</option>
+              </select>
+            </div>
             <button
               type="submit"
               className="mt-2 w-full rounded-lg bg-neutral-900 py-2.5 text-xs font-bold text-white shadow hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900"
@@ -165,6 +188,7 @@ export default async function SuperadminTenantsPage({
               <tr>
                 <th className="px-4 py-3">Nombre</th>
                 <th className="px-4 py-3">Slug</th>
+                <th className="px-4 py-3">Módulo</th>
                 <th className="px-4 py-3">Estado</th>
                 <th className="px-4 py-3">Fecha</th>
                 <th className="px-4 py-3 text-right">Acción</th>
@@ -173,7 +197,7 @@ export default async function SuperadminTenantsPage({
             <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
               {!tenants || tenants.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-xs text-neutral-400">
+                  <td colSpan={6} className="px-4 py-6 text-center text-xs text-neutral-400">
                     No hay organizaciones registradas.
                   </td>
                 </tr>
@@ -185,6 +209,15 @@ export default async function SuperadminTenantsPage({
                     </td>
                     <td className="px-4 py-3 font-mono text-neutral-600 dark:text-neutral-400">
                       {t.slug}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex rounded-full bg-indigo-50 border border-indigo-200/50 px-2 py-0.5 text-[10px] font-bold text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-800/40 dark:text-indigo-300">
+                        {t.business_type === 'mechanics'
+                          ? '🚗 Mecánica'
+                          : t.business_type === 'financial_receipts'
+                          ? '💳 Financiero'
+                          : '🏢 Completo'}
+                      </span>
                     </td>
                     <td className="px-4 py-3">
                       <span

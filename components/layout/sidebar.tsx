@@ -4,16 +4,30 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { APP_VERSION } from '@/lib/version';
 
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ReactNode;
+  badge?: string;
+}
+
+interface NavGroup {
+  group: string;
+  forBusinessType?: ('all' | 'mechanics' | 'financial_receipts')[];
+  items: NavItem[];
+}
+
 interface SidebarProps {
   userEmail?: string | null;
+  businessType?: 'all' | 'mechanics' | 'financial_receipts';
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function Sidebar({ userEmail, isOpen, onClose }: SidebarProps) {
+export function Sidebar({ userEmail, businessType = 'all', isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
 
-  const navigation = [
+  const allNavGroups: NavGroup[] = [
     {
       group: 'Operaciones Generales',
       items: [
@@ -39,6 +53,7 @@ export function Sidebar({ userEmail, isOpen, onClose }: SidebarProps) {
     },
     {
       group: 'Módulo Automotriz & Taller',
+      forBusinessType: ['all', 'mechanics'],
       items: [
         {
           name: 'Órdenes & Vehículos',
@@ -82,6 +97,7 @@ export function Sidebar({ userEmail, isOpen, onClose }: SidebarProps) {
     },
     {
       group: 'Verificación Financiera',
+      forBusinessType: ['all', 'financial_receipts'],
       items: [
         {
           name: 'Cargar Comprobante',
@@ -168,6 +184,11 @@ export function Sidebar({ userEmail, isOpen, onClose }: SidebarProps) {
       ],
     },
   ];
+
+  const navigation = allNavGroups.filter((g) => {
+    if (!('forBusinessType' in g) || !g.forBusinessType) return true;
+    return g.forBusinessType.includes(businessType);
+  });
 
   return (
     <>
