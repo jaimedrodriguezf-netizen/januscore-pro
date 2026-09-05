@@ -234,16 +234,24 @@ export default async function SuperadminTenantsPage({
                       {new Date(t.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <form action={toggleTenantAction}>
-                        <input type="hidden" name="tenantId" value={t.id} />
-                        <input type="hidden" name="currentActive" value={String(t.is_active)} />
-                        <button
-                          type="submit"
-                          className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
+                      <div className="flex items-center justify-end gap-3">
+                        <Link
+                          href={`/tenants/${t.id}/billing`}
+                          className="rounded-md bg-indigo-50 border border-indigo-200 px-2 py-1 text-[11px] font-bold text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:border-indigo-800/40 dark:text-indigo-300 dark:hover:bg-indigo-900/50"
                         >
-                          {t.is_active ? 'Desactivar' : 'Activar'}
-                        </button>
-                      </form>
+                          ⚙️ Facturación
+                        </Link>
+                        <form action={toggleTenantAction}>
+                          <input type="hidden" name="tenantId" value={t.id} />
+                          <input type="hidden" name="currentActive" value={String(t.is_active)} />
+                          <button
+                            type="submit"
+                            className="font-semibold text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
+                          >
+                            {t.is_active ? 'Desactivar' : 'Activar'}
+                          </button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 ))
