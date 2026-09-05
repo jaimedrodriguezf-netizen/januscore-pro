@@ -20,10 +20,10 @@ describe('Process Automation Landing Page Structure', () => {
       { name: 'Soluciones', href: '#soluciones' },
       { name: 'Módulos', href: '#modulos' },
       { name: 'Tecnología', href: '#tecnologia' },
-      { name: 'Ingresar', href: '/login' },
+      { name: 'Ingresar', href: '/signin' },
     ];
 
     expect(navItems).toHaveLength(4);
-    expect(navItems.find((n) => n.name === 'Ingresar')?.href).toBe('/login');
+    expect(navItems.find((n) => n.name === 'Ingresar')?.href).toBe('/signin');
   });
 });

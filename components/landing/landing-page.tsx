@@ -42,7 +42,7 @@ export function LandingPage() {
               <span>🔍 Consultar QR</span>
             </Link>
             <Link
-              href="/login"
+              href="/signin"
               className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-indigo-600/20 hover:bg-indigo-500 transition active:scale-95"
             >
               <span>Acceder al Sistema</span>
@@ -75,7 +75,7 @@ export function LandingPage() {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link
-              href="/login"
+              href="/signin"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-7 py-3.5 text-sm font-bold text-white shadow-xl shadow-indigo-600/30 hover:bg-indigo-500 hover:scale-[1.02] transition active:scale-95"
             >
               <span>🚀 Comenzar / Iniciar Sesión</span>
@@ -399,7 +399,7 @@ export function LandingPage() {
           </p>
           <div className="pt-2">
             <Link
-              href="/login"
+              href="/signin"
               className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-8 py-4 text-sm font-bold text-white shadow-xl shadow-indigo-600/30 hover:bg-indigo-500 hover:scale-105 transition active:scale-95"
             >
               <span>Ingresar a JanusCore Pro</span>
@@ -420,7 +420,7 @@ export function LandingPage() {
 
           <div className="flex items-center gap-4 text-[11px]">
             <Link href="/auto" className="hover:text-slate-400 transition">Buscador QR</Link>
-            <Link href="/login" className="hover:text-slate-400 transition">Iniciar Sesión</Link>
+            <Link href="/signin" className="hover:text-slate-400 transition">Iniciar Sesión</Link>
             <span className="font-mono text-[10px] text-slate-600">{APP_VERSION}</span>
           </div>
         </div>

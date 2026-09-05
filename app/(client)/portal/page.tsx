@@ -46,7 +46,7 @@ export default async function ClientPortalPage({
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) redirect('/login');
+    if (!user) redirect('/signin');
 
     const branchId = String(formData.get('branchId') || '');
     const file = formData.get('file');
