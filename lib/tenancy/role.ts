@@ -28,3 +28,79 @@ export async function getMyRole(
     ? (role as TenancyRole)
     : '';
 }
+
+export type UserDisplayRole =
+  | 'platform_admin'
+  | 'tenant_admin'
+  | 'operator'
+  | 'client'
+  | 'unassigned';
+
+export interface UserRoleInfo {
+  role: UserDisplayRole;
+  label: string;
+  badgeColor: string;
+  isPlatformAdmin: boolean;
+}
+
+export async function getUserRoleInfo(
+  supabase: SupabaseClient,
+  tenantId?: string
+): Promise<UserRoleInfo> {
+  try {
+    const { data: isPlatformAdmin } = await supabase.rpc('am_i_platform_admin');
+    if (isPlatformAdmin) {
+      return {
+        role: 'platform_admin',
+        label: '👑 Superadmin',
+        badgeColor: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+        isPlatformAdmin: true,
+      };
+    }
+
+    let targetTenantId = tenantId;
+    if (!targetTenantId) {
+      const { data: tenantIds } = await supabase.rpc('get_my_tenant_ids');
+      if (Array.isArray(tenantIds) && tenantIds.length > 0) {
+        targetTenantId = tenantIds[0];
+      }
+    }
+
+    if (targetTenantId) {
+      const role = await getMyRole(supabase, targetTenantId);
+      if (role === 'tenant_admin') {
+        return {
+          role: 'tenant_admin',
+          label: '🏢 Admin de Empresa',
+          badgeColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+          isPlatformAdmin: false,
+        };
+      }
+      if (role === 'operator') {
+        return {
+          role: 'operator',
+          label: '🔧 Operador / Taller',
+          badgeColor: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+          isPlatformAdmin: false,
+        };
+      }
+      if (role === 'client') {
+        return {
+          role: 'client',
+          label: '👤 Cliente',
+          badgeColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+          isPlatformAdmin: false,
+        };
+      }
+    }
+  } catch {
+    // Graceful fallback
+  }
+
+  return {
+    role: 'unassigned',
+    label: '⏳ Sin Organización',
+    badgeColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+    isPlatformAdmin: false,
+  };
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { getMyRole } from '@/lib/tenancy/role';
+import { getMyRole, getUserRoleInfo } from '@/lib/tenancy/role';
 
 describe('Tenancy Role Resolution (R13)', () => {
   function createMockSupabase(rpcResult: { data: string | null; error: Error | null }) {
@@ -50,5 +50,94 @@ describe('Tenancy Role Resolution (R13)', () => {
     const rpcError = new Error('RPC failed');
     const supabase = createMockSupabase({ data: null, error: rpcError });
     await expect(getMyRole(supabase, 'tenant-123')).rejects.toThrow('RPC failed');
+  });
+});
+
+describe('User Role Display Info (getUserRoleInfo)', () => {
+  it('returns Superadmin when am_i_platform_admin is true', async () => {
+    const supabase = {
+      rpc: vi.fn((fn: string) => {
+        if (fn === 'am_i_platform_admin') return Promise.resolve({ data: true, error: null });
+        return Promise.resolve({ data: null, error: null });
+      }),
+    } as unknown as SupabaseClient;
+
+    const info = await getUserRoleInfo(supabase);
+    expect(info.role).toBe('platform_admin');
+    expect(info.label).toBe('👑 Superadmin');
+    expect(info.isPlatformAdmin).toBe(true);
+  });
+
+  it('returns Admin de Empresa when role is tenant_admin', async () => {
+    const supabase = {
+      rpc: vi.fn((fn: string) => {
+        if (fn === 'am_i_platform_admin') return Promise.resolve({ data: false, error: null });
+        if (fn === 'get_my_role') return Promise.resolve({ data: 'tenant_admin', error: null });
+        return Promise.resolve({ data: null, error: null });
+      }),
+    } as unknown as SupabaseClient;
+
+    const info = await getUserRoleInfo(supabase, 'tenant-1');
+    expect(info.role).toBe('tenant_admin');
+    expect(info.label).toBe('🏢 Admin de Empresa');
+    expect(info.isPlatformAdmin).toBe(false);
+  });
+
+  it('returns Operador when role is operator', async () => {
+    const supabase = {
+      rpc: vi.fn((fn: string) => {
+        if (fn === 'am_i_platform_admin') return Promise.resolve({ data: false, error: null });
+        if (fn === 'get_my_role') return Promise.resolve({ data: 'operator', error: null });
+        return Promise.resolve({ data: null, error: null });
+      }),
+    } as unknown as SupabaseClient;
+
+    const info = await getUserRoleInfo(supabase, 'tenant-1');
+    expect(info.role).toBe('operator');
+    expect(info.label).toBe('🔧 Operador / Taller');
+  });
+
+  it('returns Cliente when role is client', async () => {
+    const supabase = {
+      rpc: vi.fn((fn: string) => {
+        if (fn === 'am_i_platform_admin') return Promise.resolve({ data: false, error: null });
+        if (fn === 'get_my_role') return Promise.resolve({ data: 'client', error: null });
+        return Promise.resolve({ data: null, error: null });
+      }),
+    } as unknown as SupabaseClient;
+
+    const info = await getUserRoleInfo(supabase, 'tenant-1');
+    expect(info.role).toBe('client');
+    expect(info.label).toBe('👤 Cliente');
+  });
+
+  it('auto-resolves tenantId via get_my_tenant_ids when omitted', async () => {
+    const supabase = {
+      rpc: vi.fn((fn: string) => {
+        if (fn === 'am_i_platform_admin') return Promise.resolve({ data: false, error: null });
+        if (fn === 'get_my_tenant_ids') return Promise.resolve({ data: ['auto-tenant'], error: null });
+        if (fn === 'get_my_role') return Promise.resolve({ data: 'operator', error: null });
+        return Promise.resolve({ data: null, error: null });
+      }),
+    } as unknown as SupabaseClient;
+
+    const info = await getUserRoleInfo(supabase);
+    expect(info.role).toBe('operator');
+    expect(info.label).toBe('🔧 Operador / Taller');
+  });
+
+  it('returns Sin Organización when user has no tenant memberships', async () => {
+    const supabase = {
+      rpc: vi.fn((fn: string) => {
+        if (fn === 'am_i_platform_admin') return Promise.resolve({ data: false, error: null });
+        if (fn === 'get_my_tenant_ids') return Promise.resolve({ data: [], error: null });
+        return Promise.resolve({ data: null, error: null });
+      }),
+    } as unknown as SupabaseClient;
+
+    const info = await getUserRoleInfo(supabase);
+    expect(info.role).toBe('unassigned');
+    expect(info.label).toBe('⏳ Sin Organización');
+    expect(info.isPlatformAdmin).toBe(false);
   });
 });

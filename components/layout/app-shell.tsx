@@ -8,9 +8,19 @@ interface AppShellProps {
   children: React.ReactNode;
   userEmail?: string | null;
   businessType?: 'all' | 'mechanics' | 'financial_receipts';
+  roleLabel?: string;
+  roleBadgeColor?: string;
+  isPlatformAdmin?: boolean;
 }
 
-export function AppShell({ children, userEmail, businessType = 'all' }: AppShellProps) {
+export function AppShell({
+  children,
+  userEmail,
+  businessType = 'all',
+  roleLabel = 'Usuario',
+  roleBadgeColor = 'bg-slate-800 text-slate-300 border-slate-700',
+  isPlatformAdmin = false,
+}: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -19,6 +29,9 @@ export function AppShell({ children, userEmail, businessType = 'all' }: AppShell
       <Sidebar
         userEmail={userEmail}
         businessType={businessType}
+        roleLabel={roleLabel}
+        roleBadgeColor={roleBadgeColor}
+        isPlatformAdmin={isPlatformAdmin}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
@@ -27,6 +40,8 @@ export function AppShell({ children, userEmail, businessType = 'all' }: AppShell
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header
           userEmail={userEmail}
+          roleLabel={roleLabel}
+          roleBadgeColor={roleBadgeColor}
           onOpenSidebar={() => setSidebarOpen(true)}
         />
 

@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/layout/app-shell';
+import { getUserRoleInfo } from '@/lib/tenancy/role';
 
 export default async function SuperadminLayout({
   children,
@@ -11,5 +12,16 @@ export default async function SuperadminLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  return <AppShell userEmail={user?.email}>{children}</AppShell>;
+  const roleInfo = await getUserRoleInfo(supabase);
+
+  return (
+    <AppShell
+      userEmail={user?.email}
+      roleLabel={roleInfo.label}
+      roleBadgeColor={roleInfo.badgeColor}
+      isPlatformAdmin={roleInfo.isPlatformAdmin}
+    >
+      {children}
+    </AppShell>
+  );
 }

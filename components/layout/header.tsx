@@ -5,10 +5,12 @@ import { usePathname } from 'next/navigation';
 
 interface HeaderProps {
   userEmail?: string | null;
+  roleLabel?: string;
+  roleBadgeColor?: string;
   onOpenSidebar: () => void;
 }
 
-export function Header({ userEmail, onOpenSidebar }: HeaderProps) {
+export function Header({ userEmail, roleLabel, roleBadgeColor, onOpenSidebar }: HeaderProps) {
   const pathname = usePathname();
 
   // Helper to format breadcrumbs
@@ -80,8 +82,15 @@ export function Header({ userEmail, onOpenSidebar }: HeaderProps) {
           <span>🔧 Taller</span>
         </Link>
 
+        {/* Role Badge */}
+        {roleLabel && (
+          <div className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold shadow-xs ${roleBadgeColor || 'border-slate-800 bg-slate-800/60 text-slate-300'}`}>
+            <span>{roleLabel}</span>
+          </div>
+        )}
+
         {userEmail && (
-          <div className="flex items-center gap-2 rounded-full border border-slate-800 bg-slate-800/60 px-3 py-1 text-xs text-slate-300">
+          <div className="hidden sm:flex items-center gap-2 rounded-full border border-slate-800 bg-slate-800/60 px-3 py-1 text-xs text-slate-300">
             <div className="h-2 w-2 rounded-full bg-emerald-500" />
             <span className="max-w-[140px] truncate sm:max-w-none">{userEmail}</span>
           </div>

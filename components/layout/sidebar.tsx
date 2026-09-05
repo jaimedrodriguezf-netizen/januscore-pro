@@ -20,11 +20,22 @@ interface NavGroup {
 interface SidebarProps {
   userEmail?: string | null;
   businessType?: 'all' | 'mechanics' | 'financial_receipts';
+  roleLabel?: string;
+  roleBadgeColor?: string;
+  isPlatformAdmin?: boolean;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function Sidebar({ userEmail, businessType = 'all', isOpen, onClose }: SidebarProps) {
+export function Sidebar({
+  userEmail,
+  businessType = 'all',
+  roleLabel,
+  roleBadgeColor,
+  isPlatformAdmin = false,
+  isOpen,
+  onClose,
+}: SidebarProps) {
   const pathname = usePathname();
 
   const allNavGroups: NavGroup[] = [
@@ -175,7 +186,10 @@ export function Sidebar({ userEmail, businessType = 'all', isOpen, onClose }: Si
         },
       ],
     },
-    {
+  ];
+
+  if (isPlatformAdmin) {
+    allNavGroups.push({
       group: 'Plataforma Global',
       items: [
         {
@@ -186,10 +200,11 @@ export function Sidebar({ userEmail, businessType = 'all', isOpen, onClose }: Si
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
             </svg>
           ),
+          badge: 'Superadmin',
         },
       ],
-    },
-  ];
+    });
+  }
 
   const navigation = allNavGroups.filter((g) => {
     if (!('forBusinessType' in g) || !g.forBusinessType) return true;
@@ -286,6 +301,11 @@ export function Sidebar({ userEmail, businessType = 'all', isOpen, onClose }: Si
 
         {/* User Footer Profile & Sign Out */}
         <div className="border-t border-slate-800 p-4 bg-slate-900/80">
+          <div className="mb-2">
+            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${roleBadgeColor || 'border-slate-700 bg-slate-800 text-slate-300'}`}>
+              {roleLabel || 'Usuario'}
+            </span>
+          </div>
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
