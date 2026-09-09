@@ -7,6 +7,7 @@ import { formatPlate, calculateNextService } from '@/lib/mechanics/service';
 import { generateVehicleQrDataUrl } from '@/lib/mechanics/qr-sticker';
 import { formatWorkOrderDescription, type WorkOrderItem } from '@/lib/mechanics/work-order';
 import { WorkOrderForm } from '@/components/mechanics/work-order-form';
+import { VehicleRegistrationForm } from '@/components/mechanics/vehicle-registration-form';
 import { WorkshopNavigation } from '@/components/mechanics/workshop-navigation';
 import { sanitizeSlug, type WorkshopProfile } from '@/lib/mechanics/workshop-profile';
 import { CopyButton } from '@/components/ui/copy-button';
@@ -457,101 +458,11 @@ export default async function WorkshopAdminPage({
 
       {/* Grid: Vehicle Form & Maintenance Form */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* 1. Register Vehicle Card */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-base">🚗</span>
-            <h2 className="text-sm font-bold text-slate-100">1. Registrar Nuevo Vehículo</h2>
-          </div>
-          <p className="mt-1 text-xs text-slate-400">
-            Ingresa los datos técnicos del vehículo para generar su código QR único.
-          </p>
-
-          <form action={createVehicleAction} className="mt-4 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Placa</label>
-                <input
-                  type="text"
-                  name="plate"
-                  placeholder="Ej. PBX-1234"
-                  required
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-mono font-bold uppercase text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Kilometraje Actual</label>
-                <input
-                  type="number"
-                  name="mileage"
-                  placeholder="Ej. 45000"
-                  required
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Marca</label>
-                <input
-                  type="text"
-                  name="brand"
-                  placeholder="Toyota"
-                  required
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Modelo</label>
-                <input
-                  type="text"
-                  name="model"
-                  placeholder="Corolla"
-                  required
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Año</label>
-                <input
-                  type="number"
-                  name="year"
-                  placeholder="2022"
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Propietario</label>
-                <input
-                  type="text"
-                  name="ownerName"
-                  placeholder="Juan Pérez"
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Celular / WhatsApp</label>
-                <input
-                  type="text"
-                  name="ownerPhone"
-                  placeholder="0991234567"
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="mt-2 w-full rounded-lg bg-indigo-600 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-indigo-500 transition"
-            >
-              + Registrar Vehículo
-            </button>
-          </form>
-        </div>
+        {/* 1. Register Vehicle Card with Predictive OEM Catalog Search */}
+        <VehicleRegistrationForm
+          activeTenantId={activeTenantId}
+          action={createVehicleAction}
+        />
 
         {/* 2. Add Maintenance Service Card */}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-sm">
