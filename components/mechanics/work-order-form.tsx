@@ -245,21 +245,21 @@ export function WorkOrderForm({
             <div className="space-y-2 text-xs">
               <div>
                 <span className="text-[10px] text-slate-400 block">Propietario / Cliente:</span>
-                <strong className="text-slate-100">{selectedVehicle?.owner_name || 'Jaime Rodríguez'}</strong>
+                <strong className="text-slate-100">{selectedVehicle?.owner_name || '—'}</strong>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <span className="text-[10px] text-slate-400 block">CI / RUC:</span>
-                  <span className="font-mono text-slate-200">1719623512001</span>
+                  <span className="font-mono text-slate-200">{selectedVehicle?.owner_identification || '—'}</span>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 block">Teléfono:</span>
-                  <span className="font-mono text-slate-200">{selectedVehicle?.owner_phone || '0983144424'}</span>
+                  <span className="font-mono text-slate-200">{selectedVehicle?.owner_phone || '—'}</span>
                 </div>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block">Correo Electrónico:</span>
-                <span className="text-slate-300">jaimedrodriguezf@gmail.com</span>
+                <span className="text-slate-300">{selectedVehicle?.owner_email || '—'}</span>
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { searchCatalogVehicles, type CatalogVehicleItem } from '@/lib/mechanics/catalog-search';
+import type { Vehicle } from '@/lib/mechanics/types';
 
 interface VehicleRegistrationFormProps {
   activeTenantId: string;
@@ -25,6 +26,16 @@ export function VehicleRegistrationForm({
   const [year, setYear] = useState('');
   const [ownerName, setOwnerName] = useState('');
   const [ownerPhone, setOwnerPhone] = useState('');
+  const [ownerIdentification, setOwnerIdentification] = useState('');
+  const [ownerEmail, setOwnerEmail] = useState('');
+
+  // Duplicate plate validation state
+  const [plateStatus, setPlateStatus] = useState<'idle' | 'checking' | 'duplicate' | 'available'>('idle');
+  const [duplicateVehicle, setDuplicateVehicle] = useState<Vehicle | null>(null);
+
+  // Client identification lookup state
+  const [idLookupStatus, setIdLookupStatus] = useState<'idle' | 'checking' | 'found_local' | 'found_sri' | 'not_found'>('idle');
+  const [idLookupBadge, setIdLookupBadge] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -43,6 +54,92 @@ export function VehicleRegistrationForm({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Real-time duplicate plate check
+  useEffect(() => {
+    const trimmedPlate = plate.trim();
+    if (trimmedPlate.length < 3) {
+      setPlateStatus('idle');
+      setDuplicateVehicle(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setPlateStatus('checking');
+      try {
+        const res = await fetch(
+          `/api/workshop/lookup?tenantId=${activeTenantId}&type=plate&value=${encodeURIComponent(
+            trimmedPlate
+          )}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data.found && data.vehicle) {
+            setPlateStatus('duplicate');
+            setDuplicateVehicle(data.vehicle);
+          } else {
+            setPlateStatus('available');
+            setDuplicateVehicle(null);
+          }
+        }
+      } catch {
+        setPlateStatus('idle');
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [plate, activeTenantId]);
+
+  // Real-time client identification lookup (Cédula 10 digits or RUC 13 digits)
+  useEffect(() => {
+    const cleaned = ownerIdentification.trim().replace(/\D/g, '');
+    if (cleaned.length !== 10 && cleaned.length !== 13) {
+      setIdLookupStatus('idle');
+      setIdLookupBadge(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIdLookupStatus('checking');
+      try {
+        const res = await fetch(
+          `/api/workshop/lookup?tenantId=${activeTenantId}&type=identification&value=${cleaned}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data.found && data.client) {
+            if (data.source === 'local') {
+              setIdLookupStatus('found_local');
+              const vehCount = data.vehicles?.length || 1;
+              setIdLookupBadge(
+                `✓ Cliente del taller (${vehCount} vehículo${vehCount > 1 ? 's' : ''})`
+              );
+            } else {
+              setIdLookupStatus('found_sri');
+              setIdLookupBadge('✓ Verificado SRI (CipherByte)');
+            }
+
+            if (data.client.name && !ownerName) {
+              setOwnerName(data.client.name);
+            }
+            if (data.client.phone && !ownerPhone) {
+              setOwnerPhone(data.client.phone);
+            }
+            if (data.client.email && !ownerEmail) {
+              setOwnerEmail(data.client.email);
+            }
+          } else {
+            setIdLookupStatus('not_found');
+            setIdLookupBadge(null);
+          }
+        }
+      } catch {
+        setIdLookupStatus('idle');
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [ownerIdentification, activeTenantId, ownerName, ownerPhone, ownerEmail]);
 
   const handleSelectTemplate = (item: CatalogVehicleItem) => {
     setSelectedTemplate(item);
@@ -212,9 +309,20 @@ export function VehicleRegistrationForm({
         {/* 2. Placa y Kilometraje Actual */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] font-medium text-slate-300">
-              Placa <span className="text-rose-400">*</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-[11px] font-medium text-slate-300">
+                Placa <span className="text-rose-400">*</span>
+              </label>
+              {plateStatus === 'checking' && (
+                <span className="text-[10px] text-indigo-400 animate-pulse font-medium">Verificando...</span>
+              )}
+              {plateStatus === 'available' && (
+                <span className="text-[10px] text-emerald-400 font-semibold">✓ Placa disponible</span>
+              )}
+              {plateStatus === 'duplicate' && (
+                <span className="text-[10px] text-rose-400 font-bold">⚠️ Ya registrada</span>
+              )}
+            </div>
             <input
               type="text"
               name="plate"
@@ -222,7 +330,11 @@ export function VehicleRegistrationForm({
               onChange={(e) => setPlate(e.target.value.toUpperCase())}
               placeholder="PBA-1234"
               required
-              className="mt-1 w-full font-mono rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+              className={`mt-1 w-full font-mono rounded-lg border px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-hidden transition ${
+                plateStatus === 'duplicate'
+                  ? 'border-rose-500 bg-rose-950/30 focus:border-rose-500'
+                  : 'border-slate-700 bg-slate-800/80 focus:border-indigo-500'
+              }`}
             />
           </div>
           <div>
@@ -239,6 +351,32 @@ export function VehicleRegistrationForm({
             />
           </div>
         </div>
+
+        {/* Duplicate Vehicle Alert Banner */}
+        {plateStatus === 'duplicate' && duplicateVehicle && (
+          <div className="rounded-xl border border-rose-500/40 bg-rose-950/30 p-3.5 text-xs text-rose-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 animate-in fade-in">
+            <div className="flex items-start gap-2.5">
+              <span className="text-lg leading-none mt-0.5">⚠️</span>
+              <div>
+                <p className="font-bold text-slate-100">
+                  El vehículo con placa {duplicateVehicle.plate} ya está registrado en tu taller
+                </p>
+                <p className="text-[11px] text-rose-300/80 mt-0.5">
+                  {duplicateVehicle.brand} {duplicateVehicle.model} {duplicateVehicle.year ? `(${duplicateVehicle.year})` : ''} • Propietario: {duplicateVehicle.owner_name || 'Sin nombre'} • {duplicateVehicle.current_mileage.toLocaleString()} km
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <a
+                href={`/auto/${duplicateVehicle.plate}`}
+                target="_blank"
+                className="rounded-lg border border-rose-500/40 bg-rose-900/40 px-3 py-1.5 text-[11px] font-bold text-rose-200 hover:bg-rose-800/60 transition"
+              >
+                Ver Ficha ↗
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* 3. Marca, Modelo y Año */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -295,41 +433,85 @@ export function VehicleRegistrationForm({
           </div>
         </div>
 
-        {/* 4. Propietario y Contacto */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-[11px] font-medium text-slate-300">
-              Propietario / Cliente
-            </label>
-            <input
-              type="text"
-              name="ownerName"
-              value={ownerName}
-              onChange={(e) => setOwnerName(e.target.value)}
-              placeholder="Juan Pérez"
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-            />
+        {/* 4. Propietario / Cliente (Cédula o RUC, Nombre, Teléfono, Correo) */}
+        <div className="space-y-3 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <div className="flex items-center justify-between">
+                <label className="block text-[11px] font-medium text-slate-300">
+                  Cédula o RUC del Cliente
+                </label>
+                {idLookupStatus === 'checking' && (
+                  <span className="text-[10px] text-indigo-400 animate-pulse font-medium">Buscando...</span>
+                )}
+                {idLookupBadge && (
+                  <span className="text-[10px] text-emerald-400 font-semibold">{idLookupBadge}</span>
+                )}
+              </div>
+              <input
+                type="text"
+                name="ownerIdentification"
+                value={ownerIdentification}
+                onChange={(e) => setOwnerIdentification(e.target.value)}
+                placeholder="Ej. 1719623512"
+                className="mt-1 w-full font-mono rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-300">
+                Propietario / Cliente
+              </label>
+              <input
+                type="text"
+                name="ownerName"
+                value={ownerName}
+                onChange={(e) => setOwnerName(e.target.value)}
+                placeholder="Juan Pérez o Razón Social"
+                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-[11px] font-medium text-slate-300">
-              WhatsApp / Celular
-            </label>
-            <input
-              type="text"
-              name="ownerPhone"
-              value={ownerPhone}
-              onChange={(e) => setOwnerPhone(e.target.value)}
-              placeholder="0991234567"
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-            />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-medium text-slate-300">
+                WhatsApp / Celular
+              </label>
+              <input
+                type="text"
+                name="ownerPhone"
+                value={ownerPhone}
+                onChange={(e) => setOwnerPhone(e.target.value)}
+                placeholder="0991234567"
+                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-300">
+                Correo Electrónico
+              </label>
+              <input
+                type="email"
+                name="ownerEmail"
+                value={ownerEmail}
+                onChange={(e) => setOwnerEmail(e.target.value)}
+                placeholder="cliente@correo.com"
+                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+              />
+            </div>
           </div>
         </div>
 
         <button
           type="submit"
-          className="mt-2 w-full rounded-lg bg-indigo-600 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-indigo-500 transition active:scale-[0.99]"
+          disabled={plateStatus === 'duplicate'}
+          className={`mt-2 w-full rounded-lg py-2.5 text-xs font-bold text-white shadow-sm transition active:scale-[0.99] ${
+            plateStatus === 'duplicate'
+              ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
+              : 'bg-indigo-600 hover:bg-indigo-500'
+          }`}
         >
-          + Registrar Vehículo
+          {plateStatus === 'duplicate' ? '⚠️ Placa ya registrada (No se permite duplicar)' : '+ Registrar Vehículo'}
         </button>
       </form>
     </div>
