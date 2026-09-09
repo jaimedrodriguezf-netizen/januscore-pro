@@ -3,15 +3,14 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleTenantIds } from '@/lib/tenancy/tenant';
-import { formatPlate, calculateNextService } from '@/lib/mechanics/service';
+import { formatPlate } from '@/lib/mechanics/service';
 import { generateVehicleQrDataUrl } from '@/lib/mechanics/qr-sticker';
 import { formatWorkOrderDescription, type WorkOrderItem } from '@/lib/mechanics/work-order';
-import { WorkOrderForm } from '@/components/mechanics/work-order-form';
-import { VehicleRegistrationForm } from '@/components/mechanics/vehicle-registration-form';
+import { formatHandoverWhatsAppMessage } from '@/lib/mechanics/intake-flow';
+import { WorkshopIntakeFlow } from '@/components/mechanics/workshop-intake-flow';
 import { WorkshopNavigation } from '@/components/mechanics/workshop-navigation';
 import { sanitizeSlug, type WorkshopProfile } from '@/lib/mechanics/workshop-profile';
 import { CopyButton } from '@/components/ui/copy-button';
-import type { ServiceType } from '@/lib/mechanics/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -187,57 +186,7 @@ export default async function WorkshopAdminPage({
     redirect(`/workshop?tenantId=${activeTenantId}&ok=Vehículo%20${plate}%20registrado%20exitosamente`);
   }
 
-  // Server Action: Add maintenance record
-  async function addMaintenanceAction(formData: FormData) {
-    'use server';
-    const supabase = await createSupabaseServerClient();
-    const vehicleId = String(formData.get('vehicleId') || '');
-    const serviceType = String(formData.get('serviceType') || 'oil_change') as ServiceType;
-    const mileage = Number(formData.get('mileage')) || 0;
-    const description = String(formData.get('description') || '');
-    const technicianName = String(formData.get('technicianName') || '');
-    const cost = Number(formData.get('cost')) || undefined;
-
-    if (!vehicleId || !description || mileage <= 0) {
-      redirect(`/workshop?tenantId=${activeTenantId}&err=Complete%20todos%20los%20campos%20del%20servicio`);
-    }
-
-    const nextCalc = calculateNextService({
-      serviceType,
-      currentMileage: mileage,
-      serviceDate: new Date(),
-    });
-
-    // 1. Insert maintenance record
-    const { error: mError } = await supabase.from('maintenance_records').insert({
-      tenant_id: activeTenantId,
-      vehicle_id: vehicleId,
-      service_date: new Date().toISOString(),
-      mileage,
-      service_type: serviceType,
-      description,
-      technician_name: technicianName,
-      cost,
-      status: 'completed',
-      next_service_mileage: nextCalc.nextMileage,
-      next_service_date: nextCalc.nextDate.toISOString().slice(0, 10),
-    });
-
-    if (mError) {
-      redirect(`/workshop?tenantId=${activeTenantId}&err=${encodeURIComponent(mError.message)}`);
-    }
-
-    // 2. Update vehicle current_mileage
-    await supabase
-      .from('vehicles')
-      .update({ current_mileage: mileage })
-      .eq('id', vehicleId);
-
-    revalidatePath('/workshop');
-    redirect(`/workshop?tenantId=${activeTenantId}&print=${vehicleId}&ok=Mantenimiento%20registrado`);
-  }
-
-  // Server Action: Save Full Work Order (Pilozo Vasco Form)
+  // Server Action: Save Work Order (Unified Express & Full Pilozo Vasco)
   async function saveWorkOrderAction(formData: FormData) {
     'use server';
     const supabase = await createSupabaseServerClient();
@@ -460,7 +409,11 @@ export default async function WorkshopAdminPage({
                 {printVehicle.owner_phone && (
                   <a
                     href={`https://api.whatsapp.com/send?phone=${printVehicle.owner_phone.replace(/\D/g, '')}&text=${encodeURIComponent(
-                      `Hola ${printVehicle.owner_name || ''}, te compartimos el enlace para consultar la ficha de mantenimiento de tu vehículo (${printVehicle.plate}): https://januscore.pro/auto/${printVehicle.plate}`
+                      formatHandoverWhatsAppMessage({
+                        clientName: printVehicle.owner_name || 'Estimado Cliente',
+                        plate: printVehicle.plate,
+                        workshopName: workshopProfile.name,
+                      })
                     )}`}
                     target="_blank"
                     className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-500 transition"
@@ -474,108 +427,12 @@ export default async function WorkshopAdminPage({
         </div>
       )}
 
-      {/* Grid: Vehicle Form & Maintenance Form */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* 1. Register Vehicle Card with Predictive OEM Catalog Search */}
-        <VehicleRegistrationForm
-          activeTenantId={activeTenantId}
-          action={createVehicleAction}
-        />
-
-        {/* 2. Add Maintenance Service Card */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-base">🛠️</span>
-            <h2 className="text-sm font-bold text-slate-100">2. Asentar Orden de Servicio / Mantenimiento</h2>
-          </div>
-          <p className="mt-1 text-xs text-slate-400">
-            Registra los trabajos realizados; el sistema calculará automáticamente la próxima fecha.
-          </p>
-
-          <form action={addMaintenanceAction} className="mt-4 space-y-3">
-            <div>
-              <label className="block text-[11px] font-medium text-slate-300">Vehículo</label>
-              <select
-                name="vehicleId"
-                required
-                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-mono text-slate-100 focus:border-indigo-500 focus:outline-hidden"
-              >
-                {!vehicles || vehicles.length === 0 ? (
-                  <option value="">No hay vehículos registrados</option>
-                ) : (
-                  vehicles.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.plate} — {v.brand} {v.model} ({v.current_mileage.toLocaleString()} km)
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Tipo de Servicio</label>
-                <select
-                  name="serviceType"
-                  required
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-hidden"
-                >
-                  <option value="oil_change">Cambio de Aceite (+5,000 km / 3m)</option>
-                  <option value="brakes">Frenos (+10,000 km / 6m)</option>
-                  <option value="full_abc">ABC de Motor Mayor (+10,000 km / 6m)</option>
-                  <option value="suspension">Suspensión & Dirección (+10,000 km)</option>
-                  <option value="alignment_balancing">Alineación & Balanceo (+5,000 km)</option>
-                  <option value="general_repair">Reparación General</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-[11px] font-medium text-slate-300">Kilometraje del Servicio</label>
-                <input
-                  type="number"
-                  name="mileage"
-                  placeholder="Ej. 45000"
-                  required
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-medium text-slate-300">Detalle de Trabajos & Repuestos</label>
-              <textarea
-                name="description"
-                rows={2}
-                placeholder="Cambio de aceite sintético 10W-30 + filtro de aceite y filtro de aire."
-                required
-                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-medium text-slate-300">Mecánico Responsable</label>
-              <input
-                type="text"
-                name="technicianName"
-                placeholder="Carlos Mendoza"
-                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="mt-2 w-full rounded-lg bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-500 transition"
-            >
-              ✓ Guardar Mantenimiento & Generar Sticker
-            </button>
-          </form>
-        </div>
-      </div>
-
-      {/* 3. Official Work Order Comprehensive Form (Pilozo Vasco Layout) */}
-      <WorkOrderForm
+      {/* Streamlined Workshop Intake Flow (Recepción -> Diagnóstico OEM -> Orden de Trabajo) */}
+      <WorkshopIntakeFlow
         vehicles={vehicles || []}
         activeTenantId={activeTenantId}
-        onSaveWorkOrderAction={saveWorkOrderAction}
+        createVehicleAction={createVehicleAction}
+        saveWorkOrderAction={saveWorkOrderAction}
       />
 
       {/* 4. Vehicles Table */}
