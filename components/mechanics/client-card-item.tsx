@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { WorkshopClientAggregate } from '@/lib/mechanics/client-directory';
 import { ClientEditModal } from './client-edit-modal';
 
@@ -70,6 +71,12 @@ export function ClientCardItem({
               >
                 <span>✏️ Editar</span>
               </button>
+              <Link
+                href={`/workshop/clients/${encodeURIComponent(client.clientKey)}?tenantId=${tenantId}`}
+                className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/30 bg-indigo-600/15 px-2.5 py-1 text-[11px] font-bold text-indigo-300 hover:bg-indigo-600/25 transition"
+              >
+                <span>📋 Expediente ↗</span>
+              </Link>
             </div>
           </div>
 
