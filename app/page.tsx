@@ -35,17 +35,18 @@ export default async function Home() {
     );
   }
 
-  let businessType: 'all' | 'mechanics' | 'financial_receipts' = 'all';
+  let businessType: 'all' | 'mechanics' | 'financial_receipts' = roleInfo.businessType;
   let tenantName = 'Tu Organización';
 
-  if (tenantIds.length > 0) {
+  const activeTenantId = roleInfo.tenantId || tenantIds[0];
+  if (activeTenantId) {
     const { data: tenant } = await supabase
       .from('tenants')
       .select('business_type, name')
-      .eq('id', tenantIds[0])
+      .eq('id', activeTenantId)
       .maybeSingle();
 
-    if (tenant?.business_type) {
+    if (tenant?.business_type && !roleInfo.isPlatformAdmin) {
       businessType = tenant.business_type as 'all' | 'mechanics' | 'financial_receipts';
     }
     if (tenant?.name) {

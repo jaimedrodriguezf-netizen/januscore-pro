@@ -26,9 +26,14 @@ export default async function WorkshopTemplatesPage({
 
   const { data: tenantData } = await supabase
     .from('tenants')
-    .select('slug')
+    .select('slug, business_type')
     .eq('id', activeTenantId)
     .maybeSingle();
+
+  const { data: isPlatformAdmin } = await supabase.rpc('am_i_platform_admin');
+  if (!isPlatformAdmin && tenantData?.business_type === 'financial_receipts') {
+    redirect('/');
+  }
 
   return (
     <div className="space-y-6">

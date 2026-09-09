@@ -47,6 +47,17 @@ export default async function BankKeysAdminPage({
     );
   }
 
+  if (role !== 'platform_admin') {
+    const { data: tenant } = await supabase
+      .from('tenants')
+      .select('business_type')
+      .eq('id', activeTenantId)
+      .maybeSingle();
+    if (tenant?.business_type === 'mechanics') {
+      redirect('/');
+    }
+  }
+
   const keys = await listBankPublicKeys(supabase, activeTenantId);
 
   async function addKeyAction(formData: FormData) {

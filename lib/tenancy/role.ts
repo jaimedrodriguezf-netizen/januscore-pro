@@ -41,6 +41,8 @@ export interface UserRoleInfo {
   label: string;
   badgeColor: string;
   isPlatformAdmin: boolean;
+  tenantId?: string;
+  businessType: 'all' | 'mechanics' | 'financial_receipts';
 }
 
 export async function getUserRoleInfo(
@@ -55,6 +57,7 @@ export async function getUserRoleInfo(
         label: '👑 Superadmin',
         badgeColor: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
         isPlatformAdmin: true,
+        businessType: 'all',
       };
     }
 
@@ -67,6 +70,20 @@ export async function getUserRoleInfo(
     }
 
     if (targetTenantId) {
+      let businessType: 'all' | 'mechanics' | 'financial_receipts' = 'all';
+      try {
+        const { data: tenant } = await supabase
+          .from('tenants')
+          .select('business_type')
+          .eq('id', targetTenantId)
+          .maybeSingle();
+        if (tenant?.business_type) {
+          businessType = tenant.business_type as 'all' | 'mechanics' | 'financial_receipts';
+        }
+      } catch {
+        // Fallback to 'all' if table query fails
+      }
+
       const role = await getMyRole(supabase, targetTenantId);
       if (role === 'tenant_admin') {
         return {
@@ -74,6 +91,8 @@ export async function getUserRoleInfo(
           label: '🏢 Admin de Empresa',
           badgeColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
           isPlatformAdmin: false,
+          tenantId: targetTenantId,
+          businessType,
         };
       }
       if (role === 'operator') {
@@ -82,6 +101,8 @@ export async function getUserRoleInfo(
           label: '🔧 Operador / Taller',
           badgeColor: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
           isPlatformAdmin: false,
+          tenantId: targetTenantId,
+          businessType,
         };
       }
       if (role === 'client') {
@@ -90,6 +111,8 @@ export async function getUserRoleInfo(
           label: '👤 Cliente',
           badgeColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
           isPlatformAdmin: false,
+          tenantId: targetTenantId,
+          businessType,
         };
       }
     }
@@ -102,5 +125,6 @@ export async function getUserRoleInfo(
     label: '⏳ Sin Organización',
     badgeColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
     isPlatformAdmin: false,
+    businessType: 'all',
   };
 }

@@ -33,9 +33,14 @@ export default async function WorkshopPrintSheetPage({
   if (activeTenantId) {
     const { data: tenant } = await supabase
       .from('tenants')
-      .select('name, slug, logo_url, whatsapp_phone, phone')
+      .select('name, slug, logo_url, whatsapp_phone, phone, business_type')
       .eq('id', activeTenantId)
       .maybeSingle();
+
+    const { data: isPlatformAdmin } = await supabase.rpc('am_i_platform_admin');
+    if (!isPlatformAdmin && tenant?.business_type === 'financial_receipts') {
+      redirect('/');
+    }
 
     if (tenant?.name) {
       tenantName = tenant.name;

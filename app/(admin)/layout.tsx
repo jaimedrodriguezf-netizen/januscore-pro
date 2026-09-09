@@ -17,6 +17,7 @@ export default async function AdminLayout({
   return (
     <AppShell
       userEmail={user?.email}
+      businessType={roleInfo.businessType}
       roleLabel={roleInfo.label}
       roleBadgeColor={roleInfo.badgeColor}
       isPlatformAdmin={roleInfo.isPlatformAdmin}

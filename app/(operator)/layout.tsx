@@ -17,7 +17,7 @@ export default async function OperatorLayout({
   return (
     <AppShell
       userEmail={user?.email}
-      businessType="all"
+      businessType={roleInfo.businessType}
       roleLabel={roleInfo.label}
       roleBadgeColor={roleInfo.badgeColor}
       isPlatformAdmin={roleInfo.isPlatformAdmin}

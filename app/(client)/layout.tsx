@@ -17,7 +17,7 @@ export default async function ClientLayout({
   return (
     <AppShell
       userEmail={user?.email}
-      businessType="financial_receipts"
+      businessType={roleInfo.businessType}
       roleLabel={roleInfo.label}
       roleBadgeColor={roleInfo.badgeColor}
       isPlatformAdmin={roleInfo.isPlatformAdmin}

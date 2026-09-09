@@ -41,6 +41,11 @@ export default async function WorkshopSettingsPage({
     .eq('id', activeTenantId)
     .maybeSingle();
 
+  const { data: isPlatformAdmin } = await supabase.rpc('am_i_platform_admin');
+  if (!isPlatformAdmin && tenantData?.business_type === 'financial_receipts') {
+    redirect('/');
+  }
+
   const workshopProfile: WorkshopProfile = {
     id: activeTenantId,
     name: tenantData?.name || 'Mi Mecánica',

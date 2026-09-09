@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleBranchIds } from '@/lib/tenancy/branch';
+import { getUserRoleInfo } from '@/lib/tenancy/role';
 import { uploadReceiptOriginal } from '@/lib/upload/storage';
 import { registerReceipt } from '@/lib/upload/register';
 
@@ -13,6 +14,11 @@ export default async function UploadPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const roleInfo = await getUserRoleInfo(supabase);
+  if (!roleInfo.isPlatformAdmin && roleInfo.businessType === 'mechanics') {
+    redirect('/');
+  }
 
   const branchIds = user
     ? await getAccessibleBranchIds(supabase)

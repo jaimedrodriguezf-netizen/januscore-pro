@@ -52,6 +52,17 @@ export default async function BeneficiariesAdminPage({
     );
   }
 
+  if (role !== 'platform_admin') {
+    const { data: tenant } = await supabase
+      .from('tenants')
+      .select('business_type')
+      .eq('id', activeTenantId)
+      .maybeSingle();
+    if (tenant?.business_type === 'mechanics') {
+      redirect('/');
+    }
+  }
+
   const beneficiaries = await listBeneficiaries(supabase, activeTenantId);
 
   async function addBeneficiaryAction(formData: FormData) {

@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleBranchIds } from '@/lib/tenancy/branch';
+import { getUserRoleInfo } from '@/lib/tenancy/role';
 import { calculateBranchMetrics, RawMetricReceipt } from '@/lib/metrics/aggregate';
 
 export default async function MetricsPage({
@@ -20,6 +22,11 @@ export default async function MetricsPage({
         <p className="text-sm text-neutral-600">Por favor inicia sesión para ver las métricas.</p>
       </main>
     );
+  }
+
+  const roleInfo = await getUserRoleInfo(supabase);
+  if (!roleInfo.isPlatformAdmin && roleInfo.businessType === 'mechanics') {
+    redirect('/');
   }
 
   const branchIds = await getAccessibleBranchIds(supabase);

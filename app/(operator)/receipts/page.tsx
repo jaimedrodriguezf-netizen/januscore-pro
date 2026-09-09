@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleBranchIds } from '@/lib/tenancy/branch';
+import { getUserRoleInfo } from '@/lib/tenancy/role';
 
 export default async function ReceiptsListPage({
   searchParams,
@@ -23,6 +25,11 @@ export default async function ReceiptsListPage({
         <p className="text-sm text-neutral-600">Por favor inicia sesión para ver los comprobantes.</p>
       </main>
     );
+  }
+
+  const roleInfo = await getUserRoleInfo(supabase);
+  if (!roleInfo.isPlatformAdmin && roleInfo.businessType === 'mechanics') {
+    redirect('/');
   }
 
   const branchIds = await getAccessibleBranchIds(supabase);
