@@ -116,7 +116,10 @@ export default async function WorkshopAdminPage({
     .order('updated_at', { ascending: false });
 
   if (params.q) {
-    vehicleQuery = vehicleQuery.ilike('plate', `%${params.q.trim()}%`);
+    const q = params.q.trim();
+    vehicleQuery = vehicleQuery.or(
+      `plate.ilike.%${q}%,owner_name.ilike.%${q}%,owner_identification.ilike.%${q}%,owner_phone.ilike.%${q}%`
+    );
   }
 
   const { data: vehicles } = await vehicleQuery;
@@ -142,6 +145,8 @@ export default async function WorkshopAdminPage({
     const year = Number(formData.get('year')) || undefined;
     const ownerName = String(formData.get('ownerName') || '');
     const ownerPhone = String(formData.get('ownerPhone') || '');
+    const ownerIdentification = String(formData.get('ownerIdentification') || '').trim() || null;
+    const ownerEmail = String(formData.get('ownerEmail') || '').trim() || null;
     const mileage = Number(formData.get('mileage')) || 0;
 
     const plate = formatPlate(rawPlate);
@@ -158,10 +163,23 @@ export default async function WorkshopAdminPage({
       year,
       owner_name: ownerName,
       owner_phone: ownerPhone,
+      owner_identification: ownerIdentification,
+      owner_email: ownerEmail,
       current_mileage: mileage,
     });
 
     if (error) {
+      if (
+        error.code === '23505' ||
+        error.message?.includes('vehicles_tenant_id_plate_key') ||
+        error.message?.includes('duplicate key')
+      ) {
+        redirect(
+          `/workshop?tenantId=${activeTenantId}&err=${encodeURIComponent(
+            `El vehículo con placa ${plate} ya se encuentra registrado en este taller.`
+          )}`
+        );
+      }
       redirect(`/workshop?tenantId=${activeTenantId}&err=${encodeURIComponent(error.message)}`);
     }
 
@@ -573,7 +591,7 @@ export default async function WorkshopAdminPage({
               type="text"
               name="q"
               defaultValue={params.q || ''}
-              placeholder="Buscar por placa..."
+              placeholder="Buscar por placa, cédula o cliente..."
               className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
             />
             <button
@@ -617,7 +635,11 @@ export default async function WorkshopAdminPage({
                       {v.current_mileage.toLocaleString()} km
                     </td>
                     <td className="px-6 py-3.5 text-slate-400">
-                      {v.owner_name || '—'} {v.owner_phone ? `(${v.owner_phone})` : ''}
+                      <div className="font-medium text-slate-200">{v.owner_name || '—'}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {v.owner_identification ? <span className="font-mono text-indigo-300 mr-1.5">{v.owner_identification}</span> : null}
+                        {v.owner_phone ? <span>({v.owner_phone})</span> : null}
+                      </div>
                     </td>
                     <td className="px-6 py-3.5 text-slate-400">
                       <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-300 border border-slate-700">
