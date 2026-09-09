@@ -15,6 +15,8 @@ export interface Vehicle {
   year?: number;
   owner_name?: string;
   owner_phone?: string;
+  owner_identification?: string;
+  owner_email?: string;
   current_mileage: number;
   created_at: string;
   updated_at: string;
