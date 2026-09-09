@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleTenantIds } from '@/lib/tenancy/tenant';
 import { WorkshopNavigation } from '@/components/mechanics/workshop-navigation';
+import { ClientCardItem } from '@/components/mechanics/client-card-item';
+import { updateWorkshopClient } from '@/lib/mechanics/client-edit';
 import {
   aggregateWorkshopClients,
   computeClientKPIs,
@@ -15,7 +18,7 @@ export const dynamic = 'force-dynamic';
 export default async function WorkshopClientsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tenantId?: string; q?: string }>;
+  searchParams: Promise<{ tenantId?: string; q?: string; ok?: string; err?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createSupabaseServerClient();
@@ -48,6 +51,37 @@ export default async function WorkshopClientsPage({
   const { data: isPlatformAdmin } = await supabase.rpc('am_i_platform_admin');
   if (!isPlatformAdmin && tenantData?.business_type === 'financial_receipts') {
     redirect('/');
+  }
+
+  // Server Action: Update client data across all vehicles in workshop
+  async function updateClientAction(formData: FormData) {
+    'use server';
+    const supabase = await createSupabaseServerClient();
+    const tId = String(formData.get('tenantId') || activeTenantId);
+    const originalIdentification = String(formData.get('originalIdentification') || '').trim() || null;
+    const originalName = String(formData.get('originalName') || '').trim() || null;
+    const name = String(formData.get('name') || '').trim();
+    const identification = String(formData.get('identification') || '').trim() || null;
+    const phone = String(formData.get('phone') || '').trim() || null;
+    const email = String(formData.get('email') || '').trim() || null;
+
+    const result = await updateWorkshopClient(supabase, {
+      tenantId: tId,
+      originalIdentification,
+      originalName,
+      name,
+      identification,
+      phone,
+      email,
+    });
+
+    if (!result.success) {
+      redirect(`/workshop/clients?tenantId=${tId}&err=${encodeURIComponent(result.error || 'Error al actualizar cliente')}`);
+    }
+
+    revalidatePath('/workshop/clients');
+    revalidatePath('/workshop');
+    redirect(`/workshop/clients?tenantId=${tId}&ok=Cliente%20actualizado%20correctamente`);
   }
 
   // Fetch all vehicles in this tenant with their maintenance records
@@ -92,6 +126,18 @@ export default async function WorkshopClientsPage({
           <span>← Volver al Tablero Principal</span>
         </Link>
       </div>
+
+      {/* Notifications */}
+      {params.ok && (
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/40 p-3 text-xs font-medium text-emerald-300">
+          ✓ {params.ok}
+        </div>
+      )}
+      {params.err && (
+        <div className="rounded-xl border border-rose-500/20 bg-rose-950/40 p-3 text-xs font-medium text-rose-300">
+          ⚠️ {params.err}
+        </div>
+      )}
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -166,129 +212,15 @@ export default async function WorkshopClientsPage({
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {filteredClients.map((client) => {
-            const cleanPhone = client.phone ? client.phone.replace(/\D/g, '') : null;
-            const waUrl = cleanPhone
-              ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(
-                  `Hola ${client.name}, te escribimos de ${tenantData?.name || 'nuestro taller mecánico'}.`
-                )}`
-              : null;
-
-            return (
-              <div
-                key={client.clientKey}
-                className="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-sm hover:border-slate-700 transition"
-              >
-                <div className="space-y-3">
-                  {/* Top Bar: Name & Badges */}
-                  <div className="flex flex-wrap items-start justify-between gap-2 border-b border-slate-800/80 pb-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">👤</span>
-                        <h3 className="text-sm font-bold text-slate-100">{client.name}</h3>
-                      </div>
-                      {client.identification && (
-                        <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
-                          <span className="text-slate-500">CI/RUC:</span>
-                          <span className="font-mono font-semibold text-indigo-300">
-                            {client.identification}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {client.isFleetOwner && (
-                        <span className="rounded-lg bg-indigo-500/20 border border-indigo-500/30 px-2.5 py-1 text-[10px] font-bold text-indigo-300">
-                          🚗 Flota ({client.vehicles.length} autos)
-                        </span>
-                      )}
-                      {waUrl && (
-                        <a
-                          href={waUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-600/20 border border-emerald-500/30 px-2.5 py-1 text-[11px] font-bold text-emerald-300 hover:bg-emerald-600/30 transition"
-                        >
-                          <span>📲 WhatsApp</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Contact Info & Stats Grid */}
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="text-[10px] text-slate-500 block">Teléfono:</span>
-                      <span className="font-mono text-slate-200">
-                        {client.phone || '—'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 block">Correo Electrónico:</span>
-                      <span className="text-slate-300 truncate block">
-                        {client.email || '—'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 block">Mantenimientos Totales:</span>
-                      <span className="font-bold text-indigo-300">
-                        {client.totalServices} servicio{client.totalServices !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 block">Último Mantenimiento:</span>
-                      <span className="text-slate-300">
-                        {client.lastServiceDate
-                          ? new Date(client.lastServiceDate).toLocaleDateString('es-EC', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })
-                          : 'Sin registros'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Vehicles Portfolio */}
-                  <div className="pt-2 border-t border-slate-800/60">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">
-                      Vehículos Registrados ({client.vehicles.length})
-                    </span>
-                    <div className="space-y-1.5">
-                      {client.vehicles.map((v) => (
-                        <div
-                          key={v.id}
-                          className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/60 px-3 py-2 text-xs"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-slate-100 bg-slate-800 px-2 py-0.5 rounded-md border border-slate-700">
-                              {v.plate}
-                            </span>
-                            <span className="text-slate-300">
-                              {v.brand} {v.model} {v.year ? `(${v.year})` : ''}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="font-mono text-[11px] text-slate-400">
-                              {v.current_mileage.toLocaleString()} km
-                            </span>
-                            <a
-                              href={`/auto/${v.plate}`}
-                              target="_blank"
-                              className="text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 hover:underline"
-                            >
-                              Ficha ↗
-                            </a>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {filteredClients.map((client) => (
+            <ClientCardItem
+              key={client.clientKey}
+              client={client}
+              tenantId={activeTenantId}
+              tenantName={tenantData?.name || ''}
+              updateAction={updateClientAction}
+            />
+          ))}
         </div>
       )}
     </div>
