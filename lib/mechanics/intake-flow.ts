@@ -107,3 +107,59 @@ export function formatHandoverWhatsAppMessage(params: HandoverMessageParams): st
 
   return lines.join('\n');
 }
+
+export interface ExpressWorkOrderInput {
+  vehicleId: string;
+  technicianName: string;
+  orderNumber?: string;
+  mileage: number;
+  items: WorkOrderItem[];
+  recommendations?: string;
+}
+
+export interface PreparedWorkOrderPayload {
+  vehicleId: string;
+  orderNumber: string;
+  technicianName: string;
+  serviceDate: string;
+  mileage: number;
+  cost: number;
+  nextMileage: number;
+  nextDate: string;
+  selectedOperations: string[];
+  items: WorkOrderItem[];
+  recommendations: string;
+}
+
+/**
+ * Prepares a complete work order payload for express maintenance,
+ * automatically computing next service milestone (+5,000 km) and total cost.
+ */
+export function prepareExpressWorkOrderPayload(
+  input: ExpressWorkOrderInput
+): PreparedWorkOrderPayload {
+  const { vehicleId, technicianName, mileage, items, recommendations = '' } = input;
+  const orderNumber = input.orderNumber || `OT-${Math.floor(1000 + Math.random() * 9000)}`;
+  const totalCost = items.reduce((acc, item) => acc + (Number(item.cost) || 0), 0);
+  const nextMileage = mileage + 5000;
+
+  const nextDateObj = new Date();
+  nextDateObj.setMonth(nextDateObj.getMonth() + 3);
+  const nextDate = nextDateObj.toISOString().slice(0, 10);
+  const serviceDate = new Date().toISOString().slice(0, 10);
+
+  return {
+    vehicleId,
+    orderNumber,
+    technicianName: technicianName.trim() || 'Técnico de Taller',
+    serviceDate,
+    mileage,
+    cost: totalCost,
+    nextMileage,
+    nextDate,
+    selectedOperations: ['Servicio Express de Mantenimiento'],
+    items,
+    recommendations: recommendations.trim(),
+  };
+}
+
