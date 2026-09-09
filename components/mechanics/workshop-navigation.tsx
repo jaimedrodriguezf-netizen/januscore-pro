@@ -24,6 +24,11 @@ export function WorkshopNavigation({
       active: pathname === '/workshop',
     },
     {
+      name: '👥 Clientes',
+      href: `/workshop/clients${queryParam}`,
+      active: pathname === '/workshop/clients',
+    },
+    {
       name: '📚 Catálogo OEM 100+',
       href: `/workshop/templates${queryParam}`,
       active: pathname === '/workshop/templates',
