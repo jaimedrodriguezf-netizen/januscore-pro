@@ -57,14 +57,14 @@ export function VehicleRegistrationForm({
 
   // Real-time duplicate plate check
   useEffect(() => {
-    const trimmedPlate = plate.trim();
-    if (trimmedPlate.length < 3) {
-      setPlateStatus('idle');
-      setDuplicateVehicle(null);
-      return;
-    }
-
     const timer = setTimeout(async () => {
+      const trimmedPlate = plate.trim();
+      if (trimmedPlate.length < 3) {
+        setPlateStatus('idle');
+        setDuplicateVehicle(null);
+        return;
+      }
+
       setPlateStatus('checking');
       try {
         const res = await fetch(
@@ -92,14 +92,14 @@ export function VehicleRegistrationForm({
 
   // Real-time client identification lookup (Cédula 10 digits or RUC 13 digits)
   useEffect(() => {
-    const cleaned = ownerIdentification.trim().replace(/\D/g, '');
-    if (cleaned.length !== 10 && cleaned.length !== 13) {
-      setIdLookupStatus('idle');
-      setIdLookupBadge(null);
-      return;
-    }
-
     const timer = setTimeout(async () => {
+      const cleaned = ownerIdentification.trim().replace(/\D/g, '');
+      if (cleaned.length !== 10 && cleaned.length !== 13) {
+        setIdLookupStatus('idle');
+        setIdLookupBadge(null);
+        return;
+      }
+
       setIdLookupStatus('checking');
       try {
         const res = await fetch(

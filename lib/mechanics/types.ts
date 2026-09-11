@@ -33,6 +33,7 @@ export interface MaintenanceRecord {
   technician_name?: string;
   cost?: number;
   status: 'completed' | 'in_progress';
+  order_number?: string;
   next_service_date?: string;
   next_service_mileage?: number;
   created_at: string;

@@ -11,6 +11,7 @@ import { WorkshopIntakeFlow } from '@/components/mechanics/workshop-intake-flow'
 import { WorkshopNavigation } from '@/components/mechanics/workshop-navigation';
 import { sanitizeSlug, type WorkshopProfile } from '@/lib/mechanics/workshop-profile';
 import { CopyButton } from '@/components/ui/copy-button';
+import { peekNextWorkOrderNumber, getNextWorkOrderNumber } from '@/lib/mechanics/sequences';
 
 export const dynamic = 'force-dynamic';
 
@@ -110,7 +111,7 @@ export default async function WorkshopAdminPage({
   // Fetch vehicles in this tenant
   let vehicleQuery = supabase
     .from('vehicles')
-    .select('*, maintenance_records(id, service_date, mileage, service_type, next_service_mileage, next_service_date)')
+    .select('*, maintenance_records(id, service_date, mileage, service_type, next_service_mileage, next_service_date, order_number)')
     .eq('tenant_id', activeTenantId)
     .order('updated_at', { ascending: false });
 
@@ -122,6 +123,9 @@ export default async function WorkshopAdminPage({
   }
 
   const { data: vehicles } = await vehicleQuery;
+
+  // Peek next consecutive work order number
+  const nextOrderNumber = await peekNextWorkOrderNumber(supabase, activeTenantId);
 
   // If printing a specific vehicle sticker
   let printStickerQr: string | null = null;
@@ -191,7 +195,14 @@ export default async function WorkshopAdminPage({
     'use server';
     const supabase = await createSupabaseServerClient();
     const vehicleId = String(formData.get('vehicleId') || '');
-    const orderNumber = String(formData.get('orderNumber') || '');
+    let orderNumber = String(formData.get('orderNumber') || '').trim();
+    if (!orderNumber || orderNumber === nextOrderNumber || orderNumber.startsWith('OT-')) {
+      const allocated = await getNextWorkOrderNumber(supabase, activeTenantId);
+      if (allocated) {
+        orderNumber = allocated;
+      }
+    }
+
     const technicianName = String(formData.get('technicianName') || '');
     const serviceDate = String(formData.get('serviceDate') || new Date().toISOString());
     const mileage = Number(formData.get('mileage')) || 0;
@@ -231,6 +242,7 @@ export default async function WorkshopAdminPage({
       status: 'completed',
       next_service_mileage: nextMileage,
       next_service_date: nextDate || null,
+      order_number: orderNumber,
     });
 
     if (mErr) {
@@ -246,7 +258,7 @@ export default async function WorkshopAdminPage({
     }
 
     revalidatePath('/workshop');
-    redirect(`/workshop?tenantId=${activeTenantId}&print=${vehicleId}&ok=Orden%20de%20trabajo%20${orderNumber}%20guardada%20exitosamente`);
+    redirect(`/workshop?tenantId=${activeTenantId}&print=${vehicleId}&ok=Orden%20de%20trabajo%20${encodeURIComponent(orderNumber)}%20guardada%20exitosamente`);
   }
 
   const totalVehicles = vehicles?.length ?? 0;
@@ -431,6 +443,7 @@ export default async function WorkshopAdminPage({
       <WorkshopIntakeFlow
         vehicles={vehicles || []}
         activeTenantId={activeTenantId}
+        suggestedOrderNumber={nextOrderNumber}
         createVehicleAction={createVehicleAction}
         saveWorkOrderAction={saveWorkOrderAction}
       />

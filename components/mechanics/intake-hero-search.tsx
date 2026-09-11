@@ -137,7 +137,7 @@ export function IntakeHeroSearch({
               ) : (
                 <div className="rounded-xl border border-dashed border-slate-700 bg-slate-950/40 p-6 text-center space-y-3">
                   <p className="text-xs text-slate-400">
-                    No encontramos ningún vehículo registrado que coincida con <strong className="text-slate-200">"{query}"</strong>.
+                    No encontramos ningún vehículo registrado que coincida con <strong className="text-slate-200">&ldquo;{query}&rdquo;</strong>.
                   </p>
                   <button
                     type="button"

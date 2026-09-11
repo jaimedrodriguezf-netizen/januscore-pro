@@ -139,7 +139,7 @@ export function prepareExpressWorkOrderPayload(
   input: ExpressWorkOrderInput
 ): PreparedWorkOrderPayload {
   const { vehicleId, technicianName, mileage, items, recommendations = '' } = input;
-  const orderNumber = input.orderNumber || `OT-${Math.floor(1000 + Math.random() * 9000)}`;
+  const orderNumber = input.orderNumber || 'OT-0001';
   const totalCost = items.reduce((acc, item) => acc + (Number(item.cost) || 0), 0);
   const nextMileage = mileage + 5000;
 

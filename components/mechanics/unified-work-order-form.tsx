@@ -12,6 +12,7 @@ interface UnifiedWorkOrderFormProps {
   selectedVehicle?: Vehicle | null;
   initialItems?: WorkOrderItem[];
   initialRecommendations?: string;
+  suggestedOrderNumber?: string;
   onSaveWorkOrderAction: (formData: FormData) => Promise<void>;
   onBackToDiagnosis?: () => void;
 }
@@ -22,14 +23,13 @@ export function UnifiedWorkOrderForm({
   selectedVehicle,
   initialItems = [],
   initialRecommendations = '',
+  suggestedOrderNumber = 'OT-0001',
   onSaveWorkOrderAction,
   onBackToDiagnosis,
 }: UnifiedWorkOrderFormProps) {
   const [mode, setMode] = useState<'express' | 'full'>('express');
-  const [vehicleId, setVehicleId] = useState<string>(selectedVehicle?.id || vehicles[0]?.id || '');
-  const [orderNumber, setOrderNumber] = useState<string>(
-    `OT-${Math.floor(1000 + Math.random() * 9000)}`
-  );
+  const [vehicleId] = useState<string>(selectedVehicle?.id || vehicles[0]?.id || '');
+  const [orderNumber, setOrderNumber] = useState<string>(suggestedOrderNumber);
   const [technicianName, setTechnicianName] = useState<string>('Fabricio Pilozo');
   const [mileage, setMileage] = useState<number>(selectedVehicle?.current_mileage || 0);
   const [items, setItems] = useState<WorkOrderItem[]>(
@@ -153,6 +153,7 @@ export function UnifiedWorkOrderForm({
         <WorkOrderForm
           vehicles={vehicles}
           activeTenantId={activeTenantId}
+          suggestedOrderNumber={orderNumber}
           onSaveWorkOrderAction={onSaveWorkOrderAction}
         />
       ) : (

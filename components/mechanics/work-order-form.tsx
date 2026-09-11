@@ -14,16 +14,18 @@ import type { Vehicle } from '@/lib/mechanics/types';
 interface WorkOrderFormProps {
   vehicles: Vehicle[];
   activeTenantId?: string;
+  suggestedOrderNumber?: string;
   onSaveWorkOrderAction: (formData: FormData) => Promise<void>;
 }
 
 export function WorkOrderForm({
   vehicles,
   activeTenantId,
+  suggestedOrderNumber = 'OT-0001',
   onSaveWorkOrderAction,
 }: WorkOrderFormProps) {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>(vehicles[0]?.id || '');
-  const [orderNumber, setOrderNumber] = useState<string>('01127');
+  const [orderNumber, setOrderNumber] = useState<string>(suggestedOrderNumber);
   const [technicianName, setTechnicianName] = useState<string>('Fabricio Pilozo');
   const [serviceDate, setServiceDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [mileage, setMileage] = useState<number>(vehicles[0]?.current_mileage || 60036);

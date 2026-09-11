@@ -11,6 +11,7 @@ import { UnifiedWorkOrderForm } from './unified-work-order-form';
 interface WorkshopIntakeFlowProps {
   vehicles: Vehicle[];
   activeTenantId: string;
+  suggestedOrderNumber?: string;
   createVehicleAction: (formData: FormData) => Promise<void>;
   saveWorkOrderAction: (formData: FormData) => Promise<void>;
 }
@@ -18,6 +19,7 @@ interface WorkshopIntakeFlowProps {
 export function WorkshopIntakeFlow({
   vehicles,
   activeTenantId,
+  suggestedOrderNumber,
   createVehicleAction,
   saveWorkOrderAction,
 }: WorkshopIntakeFlowProps) {
@@ -130,6 +132,7 @@ export function WorkshopIntakeFlow({
           selectedVehicle={selectedVehicle}
           initialItems={prefilledItems}
           initialRecommendations={prefilledRecommendations}
+          suggestedOrderNumber={suggestedOrderNumber}
           onSaveWorkOrderAction={saveWorkOrderAction}
           onBackToDiagnosis={() => setStep('diagnosis')}
         />
