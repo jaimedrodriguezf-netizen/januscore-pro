@@ -18,4 +18,18 @@ if (fs.existsSync(standaloneDir)) {
     fs.cpSync(staticSrc, staticDest, { recursive: true });
     console.log("[Standalone] Copied .next/static/ -> .next/standalone/.next/static/");
   }
+
+  // Ensure @swc helpers are linked in standalone node_modules for Turbopack runtime
+  const standaloneNodeModules = path.join(standaloneDir, "node_modules");
+  const pnpmSwc = path.join(standaloneNodeModules, ".pnpm", "node_modules", "@swc");
+  const targetSwc = path.join(standaloneNodeModules, "@swc");
+  if (fs.existsSync(pnpmSwc) && !fs.existsSync(targetSwc)) {
+    try {
+      fs.symlinkSync(".pnpm/node_modules/@swc", targetSwc);
+      console.log("[Standalone] Linked @swc -> .pnpm/node_modules/@swc");
+    } catch (e) {
+      console.warn("[Standalone] Could not symlink @swc:", e.message);
+    }
+  }
 }
+
