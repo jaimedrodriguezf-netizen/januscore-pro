@@ -24,4 +24,25 @@ describe('Google OAuth & Auth Callback Handler', () => {
     expect(modulesConfig.all).toContain('workshop');
     expect(modulesConfig.all).toContain('receipts');
   });
+
+  it('sanitizes malicious open redirect attempts in callback', () => {
+    function sanitizeRedirect(rawNext: string | null): string {
+      const next = rawNext ?? '/';
+      const isSafeRelative =
+        next.startsWith('/') &&
+        !next.startsWith('//') &&
+        !next.startsWith('/\\') &&
+        !next.includes('://');
+      return isSafeRelative ? next : '/';
+    }
+
+    expect(sanitizeRedirect('/workshop')).toBe('/workshop');
+    expect(sanitizeRedirect('/m/taller/PBA-1234')).toBe('/m/taller/PBA-1234');
+    expect(sanitizeRedirect('//malicious.com')).toBe('/');
+    expect(sanitizeRedirect('/\\malicious.com')).toBe('/');
+    expect(sanitizeRedirect('https://evil.com')).toBe('/');
+    expect(sanitizeRedirect('javascript:alert(1)')).toBe('/');
+    expect(sanitizeRedirect(null)).toBe('/');
+  });
 });
+

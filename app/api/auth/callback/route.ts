@@ -6,20 +6,18 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
-  const next = requestUrl.searchParams.get('next') ?? '/';
-
-  // Support reverse proxy headers in cloud hosting (Hostinger Nginx)
-  const forwardedHost = request.headers.get('x-forwarded-host');
-  const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
-  const origin = forwardedHost
-    ? `${forwardedProto}://${forwardedHost}`
-    : requestUrl.origin;
+  const rawNext = requestUrl.searchParams.get('next') ?? '/';
+  const isSafeRelative =
+    rawNext.startsWith('/') &&
+    !rawNext.startsWith('//') &&
+    !rawNext.startsWith('/\\') &&
+    !rawNext.includes('://');
+  const targetPath = isSafeRelative ? rawNext : '/';
 
   if (code) {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      const targetPath = next.startsWith('/') ? next : `/${next}`;
       return new NextResponse(null, {
         status: 302,
         headers: {
