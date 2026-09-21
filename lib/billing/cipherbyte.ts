@@ -91,6 +91,45 @@ export async function lookupTaxId(
   }
 }
 
+/**
+ * Atomically resolves consecutive SRI invoice number for a tenant, establishment, and emission point.
+ * Uses database RPC `get_next_invoice_sequence` or establishment-scoped fallback count.
+ */
+export async function getNextInvoiceNumber(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  tenantId: string,
+  establishment: string = '001',
+  emissionPoint: string = '001'
+): Promise<string> {
+  const est = (establishment || '001').trim().padStart(3, '0').slice(-3);
+  const pto = (emissionPoint || '001').trim().padStart(3, '0').slice(-3);
+
+  try {
+    const { data, error } = await supabase.rpc('get_next_invoice_sequence', {
+      p_tenant_id: tenantId,
+      p_establishment: est,
+      p_emission_point: pto,
+    });
+    if (!error && data && typeof data === 'string') {
+      return data;
+    }
+  } catch {}
+
+  // Fallback if RPC not yet executed: count with establishment-pto prefix filter
+  try {
+    const prefix = `${est}-${pto}-`;
+    const { count } = await supabase
+      .from('invoices')
+      .select('*', { count: 'exact', head: true })
+      .eq('tenant_id', tenantId)
+      .like('invoice_number', `${prefix}%`);
+    return formatInvoiceNumber(est, pto, (count || 0) + 1);
+  } catch {
+    return formatInvoiceNumber(est, pto, 1);
+  }
+}
+
 export async function emitElectronicInvoice(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
@@ -127,17 +166,12 @@ export async function emitElectronicInvoice(
     };
   }
 
-  // 2. Count existing invoices for sequence
-  const { count } = await supabase
-    .from('invoices')
-    .select('*', { count: 'exact', head: true })
-    .eq('tenant_id', payload.tenant_id);
-
-  const nextSequence = (count || 0) + 1;
-  const invoiceNumber = formatInvoiceNumber(
+  // 2. Atomically resolve consecutive invoice number
+  const invoiceNumber = await getNextInvoiceNumber(
+    supabase,
+    payload.tenant_id,
     billingConfig.establishment_code || '001',
-    billingConfig.emission_point_code || '001',
-    nextSequence
+    billingConfig.emission_point_code || '001'
   );
 
   const totals = calculateInvoiceTotals(payload.items);

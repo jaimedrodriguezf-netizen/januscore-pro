@@ -35,4 +35,39 @@ describe('CipherByte Electronic Invoicing Service', () => {
     const formatted2 = formatInvoiceNumber('002', '005', 1058);
     expect(formatted2).toBe('002-005-000001058');
   });
+
+  it('atomically resolves next invoice number via RPC', async () => {
+    const { getNextInvoiceNumber } = await import('@/lib/billing/cipherbyte');
+    const mockSupabase = {
+      rpc: vi.fn().mockResolvedValue({
+        data: '001-001-000000150',
+        error: null,
+      }),
+    };
+
+    const nextNumber = await getNextInvoiceNumber(mockSupabase, 'tenant-123', '001', '001');
+    expect(nextNumber).toBe('001-001-000000150');
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('get_next_invoice_sequence', {
+      p_tenant_id: 'tenant-123',
+      p_establishment: '001',
+      p_emission_point: '001',
+    });
+  });
+
+  it('falls back to scoped establishment count if RPC is unavailable', async () => {
+    const { getNextInvoiceNumber } = await import('@/lib/billing/cipherbyte');
+    const mockSupabase = {
+      rpc: vi.fn().mockRejectedValue(new Error('RPC missing')),
+      from: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            like: vi.fn().mockResolvedValue({ count: 9 }),
+          }),
+        }),
+      }),
+    };
+
+    const nextNumber = await getNextInvoiceNumber(mockSupabase, 'tenant-123', '002', '001');
+    expect(nextNumber).toBe('002-001-000000010');
+  });
 });

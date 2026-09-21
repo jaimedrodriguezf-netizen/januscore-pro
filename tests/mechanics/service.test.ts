@@ -52,4 +52,31 @@ describe('Mechanics Domain Service', () => {
     // Case 3: Exceeded date
     expect(isServiceDue(48000, new Date('2026-12-15'), nextService)).toBe(true);
   });
+
+  it('accurately infers ServiceType from explicit values, operations, and items', async () => {
+    const { inferServiceType } = await import('@/lib/mechanics/service');
+
+    // Explicit valid type
+    expect(inferServiceType('oil_change')).toBe('oil_change');
+    expect(inferServiceType('brakes')).toBe('brakes');
+
+    // Inferred from operations
+    expect(inferServiceType(null, ['ABC de motor completo', 'Cambio de bujías'])).toBe('full_abc');
+    expect(inferServiceType(null, ['Cambio de pastillas de freno'])).toBe('brakes');
+    expect(inferServiceType(null, ['Revisión y cambio de amortiguadores'])).toBe('suspension');
+    expect(inferServiceType(null, ['Alineación y balanceo computarizado'])).toBe('alignment_balancing');
+    expect(inferServiceType(null, ['Cambio de aceite de motor y filtro'])).toBe('oil_change');
+
+    // Inferred from items
+    expect(
+      inferServiceType(null, [], [
+        { name: 'Aceite sintético 5W-30', spec: 'dexos1' },
+        { name: 'Pastillas de freno delanteras', spec: 'Cerámica' },
+      ])
+    ).toBe('full_abc');
+
+    // Default fallback
+    expect(inferServiceType(null, [], [])).toBe('general_repair');
+  });
 });
+

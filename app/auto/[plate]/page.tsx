@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { formatPlate, isServiceDue, getNextServicePlan } from '@/lib/mechanics/service';
+import { formatPlate, updatePublicOdometer } from '@/lib/mechanics/service';
 import { MileageTrackerForm } from '@/components/mechanics/mileage-tracker-form';
 import type { MaintenanceRecord, Vehicle } from '@/lib/mechanics/types';
 import { APP_VERSION } from '@/lib/version';
@@ -70,22 +70,6 @@ export default async function VehiclePublicPage({
   const records = (recordsData ?? []) as MaintenanceRecord[];
   const latestRecord = records[0];
 
-  const hasNextService = latestRecord && (latestRecord.next_service_mileage || latestRecord.next_service_date);
-  const due = latestRecord
-    ? isServiceDue(vehicle.current_mileage, new Date(), {
-        nextMileage: latestRecord.next_service_mileage,
-        nextDate: latestRecord.next_service_date,
-      })
-    : false;
-
-  const nextPlan = getNextServicePlan({
-    nextMileage: latestRecord?.next_service_mileage,
-    currentMileage: vehicle.current_mileage,
-    nextDate: latestRecord?.next_service_date,
-    brand: vehicle.brand,
-    model: vehicle.model,
-  });
-
   const serviceLabels: Record<string, string> = {
     oil_change: 'Cambio de Aceite y Filtros',
     brakes: 'Mantenimiento de Frenos',
@@ -104,13 +88,11 @@ export default async function VehiclePublicPage({
     const m = Number(formData.get('mileage')) || 0;
 
     if (vId && m > 0) {
-      await supabase
-        .from('vehicles')
-        .update({ current_mileage: m })
-        .eq('id', vId);
-
-      revalidatePath(`/auto/${p}`);
-      revalidatePath('/workshop');
+      const res = await updatePublicOdometer(supabase, vId, m);
+      if (res.success) {
+        revalidatePath(`/auto/${p}`);
+        revalidatePath('/workshop');
+      }
     }
   }
 

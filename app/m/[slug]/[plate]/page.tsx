@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { revalidatePath } from 'next/cache';
 import { notFound } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { formatPlate, isServiceDue, getNextServicePlan } from '@/lib/mechanics/service';
+import { formatPlate, updatePublicOdometer } from '@/lib/mechanics/service';
 import { MileageTrackerForm } from '@/components/mechanics/mileage-tracker-form';
 import { WorkshopProfileCard } from '@/components/mechanics/workshop-profile-card';
 import type { MaintenanceRecord, Vehicle } from '@/lib/mechanics/types';
@@ -108,14 +108,12 @@ export default async function WorkshopBrandedVehiclePage({
     const m = Number(formData.get('mileage')) || 0;
 
     if (vId && m > 0) {
-      await supabase
-        .from('vehicles')
-        .update({ current_mileage: m })
-        .eq('id', vId);
-
-      revalidatePath(`/m/${slug}/${p}`);
-      revalidatePath(`/auto/${p}`);
-      revalidatePath('/workshop');
+      const res = await updatePublicOdometer(supabase, vId, m);
+      if (res.success) {
+        revalidatePath(`/m/${slug}/${p}`);
+        revalidatePath(`/auto/${p}`);
+        revalidatePath('/workshop');
+      }
     }
   }
 

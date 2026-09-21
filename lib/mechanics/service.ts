@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ServiceType, NextServiceCalculation } from './types';
 
 /**
@@ -67,6 +68,54 @@ export function calculateNextService(params: {
 }
 
 /**
+ * Infers valid PostgreSQL ServiceType from explicit input, operations, or items.
+ */
+export function inferServiceType(
+  rawServiceType?: string | null,
+  operations: string[] = [],
+  items: { name: string; spec?: string }[] = []
+): ServiceType {
+  const validTypes: ServiceType[] = [
+    'oil_change',
+    'brakes',
+    'suspension',
+    'full_abc',
+    'alignment_balancing',
+    'general_repair',
+  ];
+
+  if (rawServiceType && validTypes.includes(rawServiceType as ServiceType)) {
+    return rawServiceType as ServiceType;
+  }
+
+  const allText = [...operations, ...items.map((i) => `${i.name} ${i.spec || ''}`)]
+    .join(' ')
+    .toLowerCase();
+
+  if (
+    allText.includes('abc') ||
+    (allText.includes('aceite') && (allText.includes('freno') || allText.includes('bujía') || allText.includes('bujia')))
+  ) {
+    return 'full_abc';
+  }
+  if (allText.includes('freno') || allText.includes('pastilla') || allText.includes('disco')) {
+    return 'brakes';
+  }
+  if (allText.includes('suspensi') || allText.includes('amortiguador') || allText.includes('rótula') || allText.includes('rotula')) {
+    return 'suspension';
+  }
+  if (allText.includes('alineaci') || allText.includes('balanceo')) {
+    return 'alignment_balancing';
+  }
+  if (allText.includes('aceite') || allText.includes('filtro')) {
+    return 'oil_change';
+  }
+
+  return 'general_repair';
+}
+
+
+/**
  * Check if maintenance is due or overdue based on current vehicle status.
  */
 export function isServiceDue(
@@ -118,7 +167,8 @@ export function getNextServicePlan(params: {
   const isMajor40k = nextMileage % 40000 === 0;
   const isIntermediate20k = nextMileage % 20000 === 0;
 
-  let title = `Mantenimiento Preventivo (${nextMileage.toLocaleString()} km)`;
+  const vehicleSuffix = brand && model ? ` - ${brand} ${model}` : '';
+  let title = `Mantenimiento Preventivo (${nextMileage.toLocaleString()} km)${vehicleSuffix}`;
   let typeBadge = 'Preventivo Regular';
   let items: string[] = [
     'Cambio de aceite de motor sintético 100% de alta graduación',
@@ -180,3 +230,50 @@ export function getNextServicePlan(params: {
     recommendation,
   };
 }
+
+export interface UpdateOdometerResult {
+  success: boolean;
+  error?: string;
+  previousMileage?: number;
+  newMileage?: number;
+}
+
+/**
+ * Updates vehicle odometer via secure public RPC with anti-rollback validation.
+ */
+export async function updatePublicOdometer(
+  supabase: SupabaseClient,
+  vehicleId: string,
+  mileage: number
+): Promise<UpdateOdometerResult> {
+  if (!vehicleId || mileage <= 0) {
+    return { success: false, error: 'Datos de kilometraje o vehículo inválidos' };
+  }
+
+  try {
+    const { data, error } = await supabase.rpc('update_public_vehicle_odometer', {
+      p_vehicle_id: vehicleId,
+      p_mileage: mileage,
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    if (data && typeof data === 'object') {
+      const res = data as Record<string, unknown>;
+      return {
+        success: Boolean(res.success),
+        error: res.error ? String(res.error) : undefined,
+        previousMileage: typeof res.previous_mileage === 'number' ? res.previous_mileage : undefined,
+        newMileage: typeof res.new_mileage === 'number' ? res.new_mileage : undefined,
+      };
+    }
+
+    return { success: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Error inesperado al actualizar odómetro';
+    return { success: false, error: msg };
+  }
+}
+

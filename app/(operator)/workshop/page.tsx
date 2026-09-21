@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getAccessibleTenantIds } from '@/lib/tenancy/tenant';
-import { formatPlate } from '@/lib/mechanics/service';
+import { formatPlate, inferServiceType } from '@/lib/mechanics/service';
 import { generateVehicleQrDataUrl } from '@/lib/mechanics/qr-sticker';
 import { formatWorkOrderDescription, type WorkOrderItem } from '@/lib/mechanics/work-order';
 import { formatHandoverWhatsAppMessage } from '@/lib/mechanics/intake-flow';
@@ -229,13 +229,16 @@ export default async function WorkshopAdminPage({
       recommendations,
     });
 
+    const rawServiceType = String(formData.get('serviceType') || '');
+    const serviceType = inferServiceType(rawServiceType, selectedOperations, items);
+
     // 1. Insert maintenance record
     const { error: mErr } = await supabase.from('maintenance_records').insert({
       tenant_id: activeTenantId,
       vehicle_id: vehicleId,
       service_date: serviceDate,
       mileage,
-      service_type: 'full_abc',
+      service_type: serviceType,
       description,
       technician_name: technicianName,
       cost,
