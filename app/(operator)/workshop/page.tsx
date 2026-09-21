@@ -9,7 +9,7 @@ import { formatWorkOrderDescription, type WorkOrderItem } from '@/lib/mechanics/
 import { formatHandoverWhatsAppMessage } from '@/lib/mechanics/intake-flow';
 import { WorkshopIntakeFlow } from '@/components/mechanics/workshop-intake-flow';
 import { WorkshopNavigation } from '@/components/mechanics/workshop-navigation';
-import { sanitizeSlug, type WorkshopProfile } from '@/lib/mechanics/workshop-profile';
+import { type WorkshopProfile } from '@/lib/mechanics/workshop-profile';
 import { CopyButton } from '@/components/ui/copy-button';
 import { peekNextWorkOrderNumber, getNextWorkOrderNumber } from '@/lib/mechanics/sequences';
 
@@ -67,46 +67,6 @@ export default async function WorkshopAdminPage({
     description: tenantData?.description,
     isActive: tenantData?.is_active ?? true,
   };
-
-  async function saveWorkshopProfileAction(formData: FormData) {
-    'use server';
-    const supabase = await createSupabaseServerClient();
-    const tId = String(formData.get('tenantId') || '');
-    const name = String(formData.get('name') || '').trim();
-    const rawSlug = String(formData.get('slug') || '').trim();
-    const logoUrl = String(formData.get('logoUrl') || '').trim() || null;
-    const whatsappPhone = String(formData.get('whatsappPhone') || '').trim() || null;
-    const phone = String(formData.get('phone') || '').trim() || null;
-    const address = String(formData.get('address') || '').trim() || null;
-    const city = String(formData.get('city') || '').trim() || null;
-    const googleMapsUrl = String(formData.get('googleMapsUrl') || '').trim() || null;
-    const operatingHours = String(formData.get('operatingHours') || '').trim() || null;
-    const description = String(formData.get('description') || '').trim() || null;
-
-    const slug = sanitizeSlug(rawSlug || name);
-
-    if (tId && name && slug) {
-      await supabase
-        .from('tenants')
-        .update({
-          name,
-          slug,
-          logo_url: logoUrl,
-          whatsapp_phone: whatsappPhone,
-          phone,
-          address,
-          city,
-          google_maps_url: googleMapsUrl,
-          operating_hours: operatingHours,
-          description,
-        })
-        .eq('id', tId);
-
-      revalidatePath('/workshop');
-      revalidatePath(`/m/${slug}`);
-      redirect(`/workshop?tenantId=${tId}&ok=Perfil%20del%20taller%20actualizado%20correctamente`);
-    }
-  }
 
   // Fetch vehicles in this tenant
   let vehicleQuery = supabase

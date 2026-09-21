@@ -3,7 +3,6 @@ import {
   isValidTransition,
   assertValidTransition,
   InvalidStateTransitionError,
-  ReceiptStatus,
 } from '@/lib/review/state-machine';
 
 describe('Receipt State Machine (R6)', () => {

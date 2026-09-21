@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { APP_VERSION } from '@/lib/version';
 
@@ -13,7 +11,6 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ initialMode, initialError, initialSuccess }: LoginFormProps) {
-  const router = useRouter();
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode === 'signup' ? 'signup' : 'signin');
   const isSignUp = mode === 'signup';
 
@@ -60,7 +57,8 @@ export function LoginForm({ initialMode, initialError, initialSuccess }: LoginFo
         if (error) {
           setErrorMsg(error.message);
         } else {
-          // Hard navigation to refresh server session state
+          // Hard navigation forces a full reload to synchronize server session cookies
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
           window.location.href = '/';
         }
       }

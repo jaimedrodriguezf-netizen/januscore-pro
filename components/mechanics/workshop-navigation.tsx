@@ -20,6 +20,7 @@ export function WorkshopNavigation({
   const navItems = [
     {
       name: '📋 Órdenes & Vehículos',
+      badge: typeof totalVehicles === 'number' ? totalVehicles : undefined,
       href: `/workshop${queryParam}`,
       active: pathname === '/workshop',
     },
@@ -60,6 +61,11 @@ export function WorkshopNavigation({
             }`}
           >
             <span>{item.name}</span>
+            {item.badge !== undefined && (
+              <span className="rounded-full bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-300">
+                {item.badge}
+              </span>
+            )}
           </Link>
         ))}
       </div>

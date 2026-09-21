@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  MASTER_VEHICLE_CATALOG,
-  findMaintenanceTemplate,
-} from '@/lib/mechanics/catalog-100';
+import { findMaintenanceTemplate } from '@/lib/mechanics/catalog-100';
 
 describe('2024-2026 Latest Vehicle Releases & Photo URLs (SDD/TDD)', () => {
   it('includes 2024-2026 latest releases in Ecuador/Latam', () => {

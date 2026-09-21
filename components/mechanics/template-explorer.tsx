@@ -166,6 +166,7 @@ export function TemplateExplorer({
             {/* Vehicle Photo Banner */}
             <div className="relative h-36 w-full overflow-hidden bg-slate-950 border-b border-slate-800">
               {t.imageUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={t.imageUrl}
                   alt={`${t.brand} ${t.model}`}
@@ -260,6 +261,7 @@ export function TemplateExplorer({
             {/* Modal Image Hero Banner */}
             {activeModalTemplate.imageUrl && (
               <div className="relative h-48 w-full overflow-hidden bg-slate-950">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={activeModalTemplate.imageUrl}
                   alt={`${activeModalTemplate.brand} ${activeModalTemplate.model}`}
@@ -378,7 +380,19 @@ export function TemplateExplorer({
               </div>
             </div>
 
-            <div className="flex items-center justify-end pt-2 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-800">
+              {onSelectTemplateForWorkOrder && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelectTemplateForWorkOrder(activeModalTemplate);
+                    setActiveModalTemplate(null);
+                  }}
+                  className="rounded-xl bg-indigo-600 px-5 py-2 text-xs font-bold text-white hover:bg-indigo-500 shadow-md transition"
+                >
+                  ⚡ Aplicar a Orden de Trabajo
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setActiveModalTemplate(null)}

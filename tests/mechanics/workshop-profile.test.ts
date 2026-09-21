@@ -4,7 +4,6 @@ import {
   formatGoogleMapsUrl,
   sanitizeSlug,
   isValidSlug,
-  type WorkshopProfile,
 } from '@/lib/mechanics/workshop-profile';
 
 describe('Workshop Profile & Branded Public Routing (SDD/TDD)', () => {

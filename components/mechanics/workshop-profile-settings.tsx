@@ -149,8 +149,8 @@ export function WorkshopProfileSettings({
             </div>
           </div>
 
-          {/* Row 2: Logo URL & WhatsApp */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Row 2: Logo URL, WhatsApp & Secondary Phone */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-200">
                 Logo de la Mecánica (URL de Imagen)
@@ -164,13 +164,13 @@ export function WorkshopProfileSettings({
                 className="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-xs text-indigo-300 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden font-mono"
               />
               <p className="mt-1 text-[10px] text-slate-500">
-                Recomendado: PNG o JPG con fondo transparente o cuadrado
+                Recomendado: PNG o JPG transparente
               </p>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-200">
-                📲 Teléfono WhatsApp de Atención al Cliente *
+                📲 WhatsApp de Atención *
               </label>
               <input
                 type="text"
@@ -181,7 +181,24 @@ export function WorkshopProfileSettings({
                 className="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-xs text-emerald-300 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden font-mono font-bold"
               />
               <p className="mt-1 text-[10px] text-slate-500">
-                Este es el número al que se enviarán los agendamientos de los clientes automáticamente
+                Para agendamientos automáticos
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-200">
+                ☎️ Teléfono Fijo / Oficina (Opcional)
+              </label>
+              <input
+                type="text"
+                name="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Ej. 042123456"
+                className="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden font-mono"
+              />
+              <p className="mt-1 text-[10px] text-slate-500">
+                Contacto secundario de oficina
               </p>
             </div>
           </div>

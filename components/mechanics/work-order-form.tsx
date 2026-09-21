@@ -8,7 +8,7 @@ import {
   type WorkOrderItem,
 } from '@/lib/mechanics/work-order';
 import { CarDamageMap } from '@/components/mechanics/car-damage-map';
-import { formatDamageMarkersSummary, type DamageMarker } from '@/lib/mechanics/damage-map';
+import { type DamageMarker } from '@/lib/mechanics/damage-map';
 import type { Vehicle } from '@/lib/mechanics/types';
 
 interface WorkOrderFormProps {

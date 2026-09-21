@@ -202,6 +202,7 @@ export function TemplateCreatorForm({
           />
           {imageUrl && (
             <div className="h-12 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-700 bg-slate-950">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={imageUrl} alt="Vista previa" className="h-full w-full object-cover" />
             </div>
           )}
@@ -263,7 +264,14 @@ export function TemplateCreatorForm({
             <label className="block text-[10px] text-slate-400">Tipo de Bujía:</label>
             <select
               value={sparkPlugType}
-              onChange={(e) => setSparkPlugType(e.target.value)}
+              onChange={(e) => {
+                const t = e.target.value;
+                setSparkPlugType(t);
+                if (t === 'Iridio') setSparkPlugInterval(50000);
+                else if (t === 'Platino') setSparkPlugInterval(35000);
+                else if (t === 'Cobre / Níquel') setSparkPlugInterval(20000);
+                else setSparkPlugInterval(0);
+              }}
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 focus:border-indigo-500 focus:outline-hidden"
             >
               <option value="Iridio">Iridio (40.000 - 60.000 km)</option>
@@ -319,6 +327,20 @@ export function TemplateCreatorForm({
             />
           </div>
         </div>
+      </div>
+
+      {/* 4. Notes & Recommendations */}
+      <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-2">
+        <label className="block text-[10px] font-medium text-slate-400">
+          📝 Notas u Observaciones Técnicas (Opcional):
+        </label>
+        <input
+          type="text"
+          placeholder="Observaciones de taller o tolerancias específicas..."
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-hidden"
+        />
       </div>
 
       {/* Actions */}

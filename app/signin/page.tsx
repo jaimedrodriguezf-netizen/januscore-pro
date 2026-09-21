@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { LoginForm } from '@/app/login/login-form';
+import { LoginForm } from '@/components/auth/login-form';
 
 export const dynamic = 'force-dynamic';
 

@@ -30,8 +30,6 @@ export function Header({ userEmail, roleLabel, roleBadgeColor, onOpenSidebar }: 
     auto: 'Ficha Vehicular',
   };
 
-  const currentTitle = pathSegments.length > 0 ? titleMap[pathSegments[pathSegments.length - 1]] || 'Panel' : 'Centro de Control';
-
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-800 bg-slate-900/90 px-4 backdrop-blur-md sm:px-6">
       <div className="flex items-center gap-3">

@@ -118,7 +118,7 @@ describe('Admin Bank Public Keys Lifecycle (R14)', () => {
 
         if (table === 'qr_verifications') {
           return {
-            insert: vi.fn((payload: Record<string, unknown>) => {
+            insert: vi.fn((_payload: Record<string, unknown>) => {
               return Promise.resolve({ error: null });
             }),
           };

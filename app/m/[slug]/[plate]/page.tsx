@@ -124,6 +124,7 @@ export default async function WorkshopBrandedVehiclePage({
         <div className="mx-auto flex max-w-xl items-center justify-between">
           <Link href={`/m/${slug}`} className="flex items-center gap-2 hover:opacity-80 transition">
             {workshop.logoUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img src={workshop.logoUrl} alt={workshop.name} className="h-7 w-7 object-contain rounded-lg" />
             ) : (
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-black text-white">

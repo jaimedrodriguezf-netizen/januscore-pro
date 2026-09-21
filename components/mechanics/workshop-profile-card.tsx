@@ -45,6 +45,7 @@ export function WorkshopProfileCard({
         <div className="flex items-center gap-4">
           {workshop.logoUrl ? (
             <div className="h-16 w-16 overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 p-1 shadow-md shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={workshop.logoUrl}
                 alt={workshop.name}

@@ -2,8 +2,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { lookupTaxId } from '@/lib/billing/cipherbyte';
-import type { TenantBillingConfig } from '@/lib/billing/types';
 
 export default async function TenantBillingPage({
   params,
