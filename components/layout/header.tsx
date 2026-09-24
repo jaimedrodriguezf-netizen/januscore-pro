@@ -27,6 +27,7 @@ export function Header({ userEmail, roleLabel, roleBadgeColor, onOpenSidebar }: 
     beneficiaries: 'Cuentas Beneficiarias',
     keys: 'Claves Públicas Ed25519',
     tenants: 'Organizaciones (Superadmin)',
+    support: 'Tickets de Soporte',
     auto: 'Ficha Vehicular',
   };
 

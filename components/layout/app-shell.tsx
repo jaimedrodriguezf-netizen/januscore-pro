@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Sidebar } from './sidebar';
 import { Header } from './header';
+import { SupportWidget } from '@/components/support/support-widget';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -51,6 +52,9 @@ export function AppShell({
           </div>
         </main>
       </div>
+
+      {/* Floating support widget available to all authenticated users */}
+      <SupportWidget userEmail={userEmail} />
     </div>
   );
 }
