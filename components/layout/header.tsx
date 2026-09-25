@@ -80,6 +80,21 @@ export function Header({ userEmail, roleLabel, roleBadgeColor, onOpenSidebar }: 
         >
           <span>🔧 Taller</span>
         </Link>
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('open-support-modal'));
+            }
+          }}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/30 bg-indigo-950/40 px-3 py-1.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-900/50 hover:border-indigo-400 transition cursor-pointer"
+          title="Pedir ayuda o reportar un error"
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>🎧 Soporte</span>
+        </button>
 
         {/* Role Badge */}
         {roleLabel && (

@@ -309,6 +309,30 @@ export function Sidebar({
           ))}
         </div>
 
+        {/* Quick Support Button in Sidebar for all users */}
+        <div className="px-3 pb-2 pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('open-support-modal'));
+              }
+              if (window.innerWidth < 1024) onClose();
+            }}
+            className="flex w-full items-center justify-between rounded-xl border border-indigo-500/25 bg-indigo-950/40 px-3 py-2 text-xs font-semibold text-indigo-300 hover:bg-indigo-900/50 hover:border-indigo-400 transition cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span>Ayuda & Soporte</span>
+            </div>
+            <span className="rounded bg-indigo-500/20 px-1.5 py-0.5 text-[10px] font-mono text-indigo-300">
+              Falla / Duda
+            </span>
+          </button>
+        </div>
+
         {/* User Footer Profile & Sign Out */}
         <div className="border-t border-slate-800 p-4 bg-slate-900/80">
           <div className="mb-2">

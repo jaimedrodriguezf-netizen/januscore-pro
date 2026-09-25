@@ -42,6 +42,13 @@ export function SupportWidget({ userEmail: _userEmail }: SupportWidgetProps) {
     };
   }, []);
 
+  // Listen for global custom event to open support modal from anywhere (header, workshop navigation, sidebar)
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true);
+    window.addEventListener('open-support-modal', handleOpen);
+    return () => window.removeEventListener('open-support-modal', handleOpen);
+  }, []);
+
   // Handle Ctrl+V / Cmd+V paste of images directly when modal is open
   useEffect(() => {
     if (!isOpen) return;
@@ -149,14 +156,14 @@ export function SupportWidget({ userEmail: _userEmail }: SupportWidgetProps) {
       <button
         onClick={() => setIsOpen(true)}
         type="button"
-        className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xl shadow-indigo-950/50 backdrop-blur-md transition-all hover:scale-105 hover:bg-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-400"
+        className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full border border-indigo-500/40 bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-2xl shadow-indigo-950/70 backdrop-blur-md transition-all hover:scale-105 hover:bg-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-400 cursor-pointer"
         title="Enviar consulta o reportar un problema"
         aria-label="Soporte Técnico"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
-        <span>Soporte</span>
+        <span>🎧 Soporte</span>
       </button>
 
       {/* Modal Dialog */}

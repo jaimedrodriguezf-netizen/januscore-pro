@@ -70,18 +70,36 @@ export function WorkshopNavigation({
         ))}
       </div>
 
-      {/* Quick Public Portal Link */}
-      {workshopSlug && (
-        <a
-          href={`/m/${workshopSlug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-950/40 px-3 py-1.5 text-xs font-bold text-indigo-300 hover:bg-indigo-900/40 hover:border-indigo-400 transition"
+      {/* Quick Action Links: Public Portal & Support */}
+      <div className="flex flex-wrap items-center gap-2">
+        {workshopSlug && (
+          <a
+            href={`/m/${workshopSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-950/40 px-3 py-1.5 text-xs font-bold text-indigo-300 hover:bg-indigo-900/40 hover:border-indigo-400 transition"
+          >
+            <span>🌐 Ver Portal Público de Marca</span>
+            <span className="font-mono text-[11px] opacity-75">/m/{workshopSlug} ↗</span>
+          </a>
+        )}
+
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('open-support-modal'));
+            }
+          }}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-bold text-rose-300 hover:bg-rose-500/20 hover:border-rose-400 transition cursor-pointer"
+          title="Reportar una falla técnica o enviar consulta"
         >
-          <span>🌐 Ver Portal Público de Marca</span>
-          <span className="font-mono text-[11px] opacity-75">/m/{workshopSlug} ↗</span>
-        </a>
-      )}
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>🎧 Soporte / Reportar Falla</span>
+        </button>
+      </div>
     </div>
   );
 }
