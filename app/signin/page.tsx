@@ -10,10 +10,14 @@ export default async function SignInPage({
   searchParams: Promise<{ mode?: string; err?: string; ok?: string }>;
 }) {
   const params = await searchParams;
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data } = await supabase.auth.getUser();
+    user = data?.user || null;
+  } catch (err) {
+    console.warn('[SignInPage] Auth check failed gracefully:', err);
+  }
 
   // If already logged in, redirect directly to hub
   if (user) {

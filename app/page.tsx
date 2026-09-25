@@ -7,13 +7,22 @@ import { TenantWizard } from '@/components/onboarding/tenant-wizard';
 import { LandingPage } from '@/components/landing/landing-page';
 import { APP_VERSION } from '@/lib/version';
 
-export default async function Home() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export const dynamic = 'force-dynamic';
 
-  if (!user) {
+export default async function Home() {
+  let user = null;
+  let supabase = null;
+
+  try {
+    supabase = await createSupabaseServerClient();
+    const { data } = await supabase.auth.getUser();
+    user = data?.user || null;
+  } catch (err) {
+    console.error('[Home] Failed to load session:', err);
+    return <LandingPage />;
+  }
+
+  if (!user || !supabase) {
     return <LandingPage />;
   }
 
