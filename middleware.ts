@@ -33,89 +33,94 @@ function getClientIp(request: NextRequest): string {
 }
 
 export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  const userAgent = (request.headers.get('user-agent') || '').toLowerCase();
-  const clientIp = getClientIp(request);
-
-  // 1. Block known malicious automated vulnerability scanners
-  if (BLOCKED_BOT_AGENTS.some((bot) => userAgent.includes(bot))) {
-    return new NextResponse('Acceso denegado: Bot scanner no permitido', { status: 403 });
-  }
-
-  // 2. IP Rate Limiting against Bot Scraping & Brute Force
-  let limit = 120; // Default: 120 req / min
-  const windowMs = 60_000;
-
-  if (pathname.startsWith('/login') || pathname.startsWith('/signin') || pathname.startsWith('/api/auth')) {
-    limit = 30; // Auth: 30 req / min to prevent credential stuffing / brute force
-  } else if (pathname.startsWith('/auto') || pathname.startsWith('/m/')) {
-    limit = 60; // Public vehicle lookup: 60 req / min to prevent plate scraping
-  } else if (pathname.startsWith('/api/')) {
-    limit = 100; // API endpoints: 100 req / min
-  }
-
-  const rateLimitResult = rateLimiter.check(`${clientIp}:${pathname.split('/')[1] || 'root'}`, limit, windowMs);
-  if (!rateLimitResult.allowed) {
-    return new NextResponse(
-      JSON.stringify({
-        error: 'Demasiadas solicitudes desde tu IP. Por favor espera un momento.',
-        code: 'RATE_LIMIT_EXCEEDED',
-      }),
-      {
-        status: 429,
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Retry-After': '60',
-        },
-      }
-    );
-  }
-
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-
-  // Inject defense-in-depth security headers
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-
   try {
-    const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || FALLBACK_SUPABASE_URL;
-    const rawKey =
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-      FALLBACK_SUPABASE_ANON_KEY;
+    const pathname = request.nextUrl.pathname;
+    const userAgent = (request.headers.get('user-agent') || '').toLowerCase();
+    const clientIp = getClientIp(request);
 
-    const url = rawUrl.replace(/\s+/g, '');
-    const key = rawKey.replace(/\s+/g, '');
+    // 1. Block known malicious automated vulnerability scanners
+    if (BLOCKED_BOT_AGENTS.some((bot) => userAgent.includes(bot))) {
+      return new NextResponse('Acceso denegado: Bot scanner no permitido', { status: 403 });
+    }
 
-    const supabase = createServerClient(url, key, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
+    // 2. IP Rate Limiting against Bot Scraping & Brute Force
+    let limit = 120; // Default: 120 req / min
+    const windowMs = 60_000;
+
+    if (pathname.startsWith('/login') || pathname.startsWith('/signin') || pathname.startsWith('/api/auth')) {
+      limit = 30; // Auth: 30 req / min to prevent credential stuffing / brute force
+    } else if (pathname.startsWith('/auto') || pathname.startsWith('/m/')) {
+      limit = 60; // Public vehicle lookup: 60 req / min to prevent plate scraping
+    } else if (pathname.startsWith('/api/')) {
+      limit = 100; // API endpoints: 100 req / min
+    }
+
+    const rateLimitResult = rateLimiter.check(`${clientIp}:${pathname.split('/')[1] || 'root'}`, limit, windowMs);
+    if (!rateLimitResult.allowed) {
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Demasiadas solicitudes desde tu IP. Por favor espera un momento.',
+          code: 'RATE_LIMIT_EXCEEDED',
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Retry-After': '60',
+          },
+        }
+      );
+    }
+
+    let response = NextResponse.next({
+      request: {
+        headers: request.headers,
       },
     });
 
-    // Refreshes session token if expired and sets updated cookies on response headers
-    await supabase.auth.getUser();
-  } catch (err) {
-    console.error('[Middleware] Supabase auth session check failed gracefully:', err);
-  }
+    // Inject defense-in-depth security headers
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  return response;
+    try {
+      const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || FALLBACK_SUPABASE_URL;
+      const rawKey =
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        FALLBACK_SUPABASE_ANON_KEY;
+
+      const url = rawUrl.replace(/\s+/g, '');
+      const key = rawKey.replace(/\s+/g, '');
+
+      const supabase = createServerClient(url, key, {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+            response = NextResponse.next({
+              request,
+            });
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options)
+            );
+          },
+        },
+      });
+
+      // Refreshes session token if expired and sets updated cookies on response headers
+      await supabase.auth.getUser();
+    } catch (err) {
+      console.error('[Middleware] Supabase auth session check failed gracefully:', err);
+    }
+
+    return response;
+  } catch (fatalMiddlewareErr) {
+    console.error('[Middleware Fail-Open Catch-All]:', fatalMiddlewareErr);
+    return NextResponse.next();
+  }
 }
 
 export const config = {
