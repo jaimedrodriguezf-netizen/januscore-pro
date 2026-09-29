@@ -19,7 +19,7 @@ if (fs.existsSync(standaloneDir)) {
     console.log("[Standalone] Copied .next/static/ -> .next/standalone/.next/static/");
   }
 
-  // Ensure @swc helpers are linked in standalone node_modules for Turbopack runtime
+  // Ensure @swc helpers are linked in standalone node_modules
   const standaloneNodeModules = path.join(standaloneDir, "node_modules");
   const pnpmSwc = path.join(standaloneNodeModules, ".pnpm", "node_modules", "@swc");
   const targetSwc = path.join(standaloneNodeModules, "@swc");
@@ -31,5 +31,12 @@ if (fs.existsSync(standaloneDir)) {
       console.warn("[Standalone] Could not symlink @swc:", e.message);
     }
   }
-}
 
+  // Signal Phusion Passenger to reload application automatically
+  const tmpDir = path.join(rootDir, "tmp");
+  if (!fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir, { recursive: true });
+  }
+  fs.writeFileSync(path.join(tmpDir, "restart.txt"), new Date().toISOString() + "\n");
+  console.log("[Standalone] Touched tmp/restart.txt for Passenger reload");
+}
