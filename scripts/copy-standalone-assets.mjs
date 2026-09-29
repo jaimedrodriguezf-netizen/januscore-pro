@@ -19,16 +19,46 @@ if (fs.existsSync(standaloneDir)) {
     console.log("[Standalone] Copied .next/static/ -> .next/standalone/.next/static/");
   }
 
-  // Ensure @swc helpers are linked in standalone node_modules
+  // Ensure all packages in .pnpm are properly exposed in standalone node_modules
   const standaloneNodeModules = path.join(standaloneDir, "node_modules");
-  const pnpmSwc = path.join(standaloneNodeModules, ".pnpm", "node_modules", "@swc");
-  const targetSwc = path.join(standaloneNodeModules, "@swc");
-  if (fs.existsSync(pnpmSwc) && !fs.existsSync(targetSwc)) {
+  const pnpmDir = path.join(standaloneNodeModules, ".pnpm");
+  if (fs.existsSync(pnpmDir)) {
     try {
-      fs.symlinkSync(".pnpm/node_modules/@swc", targetSwc);
-      console.log("[Standalone] Linked @swc -> .pnpm/node_modules/@swc");
+      const pnpmEntries = fs.readdirSync(pnpmDir);
+      for (const entry of pnpmEntries) {
+        const nestedModules = path.join(pnpmDir, entry, "node_modules");
+        if (fs.existsSync(nestedModules)) {
+          const pkgs = fs.readdirSync(nestedModules);
+          for (const pkg of pkgs) {
+            if (pkg.startsWith("@")) {
+              const scopeDir = path.join(nestedModules, pkg);
+              if (fs.existsSync(scopeDir) && fs.statSync(scopeDir).isDirectory()) {
+                const scopedPkgs = fs.readdirSync(scopeDir);
+                const targetScopeDir = path.join(standaloneNodeModules, pkg);
+                if (!fs.existsSync(targetScopeDir)) {
+                  fs.mkdirSync(targetScopeDir, { recursive: true });
+                }
+                for (const scopedPkg of scopedPkgs) {
+                  const targetLink = path.join(targetScopeDir, scopedPkg);
+                  if (!fs.existsSync(targetLink)) {
+                    const relativeSrc = path.relative(path.dirname(targetLink), path.join(scopeDir, scopedPkg));
+                    fs.symlinkSync(relativeSrc, targetLink);
+                  }
+                }
+              }
+            } else {
+              const targetLink = path.join(standaloneNodeModules, pkg);
+              if (!fs.existsSync(targetLink)) {
+                const relativeSrc = path.relative(path.dirname(targetLink), path.join(nestedModules, pkg));
+                fs.symlinkSync(relativeSrc, targetLink);
+              }
+            }
+          }
+        }
+      }
+      console.log("[Standalone] Linked all .pnpm dependencies into standalone node_modules");
     } catch (e) {
-      console.warn("[Standalone] Could not symlink @swc:", e.message);
+      console.warn("[Standalone] Could not link .pnpm dependencies:", e.message);
     }
   }
 
