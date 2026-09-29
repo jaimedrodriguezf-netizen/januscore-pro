@@ -1,11 +1,12 @@
 {
   "name": "januscore-prov2",
   "version": "0.1.47",
+  "main": "server.js",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack && node scripts/copy-standalone-assets.mjs",
-    "start": "next start",
+    "start": "node server.js",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

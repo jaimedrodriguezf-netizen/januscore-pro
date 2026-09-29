@@ -58,3 +58,8 @@ next-env.d.ts
 # Project MCP config with secrets
 .agents/mcp_config.json
 .mcp.json
+
+# runtime logs and passenger
+crash.txt
+public/crash.txt
+tmp/
