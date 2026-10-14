@@ -30,6 +30,7 @@ export function LandingPage() {
           <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-slate-300">
             <a href="#soluciones" className="hover:text-indigo-400 transition">Soluciones</a>
             <a href="#modulos" className="hover:text-indigo-400 transition">Módulos</a>
+            <a href="#proyectos" className="hover:text-indigo-400 transition">Proyectos & Ecosistema</a>
             <a href="#como-funciona" className="hover:text-indigo-400 transition">Cómo Funciona</a>
             <a href="#seguridad" className="hover:text-indigo-400 transition">Seguridad</a>
           </nav>
@@ -305,6 +306,136 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* 4.5. Specialized Projects & Platforms Ecosystem */}
+      <section id="proyectos" className="border-t border-slate-800/80 bg-slate-950 py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+              Ecosistema de Software Desarrollado
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
+              Plataformas & Soluciones en Producción
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-400">
+              Sistemas web empresariales, herramientas de automatización y arquitecturas SaaS diseñadas e implementadas de punta a punta.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Project 1: DentiApp Online */}
+            <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 flex flex-col justify-between space-y-4 hover:border-indigo-500/50 hover:bg-slate-900 transition group">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600/10 border border-indigo-500/20 text-xl group-hover:scale-110 transition-transform">
+                    🦷
+                  </div>
+                  <span className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-0.5 text-[10px] font-mono font-bold text-indigo-400">
+                    SaaS Clínico
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white group-hover:text-indigo-300 transition">
+                  DentiApp Online
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Plataforma administrativa integral para clínicas odontológicas. Incluye odontograma interactivo, periodontograma y generación oficial de historias clínicas según la norma del Formulario 033 del MSP (Ecuador).
+                </p>
+                <div className="pt-2 flex flex-wrap gap-1.5">
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">Next.js SSR</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">Supabase RLS</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">Formulario 033</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">Vitest</span>
+                </div>
+              </div>
+              <div className="pt-3 border-t border-slate-800/80">
+                <a
+                  href="https://github.com/jaimedrodriguezf-netizen/dentiapp-online"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition"
+                >
+                  <span>Ver Repositorio & Arquitectura</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Project 2: Kattxo SRI Automation */}
+            <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 flex flex-col justify-between space-y-4 hover:border-emerald-500/50 hover:bg-slate-900 transition group">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600/10 border border-emerald-500/20 text-xl group-hover:scale-110 transition-transform">
+                    🧾
+                  </div>
+                  <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-mono font-bold text-emerald-400">
+                    Chrome Extension
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition">
+                  Kattxo SRI Extension
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Extensión de Google Chrome (Manifest V3) en TypeScript para descarga masiva de comprobantes XML desde el portal oficial del SRI. Integra cola de descargas con throttling inteligente y validación estricta de esquemas XML.
+                </p>
+                <div className="pt-2 flex flex-wrap gap-1.5">
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">TypeScript</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">Vite 6</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">Throttling Queue</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">Vitest</span>
+                </div>
+              </div>
+              <div className="pt-3 border-t border-slate-800/80">
+                <a
+                  href="https://github.com/jaimedrodriguezf-netizen/kattxo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition"
+                >
+                  <span>Ver Repositorio & Pruebas</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Project 3: Tenddy Shop */}
+            <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 flex flex-col justify-between space-y-4 hover:border-cyan-500/50 hover:bg-slate-900 transition group">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-600/10 border border-cyan-500/20 text-xl group-hover:scale-110 transition-transform">
+                    🛒
+                  </div>
+                  <span className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-0.5 text-[10px] font-mono font-bold text-cyan-400">
+                    E-commerce Multi-Tenant
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition">
+                  Tenddy Shop
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Plataforma de comercio electrónico y cotizaciones en tiempo real con aislamiento de carrito por tienda, importación/exportación masiva de catálogos mediante Excel/CSV y cierre directo por WhatsApp.
+                </p>
+                <div className="pt-2 flex flex-wrap gap-1.5">
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">Next.js 16</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">React 19</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">Excel / PapaParse</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-300">WhatsApp API</span>
+                </div>
+              </div>
+              <div className="pt-3 border-t border-slate-800/80">
+                <a
+                  href="https://github.com/jaimedrodriguezf-netizen/tenddy-shop"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition"
+                >
+                  <span>Ver Repositorio & Código</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 5. How It Works (3 Simple Steps) */}
       <section id="como-funciona" className="border-t border-slate-800/80 bg-slate-900/40 py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-12">
@@ -412,10 +543,14 @@ export function LandingPage() {
       {/* 8. Footer */}
       <footer className="border-t border-slate-900 bg-slate-950 py-10 text-xs text-slate-500">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
             <span className="font-extrabold text-slate-300">JanusCore Pro</span>
-            <span>•</span>
-            <span>Plataforma de Automatización de Procesos</span>
+            <span className="hidden sm:inline">•</span>
+            <span>Desarrollado por <strong>Ing. Jaime Daniel Rodríguez</strong></span>
+            <span className="hidden sm:inline">•</span>
+            <a href="https://linkedin.com/in/jaime-rodriguez-981463262" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">LinkedIn</a>
+            <span className="hidden sm:inline">•</span>
+            <a href="https://github.com/jaimedrodriguezf-netizen" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">GitHub</a>
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
