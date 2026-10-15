@@ -27,14 +27,14 @@ export const B2B_PRODUCTS: B2BProduct[] = [
   {
     id: 'januscore-verify',
     name: 'JanusCore Verify & Security',
-    tagline: 'Verificación Financiera Criptográfica, Prevención Antifraude & Trazabilidad',
+    tagline: 'Verificación Financiera, Prevención Antifraude & Trazabilidad B2B',
     category: 'Fintech & Seguridad B2B',
     badgeColor: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
     icon: '🛡️',
     description:
-      'Motor B2B de verificación de comprobantes y transferencias financieras con firmas criptográficas asimétricas Ed25519, análisis OCR de imágenes, detección automática de recibos duplicados y trazabilidad inmutable mediante códigos QR interactivos con aislamiento multi-tenant RLS.',
+      'Motor B2B de verificación de comprobantes y transferencias financieras con análisis OCR de imágenes, detección automática de recibos duplicados y trazabilidad mediante códigos QR interactivos con aislamiento multi-tenant RLS.',
     highlights: [
-      'Validación criptográfica asimétrica Ed25519',
+      'Validación y auditoría antifraude de comprobantes',
       'Detección automática de comprobantes duplicados o adulterados',
       'Auditoría y revisión a cuatro ojos para control de tesorería',
       'Extracción OCR de referencias, montos y fechas bancarias',
@@ -46,7 +46,7 @@ export const B2B_PRODUCTS: B2BProduct[] = [
       'Control de acceso granular por sucursales y roles RBAC',
       'Exportación estructurada de transacciones verificadas en CSV y JSON',
     ],
-    stack: ['Next.js 16', 'TypeScript 5', 'Ed25519', 'Supabase RLS', 'PostgreSQL', 'jsQR'],
+    stack: ['Next.js 16', 'TypeScript 5', 'OCR Vision', 'Supabase RLS', 'PostgreSQL', 'jsQR'],
     repoUrl: 'https://github.com/jaimedrodriguezf-netizen/januscore-pro',
     priceModel: 'Licencia SaaS por Volumen o Implementación On-Premise',
   },
@@ -140,7 +140,7 @@ export const AI_SERVICES: AIService[] = [
       'Detección automática de comprobantes duplicados o adulterados',
       'Integración con webhooks o almacenamiento en base de datos',
     ],
-    techStack: ['Python', 'Node.js', 'jsQR / OpenCV', 'Ed25519', 'Cloud Vision'],
+    techStack: ['Python', 'Node.js', 'jsQR / OpenCV', 'OCR Pipeline', 'Cloud Vision'],
   },
   {
     id: 'llm-agents',

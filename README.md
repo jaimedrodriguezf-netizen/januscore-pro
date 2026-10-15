@@ -1,6 +1,6 @@
 # JanusCore Technologies — AI Engineering, Enterprise Automation & B2B Software Products
 
-> Plataforma centralizada de ingeniería de inteligencia artificial aplicada, automatización de operaciones críticas y comercialización de software B2B de alto rendimiento. Arquitecturas multi-tenant sobre Next.js 16, Supabase (PostgreSQL con Row Level Security) y validación criptográfica asimétrica Ed25519.
+> Plataforma centralizada de ingeniería de inteligencia artificial aplicada, automatización de operaciones críticas y comercialización de software B2B de alto rendimiento. Arquitecturas multi-tenant sobre Next.js 16 y Supabase (PostgreSQL con Row Level Security).
 
 Sitio en producción: [https://januscore.pro](https://januscore.pro)
 
@@ -16,8 +16,8 @@ Centraliza una suite de **4 productos B2B listos para producción** y ofrece **s
 
 ## 📦 Catálogo de Productos B2B Comercializados
 
-### 1. 🛡️ JanusCore Verify & Security — Motor Antifraude & Verificación Criptográfica B2B
-- **Validación Criptográfica Asimétrica:** Motor de verificación de comprobantes y transferencias mediante firmas **Ed25519** (`@noble/ed25519`).
+### 1. 🛡️ JanusCore Verify & Security — Motor Antifraude & Verificación Bancaria B2B
+- **Validación Antifraude de Comprobantes:** Motor de verificación y auditoría de transferencias y comprobantes de pago.
 - **Análisis de Imágenes & OCR a Bajo Nivel:** Procesamiento con `pngjs`, `jpeg-js` y decodificación de códigos QR de alta densidad con `jsqr`.
 - **Detección de Recibos Reutilizados:** Prevención automática de fraudes por duplicación o adulteración de comprobantes de pago.
 - **Auditoría & Revisión a Cuatro Ojos:** Flujo estricto de separación de funciones para autorización de fondos y conciliación con ERPs.
@@ -58,7 +58,7 @@ Centraliza una suite de **4 productos B2B listos para producción** y ofrece **s
 - **Frontend & App:** Next.js 16 (App Router / React Server Components) + React 19 + Tailwind CSS v4
 - **Lenguaje:** TypeScript 5 (tipado estricto)
 - **Persistencia & Seguridad:** Supabase (`@supabase/ssr`, PostgreSQL con Row Level Security)
-- **Criptografía & QR:** `@noble/ed25519`, `qrcode`, `jsqr`, `jpeg-js`, `pngjs`
+- **Seguridad & QR:** `qrcode`, `jsqr`, `jpeg-js`, `pngjs`
 - **Testing:** Vitest + Playwright
 
 ---

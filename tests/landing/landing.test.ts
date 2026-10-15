@@ -12,7 +12,7 @@ describe('Process Automation & AI Engineering Hub', () => {
       'Ingeniería de Inteligencia Artificial',
       'Automatización de Procesos Críticos',
       'Catálogo Comercial de Software B2B',
-      'Verificación Financiera & Antifraude Ed25519',
+      'Verificación Financiera & Antifraude',
       'Arquitectura Multi-Tenant Segura RLS',
     ];
 

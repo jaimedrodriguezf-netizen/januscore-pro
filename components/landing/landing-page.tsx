@@ -126,8 +126,8 @@ export function LandingPage() {
               <span className="text-xs text-slate-400">Cero Papel Operativo</span>
             </div>
             <div className="p-3">
-              <span className="block text-xl font-black text-emerald-400 font-mono">Ed25519</span>
-              <span className="text-xs text-slate-400">Firmas Antifraude</span>
+              <span className="block text-xl font-black text-emerald-400 font-mono">Antifraude</span>
+              <span className="text-xs text-slate-400">Validación de Comprobantes</span>
             </div>
             <div className="p-3">
               <span className="block text-xl font-black text-cyan-400 font-mono">Multi-Tenant</span>
@@ -398,7 +398,7 @@ export function LandingPage() {
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold shrink-0">✓</span>
-                  <span>Motor antifraude financiero con verificación de firmas Ed25519 y auditoría a cuatro ojos.</span>
+                  <span>Motor antifraude financiero con validación de comprobantes, detección de duplicados y auditoría a cuatro ojos.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold shrink-0">✓</span>
@@ -433,8 +433,8 @@ export function LandingPage() {
                   <span className="text-slate-400 mt-1 block">Aislamiento total por empresa cliente a nivel de motor de base de datos.</span>
                 </div>
                 <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4">
-                  <strong className="block text-emerald-400 font-mono">Firmas Ed25519</strong>
-                  <span className="text-slate-400 mt-1 block">Validación asimétrica de autenticidad para comprobantes y transferencias.</span>
+                  <strong className="block text-emerald-400 font-mono">Motor Antifraude</strong>
+                  <span className="text-slate-400 mt-1 block">Validación y auditoría de comprobantes y transferencias bancarias.</span>
                 </div>
                 <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4">
                   <strong className="block text-cyan-400 font-mono">Model Context Protocol</strong>
@@ -526,7 +526,7 @@ export function LandingPage() {
           <div className="pt-6 border-t border-slate-900/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-600">
             <span>© {new Date().getFullYear()} JanusCore Technologies. Todos los derechos reservados.</span>
             <div className="flex items-center gap-4">
-              <span>Next.js 16 • Supabase RLS • Ed25519</span>
+              <span>Next.js 16 • Supabase RLS • Cloud Vision</span>
             </div>
           </div>
         </div>

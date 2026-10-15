@@ -77,7 +77,7 @@ export default async function Image() {
               margin: 0,
             }}
           >
-            Plataformas listas para producción: JanusCore Verify (Ed25519) • DentiApp (MSP 033) • Kattxo (SRI) • Tenddy Shop.
+            Plataformas listas para producción: JanusCore Verify • DentiApp (MSP 033) • Kattxo (SRI) • Tenddy Shop.
           </p>
         </div>
 
@@ -93,7 +93,7 @@ export default async function Image() {
           }}
         >
           <div style={{ display: 'flex', gap: '24px', fontSize: '15px', color: '#cbd5e1' }}>
-            <span>🛡️ Firmas Criptográficas Ed25519</span>
+            <span>🛡️ Verificación Antifraude Bancaria</span>
             <span>⚡ Supabase RLS</span>
             <span>🧠 Model Context Protocol (MCP)</span>
           </div>

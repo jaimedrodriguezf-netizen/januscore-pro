@@ -125,8 +125,8 @@ export default async function Home() {
       forBusinessType: ['all', 'financial_receipts'],
     },
     {
-      title: 'Claves Públicas Ed25519',
-      description: 'Gestión y activación de claves criptográficas por banco para validación de firmas digitales QR.',
+      title: 'Claves de Bancos',
+      description: 'Gestión y activación de claves bancarias para validación de comprobantes y códigos QR.',
       href: '/settings/keys',
       badge: 'Admin',
       icon: '🔑',

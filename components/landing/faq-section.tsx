@@ -14,9 +14,9 @@ export const FAQ_ITEMS: FAQItem[] = [
       'JanusCore Technologies es un estudio de ingeniería de software especializado en el desarrollo y licenciamiento de plataformas B2B listas para producción (JanusCore Verify, DentiApp Online, Kattxo SRI, Tenddy Shop) y servicios de automatización con Inteligencia Artificial aplicada (visión artificial OCR, agentes autónomos con Model Context Protocol - MCP e integraciones ERP).',
   },
   {
-    question: '¿Cómo funciona la verificación criptográfica Ed25519 para comprobantes bancarios?',
+    question: '¿Cómo funciona la verificación antifraude para comprobantes y transferencias bancarias?',
     answer:
-      'Implementamos un motor de validación matemática asimétrica mediante curvas elípticas Ed25519 (@noble/ed25519). Al recibir un comprobante o transferencia, el sistema decodifica el código QR, extrae montos y referencias por OCR, verifica la firma digital del banco emisor y detecta de inmediato comprobantes duplicados o adulterados, eliminando el riesgo de fraude en tesorería.',
+      'Implementamos un motor de validación y auditoría automática. Al recibir un comprobante o transferencia, el sistema analiza la imagen, extrae montos y referencias por OCR, decodifica el código QR bancario y detecta de inmediato comprobantes duplicados, reutilizados o adulterados, eliminando el riesgo de fraude en tesorería.',
   },
   {
     question: '¿Qué ventajas normativas ofrece DentiApp Online para clínicas odontológicas?',
