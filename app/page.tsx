@@ -65,49 +65,12 @@ export default async function Home() {
 
   const allSections = [
     {
-      title: 'Órdenes de Trabajo & Flotas',
-      description: 'Control de vehículos, órdenes de servicio, inspección 2D de carrocería y stickers QR para parabrisas.',
-      href: '/workshop',
-      badge: 'Taller',
-      icon: '🔧',
-      color: 'border-slate-800 hover:border-indigo-500/50 bg-slate-900/60',
-      forBusinessType: ['all', 'mechanics'],
-    },
-    {
-      title: 'Catálogo OEM & Fichas 100+',
-      description: 'Catálogo oficial de más de 136 modelos con especificaciones y creador de fichas de mantenimiento.',
-      href: '/workshop/templates',
-      badge: 'Fichas',
-      icon: '📚',
-      color: 'border-slate-800 hover:border-cyan-500/50 bg-slate-900/60',
-      forBusinessType: ['all', 'mechanics'],
-    },
-    {
-      title: 'Ajustes del Taller & Marca',
-      description: 'Configuración del logo, WhatsApp oficial de agendamiento, Google Maps, horarios y enlace de marca /m/[slug].',
-      href: '/workshop/settings',
-      badge: 'Perfil',
-      icon: '⚙️',
-      color: 'border-slate-800 hover:border-emerald-500/50 bg-slate-900/60',
-      forBusinessType: ['all', 'mechanics'],
-    },
-    {
-      title: 'Plancha A4 (15 Stickers)',
-      description: 'Generación e impresión de planchas de stickers QR con los datos de contacto y logo de tu mecánica.',
-      href: '/workshop/print-sheet',
-      badge: 'Impresión',
-      icon: '🖨️',
-      color: 'border-slate-800 hover:border-blue-500/50 bg-slate-900/60',
-      forBusinessType: ['all', 'mechanics'],
-    },
-    {
       title: 'Cargar Comprobantes',
       description: 'Ingreso y procesamiento manual de comprobantes bancarios con almacenamiento inmutable y escaneo OCR y QR.',
       href: '/upload',
       badge: 'Operador',
       icon: '📥',
       color: 'border-slate-800 hover:border-blue-500/50 bg-slate-900/60',
-      forBusinessType: ['all', 'financial_receipts'],
     },
     {
       title: 'Bandeja de Comprobantes',
@@ -116,7 +79,6 @@ export default async function Home() {
       badge: 'Operador',
       icon: '📋',
       color: 'border-slate-800 hover:border-amber-500/50 bg-slate-900/60',
-      forBusinessType: ['all', 'financial_receipts'],
     },
     {
       title: 'Métricas & Reportes',
@@ -125,7 +87,6 @@ export default async function Home() {
       badge: 'Analítica',
       icon: '📊',
       color: 'border-slate-800 hover:border-purple-500/50 bg-slate-900/60',
-      forBusinessType: ['all', 'financial_receipts'],
     },
     {
       title: 'Portal de Clientes',
@@ -203,12 +164,10 @@ export default async function Home() {
             </span>
           </div>
           <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100">
-            {businessType === 'mechanics' ? 'Gestión Automotriz & Fichas QR' : 'JanusCore Pro'}
+            JanusCore Enterprise Ops
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-slate-400">
-            {businessType === 'mechanics'
-              ? 'Control de vehículos, órdenes de servicio, proyección de mantenimientos y portal de marca'
-              : 'Plataforma Integral de Verificación de Pagos, Auditoría & Control de Negocios'}
+            Plataforma Integral de Verificación de Pagos, Auditoría & Control de Negocios
           </p>
         </div>
 

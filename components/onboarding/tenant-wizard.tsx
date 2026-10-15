@@ -73,7 +73,7 @@ const BUSINESS_CONFIGS: Record<BusinessType, BusinessTypeConfig> = {
 
 export function TenantWizard({ userEmail }: TenantWizardProps) {
   const router = useRouter();
-  const [businessType, setBusinessType] = useState<BusinessType>('mechanics');
+  const [businessType, setBusinessType] = useState<BusinessType>('financial_receipts');
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
@@ -150,21 +150,7 @@ export function TenantWizard({ userEmail }: TenantWizardProps) {
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
               1. Selecciona tu Tipo de Negocio
             </label>
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-              <button
-                type="button"
-                onClick={() => setBusinessType('mechanics')}
-                className={`flex flex-col items-start rounded-xl border p-3 text-left transition ${
-                  businessType === 'mechanics'
-                    ? 'border-cyan-500 bg-cyan-500/10 text-white shadow-xs'
-                    : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:border-slate-700'
-                }`}
-              >
-                <span className="text-xl">🚗</span>
-                <span className="mt-1 text-xs font-bold text-white">Taller Mecánico</span>
-                <span className="text-[10px] text-slate-400">Órdenes, autos y QR</span>
-              </button>
-
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={() => setBusinessType('financial_receipts')}
@@ -175,8 +161,8 @@ export function TenantWizard({ userEmail }: TenantWizardProps) {
                 }`}
               >
                 <span className="text-xl">🧾</span>
-                <span className="mt-1 text-xs font-bold text-white">Comprobantes</span>
-                <span className="text-[10px] text-slate-400">Auditoría & SRI</span>
+                <span className="mt-1 text-xs font-bold text-white">Comprobantes & Auditoría</span>
+                <span className="text-[10px] text-slate-400">Verificación Ed25519 & SRI</span>
               </button>
 
               <button
@@ -188,9 +174,9 @@ export function TenantWizard({ userEmail }: TenantWizardProps) {
                     : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:border-slate-700'
                 }`}
               >
-                <span className="text-xl">🌐</span>
-                <span className="mt-1 text-xs font-bold text-white">Ambos Módulos</span>
-                <span className="text-[10px] text-slate-400">Suite integral</span>
+                <span className="text-xl">🏢</span>
+                <span className="mt-1 text-xs font-bold text-white">Empresa B2B / Automatización</span>
+                <span className="text-[10px] text-slate-400">Suite de operaciones completa</span>
               </button>
             </div>
           </div>

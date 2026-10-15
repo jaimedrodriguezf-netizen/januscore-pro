@@ -1,6 +1,6 @@
-# JanusCore Pro - Plataforma B2B de Automatización de Operaciones & Verificación Financiera
+# JanusCore Technologies — AI Engineering, Enterprise Automation & B2B Software Products
 
-> Ecosistema modular B2B para digitalización de operaciones de campo, trazabilidad automotriz y verificación antifraude de comprobantes financieros con firmas criptográficas Ed25519 y arquitectura multi-tenant sobre Next.js 16 y Supabase (PostgreSQL con Row Level Security).
+> Plataforma centralizada de ingeniería de inteligencia artificial aplicada, automatización de operaciones críticas y comercialización de software B2B de alto rendimiento. Arquitecturas multi-tenant sobre Next.js 16, Supabase (PostgreSQL con Row Level Security) y validación criptográfica asimétrica Ed25519.
 
 Sitio en producción: [https://januscore.pro](https://januscore.pro)
 
@@ -8,52 +8,58 @@ Sitio en producción: [https://januscore.pro](https://januscore.pro)
 
 ## 🎯 Visión General
 
-**JanusCore Pro** es una plataforma tecnológica diseñada para eliminar el uso de papel y los riesgos operativos en negocios tradicionales. Conecta operaciones físicas con el mundo digital mediante códigos QR interactivos, portales dedicados por marca (`/m/[slug]`), trazabilidad en tiempo real y conciliación bancaria automatizada.
+**JanusCore Technologies** es un estudio y plataforma tecnológica diseñada para eliminar el uso de papel, los cuellos de botella manuales y los riesgos de fraude en empresas tradicionales y operaciones de campo. 
+
+Centraliza una suite de **4 productos B2B listos para producción** y ofrece **servicios de ingeniería de IA y automatización desatendida** a medida para empresas que buscan escalar su eficiencia operativa.
 
 ---
 
-## 🚀 Módulos y Capacidades Principales
+## 📦 Catálogo de Productos B2B Comercializados
 
-### 1. Trazabilidad Automotriz & Talleres Mecánicos
-- **Recepción Digital sin Papel:** Mapeo interactivo 2D de carrocería y registro de inventario al ingreso del vehículo.
-- **Catálogo OEM Integrado:** Fichas técnicas preconfiguradas para más de 136 modelos de vehículos comerciales.
-- **Stickers QR para Parabrisas:** Generación e impresión de planchas A4 de stickers con QR únicos para trazabilidad del cliente sin necesidad de instalar aplicaciones.
-- **Portal de Autoservicio (`/m/[slug]`):** Espacio web donde los clientes consultan el estado de su vehículo, historial de servicios y kilometraje.
+### 1. 🛡️ JanusCore Verify & Security — Motor Antifraude & Verificación Criptográfica B2B
+- **Validación Criptográfica Asimétrica:** Motor de verificación de comprobantes y transferencias mediante firmas **Ed25519** (`@noble/ed25519`).
+- **Análisis de Imágenes & OCR a Bajo Nivel:** Procesamiento con `pngjs`, `jpeg-js` y decodificación de códigos QR de alta densidad con `jsqr`.
+- **Detección de Recibos Reutilizados:** Prevención automática de fraudes por duplicación o adulteración de comprobantes de pago.
+- **Auditoría & Revisión a Cuatro Ojos:** Flujo estricto de separación de funciones para autorización de fondos y conciliación con ERPs.
+- **Aislamiento Multi-Tenant:** Políticas estrictas de Row Level Security (RLS) en PostgreSQL para proteger la información financiera de cada empresa.
+- **Repositorio:** [github.com/jaimedrodriguezf-netizen/januscore-pro](https://github.com/jaimedrodriguezf-netizen/januscore-pro)
 
-### 2. Verificación Financiera & Antifraude (Ed25519)
-- **Validación Criptográfica:** Motor de verificación de comprobantes y transferencias mediante firmas asimétricas **Ed25519** (`@noble/ed25519`).
-- **Procesamiento de Imágenes a Bajo Nivel:** Análisis de imágenes con `pngjs`, `jpeg-js` y decodificación de códigos QR con `jsqr`.
-- **Detección de Recibos Reutilizados:** Prevención de fraudes por duplicación de comprobantes de pago.
+### 2. 🦷 DentiApp Online — SaaS Clínico Odontológico Multi-Tenant
+- **Cumplimiento Oficial Formulario 033 MSP:** Generación automatizada de historias clínicas según la normativa del Ministerio de Salud Pública (Ecuador).
+- **Odontograma & Periodontograma Interactivo:** Registro visual de piezas dentales, diagnósticos y tratamientos en tiempo real.
+- **Gestión Multi-Clínica:** Aislamiento total de historiales clínicos y roles RBAC (doctores, asistentes, administración).
+- **Repositorio:** [github.com/jaimedrodriguezf-netizen/dentiapp-online](https://github.com/jaimedrodriguezf-netizen/dentiapp-online)
 
-### 3. Arquitectura Multi-Tenant & Seguridad
-- Aislamiento total de datos por empresa cliente mediante políticas de **Row Level Security (RLS)** en PostgreSQL.
-- Control de acceso basado en roles (Platform Admin, Tenant Owner, Operador, Cliente).
-- Suite automatizada de pruebas específicas para validación de políticas RLS (`npm run test:rls`).
+### 3. 🧾 Kattxo SRI Extension — Automatización Fiscal & Extracción XML
+- **Descarga Masiva sin Bloqueos:** Extensión de Google Chrome (Manifest V3) en TypeScript con cola de throttling inteligente anti-baneo para el portal del SRI.
+- **Parseo y Validación Estricta:** Extracción y tabulación de datos de comprobantes electrónicos (retenciones, facturas).
+- **Ahorro Operativo:** Reduce hasta un 90% el tiempo de descarga manual en departamentos contables y auditorías.
+- **Repositorio:** [github.com/jaimedrodriguezf-netizen/kattxo](https://github.com/jaimedrodriguezf-netizen/kattxo)
+
+### 4. 🛒 Tenddy Shop — E-commerce B2B/B2C con Cotizador Masivo
+- **Aislamiento Multi-Tenant por Tienda:** Comercio electrónico moderno con carrito independiente y panel de control ágil.
+- **Carga Masiva Excel/CSV:** Gestión de inventarios y catálogos de miles de productos mediante hojas de cálculo.
+- **Cotizador en Tiempo Real & Cierre por WhatsApp:** Cálculo de márgenes y canalización instantánea de órdenes a chats comerciales.
+- **Repositorio:** [github.com/jaimedrodriguezf-netizen/tenddy-shop](https://github.com/jaimedrodriguezf-netizen/tenddy-shop)
+
+---
+
+## ⚡ Servicios de Ingeniería de IA & Automatización a Medida
+
+1. **Visión Artificial & OCR para Documentos:** Extracción estructurada y validación de comprobantes de pago, firmas y documentos no estructurados.
+2. **Agentes de IA & Model Context Protocol (MCP):** Integración de LLMs (OpenAI, Claude, Gemini) con bases de datos transaccionales de forma segura.
+3. **Automatización de Flujos & Sincronización ERP:** Integración desatendida entre plataformas de facturación, portales gubernamentales y sistemas ERP legacy.
+4. **Arquitecturas Cloud & Seguridad RLS:** Diseño e implementación de sistemas multi-inquilino con políticas Row Level Security en PostgreSQL.
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-- **Framework Web:** Next.js 16 (App Router / React Server Components) + React 19
+- **Frontend & App:** Next.js 16 (App Router / React Server Components) + React 19 + Tailwind CSS v4
 - **Lenguaje:** TypeScript 5 (tipado estricto)
-- **Persistencia & RLS:** Supabase (`@supabase/ssr`, `@supabase/supabase-js`, PostgreSQL)
+- **Persistencia & Seguridad:** Supabase (`@supabase/ssr`, PostgreSQL con Row Level Security)
 - **Criptografía & QR:** `@noble/ed25519`, `qrcode`, `jsqr`, `jpeg-js`, `pngjs`
-- **Estilos:** Tailwind CSS v4
-- **Testing:** Vitest 4 + Playwright (E2E)
-
----
-
-## 🧪 Pruebas Automatizadas
-
-El proyecto cuenta con suites de pruebas unitarias, de integración y de seguridad RLS:
-
-```bash
-# Ejecutar suite de pruebas generales
-npm test
-
-# Ejecutar pruebas exclusivas de aislamiento Row Level Security (RLS)
-npm run test:rls
-```
+- **Testing:** Vitest + Playwright
 
 ---
 
@@ -64,37 +70,22 @@ npm run test:rls
 - pnpm >= 9 o npm >= 10
 - Instancia activa de Supabase
 
-### 1. Clonar e instalar
 ```bash
+# Clonar repositorio
 git clone https://github.com/jaimedrodriguezf-netizen/januscore-pro.git
 cd januscore-pro
+
+# Instalar dependencias
 pnpm install
-```
 
-### 2. Variables de entorno (`.env.local`)
-```env
-NEXT_PUBLIC_SUPABASE_URL=tu_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
-```
-
-### 3. Iniciar desarrollo
-```bash
+# Iniciar servidor de desarrollo
 pnpm dev
 ```
 
 ---
 
-## 🌐 Ecosistema de Plataformas Relacionadas
+## 📄 Contacto & Licenciamiento
 
-JanusCore Pro forma parte de un ecosistema de soluciones de software empresarial desarrolladas por el mismo autor:
-- 🦷 **[DentiApp Online](https://github.com/jaimedrodriguezf-netizen/dentiapp-online):** SaaS clínico odontológico multi-tenant con cumplimiento oficial del Formulario 033 MSP (Ecuador).
-- 🧾 **[Kattxo SRI Extension](https://github.com/jaimedrodriguezf-netizen/kattxo):** Extensión de Chrome en TypeScript para descarga masiva y análisis de comprobantes XML del SRI.
-- 🛒 **[Tenddy Shop](https://github.com/jaimedrodriguezf-netizen/tenddy-shop):** E-commerce multi-tenant con cotizador en línea y procesamiento masivo con Excel/CSV.
-
----
-
-## 📄 Licencia y Autor
-
-Desarrollado y mantenido por **Ing. Jaime Daniel Rodríguez** ([jaimedrodriguezf@gmail.com](mailto:jaimedrodriguezf@gmail.com)).  
-LinkedIn: [linkedin.com/in/jaime-rodriguez-981463262](https://linkedin.com/in/jaime-rodriguez-981463262) | Portafolio: [januscore.pro](https://januscore.pro)
+Para licencias comerciales, demostraciones ejecutivas o proyectos de ingeniería a medida:
+- **Sitio Web:** [https://januscore.pro](https://januscore.pro)
+- **Email Comercial:** [jaimedrodriguezf@gmail.com](mailto:jaimedrodriguezf@gmail.com)
