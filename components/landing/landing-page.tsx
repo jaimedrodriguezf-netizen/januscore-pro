@@ -469,12 +469,12 @@ export function LandingPage() {
               <span>→</span>
             </button>
             <a
-              href="https://api.whatsapp.com/send?phone=593984606775&text=Hola%20JanusCore!%20Me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20soluciones%20de%20software%20y%20automatizaci%C3%B3n."
+              href="https://api.whatsapp.com/send?phone=593983144424&text=Hola%20JanusCore!%20Me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20soluciones%20de%20software%20y%20automatizaci%C3%B3n."
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-500/40 bg-emerald-950/30 px-6 py-4 text-sm font-semibold text-emerald-300 hover:bg-emerald-900/40 hover:text-white transition"
             >
-              <span>📲 Chat Directo por WhatsApp</span>
+              <span>📲 WhatsApp: +593 98 314 4424</span>
             </a>
           </div>
         </div>
@@ -501,6 +501,14 @@ export function LandingPage() {
               <a href="#servicios-ia" className="hover:text-white transition">Servicios IA</a>
               <a href="#soluciones" className="hover:text-white transition">Soluciones</a>
               <Link href="/signin" className="hover:text-white transition">Acceso Clientes</Link>
+              <a
+                href="https://api.whatsapp.com/send?phone=593983144424"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-400 hover:text-emerald-300 font-semibold transition"
+              >
+                WhatsApp: +593 98 314 4424
+              </a>
               <button
                 onClick={() => openLeadModal('custom')}
                 className="text-indigo-400 hover:underline"

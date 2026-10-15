@@ -88,4 +88,5 @@ pnpm dev
 
 Para licencias comerciales, demostraciones ejecutivas o proyectos de ingeniería a medida:
 - **Sitio Web:** [https://januscore.pro](https://januscore.pro)
+- **WhatsApp / Teléfono:** [+593 98 314 4424](https://wa.me/593983144424)
 - **Email Comercial:** [jaimedrodriguezf@gmail.com](mailto:jaimedrodriguezf@gmail.com)

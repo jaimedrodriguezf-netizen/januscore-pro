@@ -59,9 +59,9 @@ export function LeadModal({ isOpen, onClose, initialInterest }: LeadModalProps) 
       `• *Teléfono:* ${phone.trim() || 'No especificado'}\n` +
       (message.trim() ? `• *Detalle del requerimiento:* ${message.trim()}\n` : '');
 
-    // Default contact phone (+593984606775 or direct api link)
+    // Official contact phone (+593983144424)
     const encoded = encodeURIComponent(text);
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=593984606775&text=${encoded}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=593983144424&text=${encoded}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     onClose();
   };

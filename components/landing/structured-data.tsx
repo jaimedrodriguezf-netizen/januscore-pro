@@ -16,7 +16,7 @@ export function StructuredData() {
         contactPoint: [
           {
             '@type': 'ContactPoint',
-            telephone: '+593-984-606-775',
+            telephone: '+593-983-144-424',
             contactType: 'sales',
             areaServed: ['EC', 'LATAM', 'Worldwide'],
             availableLanguage: ['Spanish', 'English'],
