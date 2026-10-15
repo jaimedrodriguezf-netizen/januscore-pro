@@ -5,6 +5,7 @@ import robots from '@/app/robots';
 import sitemap from '@/app/sitemap';
 import manifest from '@/app/manifest';
 import { FAQ_ITEMS } from '@/components/landing/faq-section';
+import { FEATURED_CASE_STUDIES, TRUSTED_INDUSTRIES } from '@/lib/catalog/clients';
 
 describe('Process Automation & AI Engineering Hub', () => {
   it('contains core value propositions for business automation and AI engineering', () => {
@@ -110,6 +111,19 @@ describe('Process Automation & AI Engineering Hub', () => {
       expect(faq.question.length).toBeGreaterThan(15);
       expect(faq.answer.length).toBeGreaterThan(50);
     });
+  });
+
+  it('validates enterprise case studies and social proof (GM Bruño S.A.)', () => {
+    expect(FEATURED_CASE_STUDIES.length).toBeGreaterThanOrEqual(1);
+    const gmStudy = FEATURED_CASE_STUDIES.find((s) => s.id === 'gm-bruno');
+    expect(gmStudy).toBeDefined();
+    expect(gmStudy?.clientName).toBe('Importadora GM Bruño S.A.');
+    expect(gmStudy?.liveUrl).toBe('https://app.gmbruno.com');
+    expect(gmStudy?.scale).toContain('18 Sucursales');
+    expect(gmStudy?.metrics.length).toBeGreaterThanOrEqual(4);
+    expect(gmStudy?.keyModules.length).toBeGreaterThanOrEqual(4);
+
+    expect(TRUSTED_INDUSTRIES.length).toBeGreaterThanOrEqual(4);
   });
 });
 

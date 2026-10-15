@@ -7,6 +7,7 @@ import { B2B_PRODUCTS, AI_SERVICES } from '@/lib/catalog/products';
 import { LeadModal } from './lead-modal';
 import { StructuredData } from './structured-data';
 import { FAQSection } from './faq-section';
+import { CaseStudiesSection } from './case-studies-section';
 
 export function LandingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,6 +54,7 @@ export function LandingPage() {
 
           <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-slate-300">
             <a href="#productos" className="hover:text-indigo-400 transition">Productos B2B</a>
+            <a href="#casos-de-exito" className="hover:text-indigo-400 transition">Casos de Éxito</a>
             <a href="#servicios-ia" className="hover:text-indigo-400 transition">Servicios IA</a>
             <a href="#soluciones" className="hover:text-indigo-400 transition">Soluciones</a>
             <a href="#seguridad" className="hover:text-indigo-400 transition">Seguridad</a>
@@ -259,6 +261,9 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* 3.5. Case Studies & Social Proof (GM Bruño S.A.) */}
+      <CaseStudiesSection />
 
       {/* 4. AI Engineering & Custom Automation Services */}
       <section id="servicios-ia" className="py-20">

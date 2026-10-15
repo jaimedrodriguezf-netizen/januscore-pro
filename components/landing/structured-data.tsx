@@ -13,6 +13,13 @@ export function StructuredData() {
         url: 'https://januscore.pro',
         description:
           'Estudio de ingeniería de inteligencia artificial, automatización de procesos empresariales y plataforma de software B2B de misión crítica.',
+        knowsAbout: [
+          'Enterprise ERP Synchronization',
+          'Contífico ERP Integration',
+          'Inter-branch Logistics Automation',
+          'AI Engineering & OCR Vision',
+          'Multi-Tenant PostgreSQL RLS Architecture',
+        ],
         email: 'jaimedrodriguezf@gmail.com',
         contactPoint: [
           {
