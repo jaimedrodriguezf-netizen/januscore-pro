@@ -3,6 +3,8 @@ import { B2B_PRODUCTS, AI_SERVICES } from '@/lib/catalog/products';
 
 import robots from '@/app/robots';
 import sitemap from '@/app/sitemap';
+import manifest from '@/app/manifest';
+import { FAQ_ITEMS } from '@/components/landing/faq-section';
 
 describe('Process Automation & AI Engineering Hub', () => {
   it('contains core value propositions for business automation and AI engineering', () => {
@@ -88,6 +90,26 @@ describe('Process Automation & AI Engineering Hub', () => {
     const signin = items.find((i) => i.url === 'https://januscore.pro/signin');
     expect(signin).toBeDefined();
     expect(signin?.priority).toBe(0.5);
+  });
+
+  it('validates Web App Manifest for mobile discovery and PWA', () => {
+    const config = manifest();
+    expect(config.name).toBe('JanusCore Technologies — AI Engineering & B2B Software');
+    expect(config.short_name).toBe('JanusCore');
+    expect(config.start_url).toBe('/');
+    expect(config.display).toBe('standalone');
+    expect(config.theme_color).toBe('#020617');
+    expect(config.icons).toBeDefined();
+  });
+
+  it('validates comprehensive FAQ data structure for Google Rich Snippets', () => {
+    expect(FAQ_ITEMS.length).toBeGreaterThanOrEqual(5);
+    FAQ_ITEMS.forEach((faq) => {
+      expect(faq.question).toBeTruthy();
+      expect(faq.answer).toBeTruthy();
+      expect(faq.question.length).toBeGreaterThan(15);
+      expect(faq.answer.length).toBeGreaterThan(50);
+    });
   });
 });
 

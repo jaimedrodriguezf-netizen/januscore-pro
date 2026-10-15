@@ -1,5 +1,6 @@
 import React from 'react';
 import { B2B_PRODUCTS } from '@/lib/catalog/products';
+import { FAQ_ITEMS } from './faq-section';
 
 export function StructuredData() {
   const schema = {
@@ -50,6 +51,18 @@ export function StructuredData() {
           '@id': 'https://januscore.pro/#organization',
         },
       })),
+      {
+        '@type': 'FAQPage',
+        '@id': 'https://januscore.pro/#faq',
+        mainEntity: FAQ_ITEMS.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.answer,
+          },
+        })),
+      },
     ],
   };
 

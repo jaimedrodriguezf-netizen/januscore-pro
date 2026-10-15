@@ -6,6 +6,7 @@ import { APP_VERSION } from '@/lib/version';
 import { B2B_PRODUCTS, AI_SERVICES } from '@/lib/catalog/products';
 import { LeadModal } from './lead-modal';
 import { StructuredData } from './structured-data';
+import { FAQSection } from './faq-section';
 
 export function LandingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,9 +53,10 @@ export function LandingPage() {
 
           <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-slate-300">
             <a href="#productos" className="hover:text-indigo-400 transition">Productos B2B</a>
-            <a href="#servicios-ia" className="hover:text-indigo-400 transition">Servicios de IA & Automatización</a>
+            <a href="#servicios-ia" className="hover:text-indigo-400 transition">Servicios IA</a>
             <a href="#soluciones" className="hover:text-indigo-400 transition">Soluciones</a>
-            <a href="#seguridad" className="hover:text-indigo-400 transition">Seguridad & RLS</a>
+            <a href="#seguridad" className="hover:text-indigo-400 transition">Seguridad</a>
+            <a href="#faq" className="hover:text-indigo-400 transition">FAQ</a>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -447,6 +449,9 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* 6.5. FAQ Section */}
+      <FAQSection />
 
       {/* 7. Lead Capture & Direct Conversion Banner */}
       <section className="border-t border-slate-800/80 bg-slate-900/60 py-16">
